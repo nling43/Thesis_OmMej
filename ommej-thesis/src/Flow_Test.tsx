@@ -7,6 +7,9 @@ import ReactFlow, {
   Connection,
   Edge,
 } from 'reactflow';
+import styled, { ThemeProvider } from 'styled-components';
+import { darkTheme } from './theme';
+
 import 'reactflow/dist/style.css';
 import { useState, useEffect, useCallback} from 'react';
 
@@ -52,6 +55,29 @@ const start_nodes = [
     position: { x: 100, y: 100 },
   },
 ];
+const ReactFlowStyled = styled(ReactFlow)`
+  background-color: ${(props) => props.theme.bg};
+`;
+
+
+const ControlsStyled = styled(Controls)`
+  button {
+    background-color: ${(props) => props.theme.controlsBg};
+    color: ${(props) => props.theme.controlsColor};
+    border-bottom: 1px solid ${(props) => props.theme.controlsBorder};
+
+    &:hover {
+      background-color: ${(props) => props.theme.controlsBgHover};
+    }
+
+    path {
+      fill: currentColor;
+    }
+  }
+`;
+
+
+
 
 function Flow() {
   const { height, width } = useWindowDimensions();
@@ -71,17 +97,19 @@ function Flow() {
   const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), []);
 
   return (
-    <div style={{ height: height-20,  width: width-20 }}>
-      <ReactFlow 
+    <div style={{ height: height-50,  width: width }}>
+      <ThemeProvider theme={darkTheme}>
+      <ReactFlowStyled 
       nodes={nodes} 
       onNodesChange={onNodesChange}
       edges={edges}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
       >
-        <Background />
-        <Controls />
-      </ReactFlow>
+        <Background/>
+        <ControlsStyled />
+      </ReactFlowStyled>
+      </ThemeProvider>
     </div>
   );
 }

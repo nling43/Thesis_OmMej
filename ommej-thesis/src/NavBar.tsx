@@ -8,7 +8,7 @@ import './NavBar.css';
 export default function NavBar() {
   return (
     <>
-       <Navbar variant="light" bg="light" >
+       <Navbar variant="dark" bg="dark" >
       <Container fluid>
         
           <Nav>
@@ -21,7 +21,7 @@ export default function NavBar() {
                   <Form.Control
                     type="search"
                     placeholder="Search"
-                    className="me-2"
+                    className="Search"
                     aria-label="Search"
                   />
                   <Button className='button' variant="outline-success">Search</Button>
