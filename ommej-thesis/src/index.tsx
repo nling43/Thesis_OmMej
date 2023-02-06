@@ -1,9 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
 import Flow from './Flow_Test'
-import 'reactflow/dist/style.css';
 
 import reportWebVitals from './reportWebVitals';
 
