@@ -6,6 +6,7 @@ import ReactFlow, {
   addEdge,
   Connection,
   Edge,
+  Panel,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useState, useEffect, useCallback} from 'react';
