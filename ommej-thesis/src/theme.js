@@ -4,6 +4,8 @@ export const darkTheme = {
 	nodeBg: "#343435",
 	nodeColor: "#f9f9f9",
 	nodeBorder: "#888",
+	handleInputColor: "#ffff",
+
 	minimapMaskBg: "#343435",
 	controlsBg: "#555",
 	controlsBgHover: "#676768",

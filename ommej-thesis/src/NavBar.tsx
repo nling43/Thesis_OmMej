@@ -24,10 +24,10 @@ export default function NavBar() {
                     className="Search"
                     aria-label="Search"
                   />
-                  <Button className='button' variant="outline-success">Search</Button>
+                  <Button className='button' variant="success">Search</Button>
                 </Form>
-            <Button className='button' variant="outline-primary">Create Question</Button>{' '}
-            <Button className='button' variant="outline-primary">Delete Question</Button>{' '}
+            <Button className='button' variant="primary">Create Question</Button>{' '}
+            <Button className='button' variant="primary">Delete Question</Button>{' '}
           </Nav>
       </Container>
     </Navbar>
