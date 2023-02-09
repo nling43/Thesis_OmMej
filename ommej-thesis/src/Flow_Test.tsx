@@ -9,7 +9,8 @@ import ReactFlow, {
   EdgeChange,
   Connection,
   Background,
-  Controls
+  Controls,
+  Panel,
 } from 'reactflow';
 import styled, { ThemeProvider } from 'styled-components';
 import { darkTheme } from './theme';
