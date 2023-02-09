@@ -66,7 +66,7 @@ const start_nodes = [
   {
     id: '5',
     type: 'custom',
-    data: { label: 'Question 2 kdsakjndjankjdsjandanjdhvudsnfinsnfi' },
+    data: { label: 'Question 5' },
     position: { x: 200, y: 300 },
 
   },
