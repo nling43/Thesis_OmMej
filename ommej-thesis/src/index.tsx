@@ -1,17 +1,15 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Flow from './Flow_Test'
-import NavBar from './NavBar';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+import App from './App';
+
+
+import './index.css';
+
+const root = createRoot(document.getElementById('root') as HTMLElement);
+
 root.render(
-  <React.StrictMode >
-    <>
-    <NavBar />
-    <Flow />
-    </>
-  </React.StrictMode>
+  <StrictMode>
+    <App />
+  </StrictMode>
 );
