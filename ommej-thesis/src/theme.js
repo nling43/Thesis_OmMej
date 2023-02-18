@@ -1,7 +1,9 @@
 export const darkTheme = {
 	bg: "#000",
 	primary: "#ff0072",
-	nodeBg: "#343435",
+	questionBg: "#343435",
+	answerBg: "#311415",
+
 	nodeColor: "#f9f9f9",
 	nodeBorder: "#888",
 	handleInputColor: "#ffff",
