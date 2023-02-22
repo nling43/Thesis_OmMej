@@ -4,9 +4,7 @@ import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
-import axios from "axios";
 import "./NavBar.css";
-
 export default function NavBar() {
 	const [selectedFile, setSelectedFile] = useState();
 	const onChangeHandler = (event) => {
@@ -15,22 +13,18 @@ export default function NavBar() {
 		if (file.type == "application/json") {
 			setSelectedFile(file);
 		} else {
+			setSelectedFile(null);
 			alert("bad file");
 		}
 	};
-	const handleUpload = async () => {
-		console.log(selectedFile);
-		const data = new FormData();
-		data.append("file", selectedFile);
-		try {
-			await axios.post("http://localhost:8000/upload", data, {}).then((res) => {
-				console.log(res.status);
-			});
-		} catch (error) {
-			console.log(error);
-		}
+	const handleUpload = () => {
+		const reader = new FileReader();
+		reader.onload = function (e) {
+			const contents = e.target.result;
+			console.log(contents);
+		};
+		reader.readAsText(selectedFile);
 	};
-
 	return (
 		<>
 			<Navbar variant="dark" bg="dark">
