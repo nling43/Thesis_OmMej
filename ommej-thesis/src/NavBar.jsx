@@ -17,25 +17,13 @@ export default function NavBar() {
 			alert("bad file");
 		}
 	};
-	const handleUpload = () => {
-		const reader = new FileReader();
-		reader.onload = function (e) {
-			const contents = e.target.result;
-			console.log(contents);
-		};
-		reader.readAsText(selectedFile);
-	};
+
 	return (
 		<>
 			<Navbar variant="dark" bg="dark">
 				<Container fluid>
 					<Nav>
-						<input type="file" name="file" onChange={onChangeHandler} />
-						<Button
-							className="button"
-							variant="outline-primary"
-							onClick={handleUpload}
-						>
+						<Button className="button" variant="outline-primary">
 							Upload File
 						</Button>
 						<Button className="button" variant="outline-primary">
