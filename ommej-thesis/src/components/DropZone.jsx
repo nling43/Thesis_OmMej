@@ -2,7 +2,18 @@ import React, { useMemo } from "react";
 import { useDropzone } from "react-dropzone";
 import Button from "react-bootstrap/Button";
 import "../css/DropZone.css";
+
+import { shallow } from "zustand/shallow";
+import "reactflow/dist/style.css";
+import useStore from "../Store/store";
+
 export default function DropZone() {
+	const selector = (state) => ({
+		nodes: state.nodes,
+		onNodesChange: state.onNodesChange,
+	});
+	const { nodes, onNodesChange } = useStore(selector, shallow);
+
 	const {
 		acceptedFiles,
 		fileRejections,
@@ -60,31 +71,22 @@ export default function DropZone() {
 	const handleUpload = () => {
 		const reader = new FileReader();
 		reader.onload = function (e) {
-			const temp = [];
-
 			const contents = e.target.result;
 			const json = JSON.parse(contents);
 			const questions = json.questions;
 			Object.entries(questions).forEach(([key, value]) => {
-				Object.entries(value).forEach(([key, value]) => {
-					if (key === "answers") {
-						Object.entries(value).forEach(([key, value]) => {
-							Object.entries(value).forEach(([key, value]) => {
-								if (key == "tags") {
-									value.forEach((element) => {
-										if (!temp.includes(element)) {
-											temp.push(element);
-										}
-									});
-								}
-							});
-						});
-					}
-				});
+				const node = {
+					id: key,
+					data: value,
+					position: { x: 0, y: 0 },
+					type: "Question",
+				};
+				nodes.push(node);
 			});
-
-			console.log(temp);
+			onNodesChange(nodes);
 		};
+
+		console.log(nodes);
 		acceptedFiles.forEach((file) => {
 			reader.readAsText(file);
 		});
