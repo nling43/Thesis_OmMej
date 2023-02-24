@@ -25,8 +25,6 @@ import AnswerNodePeople from "./nodes/Answers/AnswerNodePeople.jsx";
 
 function getWindowDimensions() {
 	const { innerWidth: width, innerHeight: height } = window;
-	console.log("width = ", width);
-	console.log("height = ", height);
 
 	return {
 		width,

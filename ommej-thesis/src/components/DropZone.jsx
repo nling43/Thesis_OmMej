@@ -60,9 +60,30 @@ export default function DropZone() {
 	const handleUpload = () => {
 		const reader = new FileReader();
 		reader.onload = function (e) {
+			const temp = [];
+
 			const contents = e.target.result;
 			const json = JSON.parse(contents);
-			console.log(json.questions);
+			const questions = json.questions;
+			Object.entries(questions).forEach(([key, value]) => {
+				Object.entries(value).forEach(([key, value]) => {
+					if (key === "answers") {
+						Object.entries(value).forEach(([key, value]) => {
+							Object.entries(value).forEach(([key, value]) => {
+								if (key == "tags") {
+									value.forEach((element) => {
+										if (!temp.includes(element)) {
+											temp.push(element);
+										}
+									});
+								}
+							});
+						});
+					}
+				});
+			});
+
+			console.log(temp);
 		};
 		acceptedFiles.forEach((file) => {
 			reader.readAsText(file);
