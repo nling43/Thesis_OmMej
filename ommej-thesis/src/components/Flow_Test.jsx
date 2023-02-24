@@ -14,14 +14,14 @@ import ReactFlow, {
 } from "reactflow";
 import styled, { ThemeProvider } from "styled-components";
 import { darkTheme } from "../theme";
-import "./css/Flow.css";
+import "../css/Flow.css";
 
 import "reactflow/dist/style.css";
 import { useState, useEffect, useCallback } from "react";
-import QuestionNode from "./nodes/QuestionNode.jsx";
-import AnswerNodeText from "./nodes/AnswerNodeText.jsx";
-import AnswerNodeSkip from "./nodes/AnswerNodeSkip";
-import AnswerNodePeople from "./nodes/AnswerNodePeople.jsx";
+import QuestionNode from "./nodes/Question/QuestionNode.jsx";
+import AnswerNodeText from "./nodes/Answers/AnswerNodeText.jsx";
+import AnswerNodeSkip from "./nodes/Answers/AnswerNodeSkip";
+import AnswerNodePeople from "./nodes/Answers/AnswerNodePeople.jsx";
 
 function getWindowDimensions() {
 	const { innerWidth: width, innerHeight: height } = window;
