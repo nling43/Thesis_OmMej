@@ -44,10 +44,10 @@ export default function DropZone() {
 		marginInline: "auto",
 		borderWidth: 2,
 		borderRadius: 8,
-		borderColor: "#eeeeee",
+		borderColor: "#fff",
 		borderStyle: "dashed",
-		backgroundColor: "#fafafa",
-		color: "black",
+		backgroundColor: "rgb(87, 86, 86)",
+		color: "#fff",
 		outline: "none",
 		fontSize: "1.5rem",
 		transition: "border .24s ease-in-out",
@@ -75,10 +75,11 @@ export default function DropZone() {
 			const json = JSON.parse(contents);
 			const questions = json.questions;
 			Object.entries(questions).forEach(([key, value]) => {
+				const y = 200 * nodes.length;
 				const node = {
 					id: key,
 					data: value,
-					position: { x: 0, y: 0 },
+					position: { x: 0, y: y },
 					type: "Question",
 				};
 				nodes.push(node);
