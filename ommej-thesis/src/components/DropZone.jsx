@@ -79,20 +79,12 @@ export default function DropZone() {
 			const contents = e.target.result;
 			const json = JSON.parse(contents);
 			const questions = json.questions;
-<<<<<<< Updated upstream
-			Object.entries(questions).forEach(([key, value]) => {
-				const node = {
-					id: key,
-					data: value,
-					position: { x: 0, y: 0 },
-=======
 			Object.entries(questions).forEach(([id, data]) => {
 				const y = 200 * nodes.length;
 				const question = {
 					id: id,
 					data: data,
 					position: { x: 0, y: y },
->>>>>>> Stashed changes
 					type: "Question",
 				};
 				nodes.push(question);
