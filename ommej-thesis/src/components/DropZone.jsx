@@ -11,8 +11,13 @@ export default function DropZone() {
 	const selector = (state) => ({
 		nodes: state.nodes,
 		onNodesChange: state.onNodesChange,
+		edges: state.edges,
+		onEdgesChange: state.onEdgesChange,
 	});
-	const { nodes, onNodesChange } = useStore(selector, shallow);
+	const { nodes, onNodesChange, edges, onEdgesChange } = useStore(
+		selector,
+		shallow
+	);
 
 	const {
 		acceptedFiles,
@@ -75,19 +80,41 @@ export default function DropZone() {
 			const json = JSON.parse(contents);
 			const questions = json.questions;
 			Object.entries(questions).forEach(([id, data]) => {
-				const y = 200 * nodes.length;
 				const question = {
 					id: id,
 					data: data,
-					position: { x: 0, y: y },
+					position: { x: 0, y: 0 },
 					type: "Question",
 				};
+				const answers = data.answers;
+				Object.entries(answers).forEach(([id, data]) => {
+					const answer = {
+						id: id,
+						data: data,
+						position: { x: 0, y: 0 },
+						type: data.type,
+					};
+					const edgeFromQuestion = {
+						id: question.id + id,
+						source: question.id,
+						target: id,
+					};
+					const edgeFromAnswer = {
+						id: id + data.next,
+						source: id,
+						target: data.next,
+					};
+					edges.push(edgeFromQuestion);
+					edges.push(edgeFromAnswer);
+					nodes.push(answer);
+				});
+
 				nodes.push(question);
 			});
+			onNodesChange(edges);
 			onNodesChange(nodes);
 		};
 
-		console.log(nodes);
 		acceptedFiles.forEach((file) => {
 			reader.readAsText(file);
 		});

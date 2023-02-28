@@ -1,6 +1,10 @@
-*{
-    -ms-overflow-style: none;
+* {
+	-ms-overflow-style: none;
 }
 ::-webkit-scrollbar {
-    display: none;
+	display: none;
+}
+
+.flow_container {
+	height: calc(100vh - 50px);
 }
