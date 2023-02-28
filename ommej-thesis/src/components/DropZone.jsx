@@ -11,13 +11,8 @@ export default function DropZone() {
 	const selector = (state) => ({
 		nodes: state.nodes,
 		onNodesChange: state.onNodesChange,
-		edges: state.edges,
-		onEdgesChange: state.onEdgesChange,
 	});
-	const { nodes, onNodesChange, edges, onEdgesChange } = useStore(
-		selector,
-		shallow
-	);
+	const { nodes, onNodesChange } = useStore(selector, shallow);
 
 	const {
 		acceptedFiles,
@@ -49,10 +44,10 @@ export default function DropZone() {
 		marginInline: "auto",
 		borderWidth: 2,
 		borderRadius: 8,
-		borderColor: "#eeeeee",
+		borderColor: "#fff",
 		borderStyle: "dashed",
-		backgroundColor: "#fafafa",
-		color: "black",
+		backgroundColor: "rgb(87, 86, 86)",
+		color: "#fff",
 		outline: "none",
 		fontSize: "1.5rem",
 		transition: "border .24s ease-in-out",
@@ -88,34 +83,8 @@ export default function DropZone() {
 					type: "Question",
 				};
 				nodes.push(question);
-				const answers = data.answers;
-				const position = structuredClone(question.position);
-				position.x = position.x - 1000;
-				position.y = position.y + 200;
-
-				Object.entries(answers).forEach(([id, data]) => {
-					const answereposition = structuredClone(position);
-					position.x = position.x + 300;
-					answereposition.x = position.x;
-					console.log(data.type);
-					const answer = {
-						id: id,
-						data: data,
-						position: answereposition,
-						type: data.type,
-					};
-					const edge = {
-						id: question.id + id,
-						source: question.id,
-						target: id,
-					};
-					edges.push(edge);
-					console.log(answer);
-					nodes.push(answer);
-				});
 			});
 			onNodesChange(nodes);
-			onEdgesChange(edges);
 		};
 
 		console.log(nodes);

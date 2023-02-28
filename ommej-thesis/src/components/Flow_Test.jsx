@@ -1,7 +1,8 @@
 import React from "react";
-import ReactFlow, { MiniMap } from "reactflow";
+import ReactFlow, { MiniMap, Controls, Background } from "reactflow";
 import { shallow } from "zustand/shallow";
-
+import styled, { ThemeProvider } from "styled-components";
+import { darkTheme } from "../theme";
 import "reactflow/dist/style.css";
 
 import useStore from "../Store/store";
@@ -29,17 +30,38 @@ function Flow() {
 		selector,
 		shallow
 	);
-
+	const ControlsStyled = styled(Controls)`
+		button {
+			background-color: ${(props) => props.theme.controlsBg};
+			color: ${(props) => props.theme.controlsColor};
+			border-bottom: 1px solid ${(props) => props.theme.controlsBorder};
+			&:hover {
+				background-color: ${(props) => props.theme.controlsBgHover};
+			}
+			path {
+				fill: currentColor;
+			}
+		}
+	`;
+	const ReactFlowStyled = styled(ReactFlow)`
+		background-color: ${(props) => props.theme.bg};
+	`;
 	return (
-		<div style={{ height: 500 }}>
-			<ReactFlow
-				nodes={nodes}
-				edges={edges}
-				onNodesChange={onNodesChange}
-				onEdgesChange={onEdgesChange}
-				onConnect={onConnect}
-				nodeTypes={nodeTypes}
-			/>
+		<div style={{ height: 1500 }}>
+			<ThemeProvider theme={darkTheme}>
+				<ReactFlow
+					nodes={nodes}
+					edges={edges}
+					onNodesChange={onNodesChange}
+					onEdgesChange={onEdgesChange}
+					onConnect={onConnect}
+					nodeTypes={nodeTypes}
+				>
+					<Background />
+					<ControlsStyled />
+					<MiniMap />
+				</ReactFlow>
+			</ThemeProvider>
 		</div>
 	);
 }
