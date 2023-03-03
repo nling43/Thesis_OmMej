@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import ELK from "elkjs";
 import { useDropzone } from "react-dropzone";
 import Button from "react-bootstrap/Button";
 import "../css/DropZone.css";
@@ -74,10 +75,20 @@ export default function DropZone() {
 		}),
 		[isDragAccept, isDragReject]
 	);
-	const getLayoutedElements = (nodes, edges) => {
+	const genLayoutDagre = (nodes, edges) => {
+		console.log("start layout gen");
 		const dagreGraph = new dagre.graphlib.Graph();
 		dagreGraph.setDefaultEdgeLabel(() => ({}));
-		dagreGraph.setGraph({ rankdir: "TB" });
+		dagreGraph.setGraph({
+			rankdir: "TB",
+			allign: "UL",
+			marginx: 0,
+			marginy: 0,
+			nodesep: 0,
+			edgesep: 0,
+			acyclicer: "greedy",
+			ranker: "tight-tree",
+		});
 
 		const nodeWidth = 50;
 		const nodeHeight = 50;
@@ -97,7 +108,60 @@ export default function DropZone() {
 				y: nodeWithPosition.y,
 			};
 		});
+		console.log("finish layout");
 	};
+
+	const genLayoutElk = (nodes, edges) => {
+		console.log("start layout gen");
+		const elk = new ELK();
+		nodes.forEach((node) => {
+			if (!!node.data.text && node.data.text.sv.length < 50) {
+				console.log(node);
+				node.width = node.data.text.sv.length * 10;
+				node.height = 200;
+			} else {
+				node.height = 200;
+
+				node.width = 100;
+			}
+		});
+		const graph = {
+			id: "root",
+			layoutOptions: {
+				"elk.algorithm": "mrtree",
+				"elk.spacing.nodeNode": "25",
+			},
+			// "elk.algorithm": "layered",
+			// "elk.contentAlignment": "V_CENTER",
+			// "elk.direction": "RIGHT",
+			// "elk.spacing.nodeNode": "25",
+			// "elk.layered.spacing.nodeNodeBetweenLayers": "75"
+			// "elk.layered.spacing": "50",
+			// "elk.spacing": "50"
+			// "elk.spacing.individual": "250"
+			// "elk.alignment": "RIGHT"
+			children: nodes,
+			edges: edges,
+		};
+
+		elk
+			.layout(graph)
+			.then(() => {
+				nodes.forEach((node) => {
+					const nodeWithPosition = graph.children.find(
+						(node2) => node.id == node2.id
+					);
+					node.position = {
+						x: nodeWithPosition.x,
+						y: nodeWithPosition.y,
+					};
+				});
+				onNodesChange(nodes);
+				onEdgesChange(edges);
+			})
+			.catch(console.error);
+	};
+
 	const handleUpload = () => {
 		const reader = new FileReader();
 		reader.onload = function (e) {
@@ -117,16 +181,16 @@ export default function DropZone() {
 				if (!!data.includeIf) {
 					data.includeIf.answers.forEach((element) => {
 						const ifEdge = {
-							id: id + element,
+							id: "if " + id + " " + element,
 							source: id,
 							target: element,
 						};
 						edges.push(ifEdge);
 					});
 					const elseEdge = {
-						id: id + data.else,
+						id: "else " + id + " " + data.includeIf.else,
 						source: id,
-						target: data.else,
+						target: data.includeIf.else,
 					};
 					edges.push(elseEdge);
 				}
@@ -139,14 +203,14 @@ export default function DropZone() {
 						type: data.type,
 					};
 					const edgeFromQuestion = {
-						id: question.id + id,
+						id: "fromQ " + question.id + " " + id,
 						source: question.id,
 						target: id,
 					};
 
 					if (!!data.next) {
 						const edgeFromAnswer = {
-							id: id + data.next,
+							id: "fromA " + id + " " + data.next,
 							source: id,
 							target: data.next,
 						};
@@ -160,12 +224,14 @@ export default function DropZone() {
 			});
 			nodes.push(...nodesquestion);
 			nodes.push(...nodesanswers);
-			getLayoutedElements(nodes, edges);
-			onNodesChange(nodes);
-			onNodesChange(edges);
+
+			genLayoutElk(nodes, edges);
+
+			console.log("finish upload");
 		};
 
 		acceptedFiles.forEach((file) => {
+			console.log("start upload");
 			reader.readAsText(file);
 		});
 	};

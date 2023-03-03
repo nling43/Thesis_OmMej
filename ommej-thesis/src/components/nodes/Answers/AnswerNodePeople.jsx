@@ -27,7 +27,7 @@ export default memo(({ data, selected }) => {
 		<Node selected={selected}>
 			<Handle type="target" position="top" />
 			<div>
-				<FontAwesomeIcon icon={faUser} style={{ fontSize: "2rem" }} />
+				<FontAwesomeIcon icon={faUser} />
 			</div>
 			<Handle type="source" position="bottom" id="1"></Handle>
 		</Node>
