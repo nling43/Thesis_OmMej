@@ -3,11 +3,10 @@ import { Handle } from "reactflow";
 import styled from "styled-components";
 
 const Node = styled.div`
-	padding: 30px 50px;
+	padding: 3px 5px;
 	border-radius: 0px;
 	background: ${(props) => props.theme.questionBg};
 	color: ${(props) => props.theme.nodeColor};
-	font-size: "1rem";
 	border: 2px solid
 		${(props) =>
 			props.selected ? props.theme.handleInputColor : props.theme.nodeBorder};

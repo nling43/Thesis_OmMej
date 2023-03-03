@@ -6,6 +6,7 @@ import "../css/DropZone.css";
 import { shallow } from "zustand/shallow";
 import "reactflow/dist/style.css";
 import useStore from "../Store/store";
+import dagre from "dagre";
 
 export default function DropZone() {
 	const selector = (state) => ({
@@ -73,9 +74,36 @@ export default function DropZone() {
 		}),
 		[isDragAccept, isDragReject]
 	);
+	const getLayoutedElements = (nodes, edges) => {
+		const dagreGraph = new dagre.graphlib.Graph();
+		dagreGraph.setDefaultEdgeLabel(() => ({}));
+		dagreGraph.setGraph({ rankdir: "TB" });
+
+		const nodeWidth = 50;
+		const nodeHeight = 50;
+		nodes.forEach((node) => {
+			dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+		});
+
+		edges.forEach((edge) => {
+			dagreGraph.setEdge(edge.source, edge.target);
+		});
+
+		dagre.layout(dagreGraph);
+		nodes.forEach((node) => {
+			const nodeWithPosition = dagreGraph.node(node.id);
+			node.position = {
+				x: nodeWithPosition.x,
+				y: nodeWithPosition.y,
+			};
+		});
+	};
 	const handleUpload = () => {
 		const reader = new FileReader();
 		reader.onload = function (e) {
+			const nodesquestion = [];
+			const nodesanswers = [];
+
 			const contents = e.target.result;
 			const json = JSON.parse(contents);
 			const questions = json.questions;
@@ -86,6 +114,22 @@ export default function DropZone() {
 					position: { x: 0, y: 0 },
 					type: "Question",
 				};
+				if (!!data.includeIf) {
+					data.includeIf.answers.forEach((element) => {
+						const ifEdge = {
+							id: id + element,
+							source: id,
+							target: element,
+						};
+						edges.push(ifEdge);
+					});
+					const elseEdge = {
+						id: id + data.else,
+						source: id,
+						target: data.else,
+					};
+					edges.push(elseEdge);
+				}
 				const answers = data.answers;
 				Object.entries(answers).forEach(([id, data]) => {
 					const answer = {
@@ -99,26 +143,33 @@ export default function DropZone() {
 						source: question.id,
 						target: id,
 					};
-					const edgeFromAnswer = {
-						id: id + data.next,
-						source: id,
-						target: data.next,
-					};
+
+					if (!!data.next) {
+						const edgeFromAnswer = {
+							id: id + data.next,
+							source: id,
+							target: data.next,
+						};
+						edges.push(edgeFromAnswer);
+					}
 					edges.push(edgeFromQuestion);
-					edges.push(edgeFromAnswer);
-					nodes.push(answer);
+					nodesanswers.push(answer);
 				});
 
-				nodes.push(question);
+				nodesquestion.push(question);
 			});
-			onNodesChange(edges);
+			nodes.push(...nodesquestion);
+			nodes.push(...nodesanswers);
+			getLayoutedElements(nodes, edges);
 			onNodesChange(nodes);
+			onNodesChange(edges);
 		};
 
 		acceptedFiles.forEach((file) => {
 			reader.readAsText(file);
 		});
 	};
+
 	return (
 		<>
 			<div className="container">
