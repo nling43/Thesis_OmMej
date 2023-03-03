@@ -8,6 +8,8 @@ import "reactflow/dist/style.css";
 import useStore from "../Store/store";
 
 export default function DropZone() {
+
+
 	const selector = (state) => ({
 		nodes: state.nodes,
 		onNodesChange: state.onNodesChange,
