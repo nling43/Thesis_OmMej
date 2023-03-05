@@ -58,7 +58,6 @@ function Flow() {
 					onConnect={onConnect}
 					nodeTypes={nodeTypes}
 				>
-					<Background />
 					<ControlsStyled />
 					<MiniMap />
 				</ReactFlow>

@@ -6,7 +6,6 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 const Node = styled.div`
 	padding: 3px 5px;
 		font-size: 0.5rem:
-
 	border-radius: 200px;
 	background: ${(props) => props.theme.answerBg};
 	color: ${(props) => props.theme.nodeColor};

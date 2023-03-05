@@ -81,18 +81,20 @@ export default function DropZone() {
 		dagreGraph.setDefaultEdgeLabel(() => ({}));
 		dagreGraph.setGraph({
 			rankdir: "TB",
-			allign: "UL",
-			marginx: 0,
-			marginy: 0,
-			nodesep: 0,
-			edgesep: 0,
+			marginx: 10,
+			marginy: 10,
+			nodesep: 10,
+			edgesep: 10,
 			acyclicer: "greedy",
-			ranker: "tight-tree",
+			ranker: "network-simplex",
 		});
 
-		const nodeWidth = 50;
-		const nodeHeight = 50;
 		nodes.forEach((node) => {
+			let nodeWidth = 100;
+			let nodeHeight = 50;
+			if (!!node.data.text && node.data.text.sv.length < 50) {
+				nodeWidth = node.data.text.sv.length * 10;
+			}
 			dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
 		});
 
@@ -184,6 +186,7 @@ export default function DropZone() {
 							id: "if " + id + " " + element,
 							source: id,
 							target: element,
+							weight: 10,
 						};
 						edges.push(ifEdge);
 					});
@@ -191,6 +194,7 @@ export default function DropZone() {
 						id: "else " + id + " " + data.includeIf.else,
 						source: id,
 						target: data.includeIf.else,
+						weight: 10,
 					};
 					edges.push(elseEdge);
 				}
@@ -206,6 +210,7 @@ export default function DropZone() {
 						id: "fromQ " + question.id + " " + id,
 						source: question.id,
 						target: id,
+						weight: 1,
 					};
 
 					if (!!data.next) {
@@ -213,6 +218,7 @@ export default function DropZone() {
 							id: "fromA " + id + " " + data.next,
 							source: id,
 							target: data.next,
+							weight: 5,
 						};
 						edges.push(edgeFromAnswer);
 					}
@@ -225,8 +231,9 @@ export default function DropZone() {
 			nodes.push(...nodesquestion);
 			nodes.push(...nodesanswers);
 
-			genLayoutElk(nodes, edges);
-
+			genLayoutDagre(nodes, edges);
+			onNodesChange(nodes);
+			onEdgesChange(edges);
 			console.log("finish upload");
 		};
 

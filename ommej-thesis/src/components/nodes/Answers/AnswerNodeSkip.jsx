@@ -27,7 +27,7 @@ export default memo(({ data, selected }) => {
 		<Node selected={selected}>
 			<Handle type="target" position="top" style={{ width: 13 }} />
 			<div>
-				<FontAwesomeIcon icon={faArrowDownLong} style={{ fontSize: "2rem" }} />
+				<FontAwesomeIcon icon={faArrowDownLong} />
 			</div>
 			<Handle type="source" position="bottom" id="1"></Handle>
 		</Node>
