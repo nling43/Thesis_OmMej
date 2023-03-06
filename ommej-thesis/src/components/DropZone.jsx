@@ -262,6 +262,9 @@ export default function DropZone() {
 						};
 						edgesFromAnswers.push(edgeFromAnswer);
 						questionOnNextLevel.add(data.next);
+						if (questionOnCurrentLevel.has(data.next)) {
+							questionOnCurrentLevel.delete(data.next);
+						}
 					}
 					edgesFromQuestions.push(edgeFromQuestion);
 					nodesanswers.push(answer);
