@@ -5,7 +5,7 @@ import styled from "styled-components";
 const Node = styled.div`
 	padding: 3px 3px;
 		font-size: 0.5rem:
-
+	witdh :200px;
 	border-radius: 200px;
 	background: ${(props) => props.theme.answerBg};
 	color: ${(props) => props.theme.nodeColor};
@@ -22,6 +22,7 @@ const Node = styled.div`
 `;
 
 export default memo(({ data, selected }) => {
+	console.log(data);
 	return (
 		<Node selected={selected}>
 			<Handle type="target" position="top" style={{ width: 13 }} />

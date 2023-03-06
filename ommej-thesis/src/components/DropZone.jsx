@@ -151,7 +151,7 @@ export default function DropZone() {
 			.then(() => {
 				nodes.forEach((node) => {
 					const nodeWithPosition = graph.children.find(
-						(node2) => node.id == node2.id
+						(node2) => node.id === node2.id
 					);
 					node.position = {
 						x: nodeWithPosition.x,
@@ -172,45 +172,86 @@ export default function DropZone() {
 
 			const contents = e.target.result;
 			const json = JSON.parse(contents);
+			const edgesFromQuestions = [];
+			const edgesFromAnswers = [];
+			const ifEdges = [];
+			const elseEdges = [];
 			const questions = json.questions;
+			const nodeHeight = 100;
+			const nodeWidth = 200;
+			const margin = 300;
+			const rootX = 0;
+			const rootY = 0;
+			let level = 0;
+			let questionOnCurrentLevel = new Set();
+			let questionOnNextLevel = new Set();
 			Object.entries(questions).forEach(([id, data]) => {
+				let x = rootX;
+				let y = rootY;
+				const posQ = Array.from(questionOnCurrentLevel).findIndex(
+					(el) => el === id
+				);
+
+				if (level !== 0) {
+					const prevEdge = edgesFromAnswers.find((el) => el.target === id);
+					const prevAnswer = nodesanswers.find(
+						(el) => el.id === prevEdge.source
+					);
+					if (questionOnCurrentLevel.size == 1) {
+						x = rootX;
+					} else {
+						const posQAllign =
+							questionOnCurrentLevel.size / 2 -
+							questionOnCurrentLevel.size +
+							posQ;
+
+						x = prevAnswer.position.x + nodeWidth * posQAllign;
+						console.log(questionOnCurrentLevel.size);
+					}
+					y = level * margin + nodeHeight;
+				}
+
 				const question = {
 					id: id,
 					data: data,
-					position: { x: 0, y: 0 },
+					position: { x: x, y: y },
 					type: "Question",
 				};
+				console.log(x, y);
 				if (!!data.includeIf) {
 					data.includeIf.answers.forEach((element) => {
 						const ifEdge = {
 							id: "if " + id + " " + element,
 							source: id,
 							target: element,
-							weight: 10,
+							style: { stroke: "green" },
 						};
-						edges.push(ifEdge);
+						ifEdges.push(ifEdge);
 					});
 					const elseEdge = {
 						id: "else " + id + " " + data.includeIf.else,
 						source: id,
 						target: data.includeIf.else,
-						weight: 10,
+						style: { stroke: "red" },
 					};
-					edges.push(elseEdge);
+					elseEdges.push(elseEdge);
 				}
 				const answers = data.answers;
+				const numberOfAnswers = Object.keys(answers).length;
+				let posA = numberOfAnswers / 2 - numberOfAnswers;
 				Object.entries(answers).forEach(([id, data]) => {
+					const answerX = x + nodeWidth * posA;
+
 					const answer = {
 						id: id,
 						data: data,
-						position: { x: 0, y: 0 },
+						position: { x: answerX, y: y + 100 + nodeHeight },
 						type: data.type,
 					};
 					const edgeFromQuestion = {
 						id: "fromQ " + question.id + " " + id,
 						source: question.id,
 						target: id,
-						weight: 1,
 					};
 
 					if (!!data.next) {
@@ -218,20 +259,31 @@ export default function DropZone() {
 							id: "fromA " + id + " " + data.next,
 							source: id,
 							target: data.next,
-							weight: 5,
 						};
-						edges.push(edgeFromAnswer);
+						edgesFromAnswers.push(edgeFromAnswer);
+						questionOnNextLevel.add(data.next);
 					}
-					edges.push(edgeFromQuestion);
+					edgesFromQuestions.push(edgeFromQuestion);
 					nodesanswers.push(answer);
+					posA++;
 				});
-
 				nodesquestion.push(question);
+				console.log(questionOnCurrentLevel);
+				if (posQ === questionOnCurrentLevel.size - 1 || level === 0) {
+					level++;
+
+					questionOnCurrentLevel = new Set(questionOnNextLevel);
+					questionOnNextLevel = new Set();
+				}
 			});
 			nodes.push(...nodesquestion);
 			nodes.push(...nodesanswers);
+			edges.push(...edgesFromAnswers);
+			edges.push(...edgesFromQuestions);
+			edges.push(...ifEdges);
+			edges.push(...elseEdges);
 
-			genLayoutDagre(nodes, edges);
+			//genLayoutDagre(nodes, edges);
 			onNodesChange(nodes);
 			onEdgesChange(edges);
 			console.log("finish upload");

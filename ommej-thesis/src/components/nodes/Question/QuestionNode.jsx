@@ -5,6 +5,7 @@ import styled from "styled-components";
 const Node = styled.div`
 	padding: 3px 5px;
 	border-radius: 0px;
+
 	background: ${(props) => props.theme.questionBg};
 	color: ${(props) => props.theme.nodeColor};
 	border: 2px solid

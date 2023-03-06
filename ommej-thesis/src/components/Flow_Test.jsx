@@ -26,6 +26,7 @@ const selector = (state) => ({
 	onNodesChange: state.onNodesChange,
 	onEdgesChange: state.onEdgesChange,
 	onConnect: state.onConnect,
+	sellected: state.selectedNodes,
 });
 const ControlsStyled = styled(Controls)`
 	button {
