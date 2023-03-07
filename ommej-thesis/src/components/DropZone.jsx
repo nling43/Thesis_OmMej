@@ -272,7 +272,7 @@ export default function DropZone() {
 				});
 				nodesquestion.push(question);
 				console.log(questionOnCurrentLevel);
-				if (posQ === questionOnCurrentLevel.size - 1 || level === 0) {
+				if (posQ < questionOnCurrentLevel.size || level === 0) {
 					level++;
 
 					questionOnCurrentLevel = new Set(questionOnNextLevel);
