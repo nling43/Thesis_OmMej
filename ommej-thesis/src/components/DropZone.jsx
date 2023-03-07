@@ -185,6 +185,7 @@ export default function DropZone() {
 			let level = 0;
 			let questionOnCurrentLevel = new Set();
 			let questionOnNextLevel = new Set();
+			console.log(questions)
 			Object.entries(questions).forEach(([id, data]) => {
 				let x = rootX;
 				let y = rootY;
@@ -215,8 +216,11 @@ export default function DropZone() {
 					id: id,
 					data: data,
 					position: { x: x, y: y },
-					type: "Question",
+					type: "question_"+data.type,
+					//if data type = person then add question + person to type
+					//if data type = accommodation then add question + accommodation to type
 				};
+				console.log(question)
 				console.log(x, y);
 				if (!!data.includeIf) {
 					data.includeIf.answers.forEach((element) => {
@@ -246,8 +250,10 @@ export default function DropZone() {
 						id: id,
 						data: data,
 						position: { x: answerX, y: y + 100 + nodeHeight },
-						type: data.type,
+						type: "answer_"+data.type,
 					};
+					console.log(answer)
+
 					const edgeFromQuestion = {
 						id: "fromQ " + question.id + " " + id,
 						source: question.id,
