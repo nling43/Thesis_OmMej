@@ -7,6 +7,7 @@ export const darkTheme = {
 	nodeColor: "#f9f9f9",
 	nodeBorder: "#888",
 	handleInputColor: "#ffff",
+	
 
 	minimapMaskBg: "#343435",
 	controlsBg: "#555",
@@ -14,6 +15,7 @@ export const darkTheme = {
 	controlsColor: "#dddddd",
 	controlsBorder: "#676768",
 
+	
 	questionTextSingle: "#BCF4F5",
 	questionTextPersons: "#B4EBCA",
 	questionTextArticle: "#D9F2B4",
@@ -27,4 +29,8 @@ export const darkTheme = {
 	answerText: "#040403",
 	answerTextPeople: "#040403",
 	answerTextAccommodation: "#040403",
+	//Panel Theme
+	panelBg: "#FFFCF9",
+	panelBorder: "#040403",
+	panelColor: "#040403",
 };

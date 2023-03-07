@@ -22,7 +22,6 @@ const Node = styled.div`
 `;
 
 export default memo(({ data, selected }) => {
-	console.log(data);
 	return (
 		<Node selected={selected}>
 			<Handle type="target" position="top" style={{ width: 13 }} />
