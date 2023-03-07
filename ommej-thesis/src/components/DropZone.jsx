@@ -87,6 +87,7 @@ export default function DropZone() {
 		const rootX = 100;
 		const rootY = 0;
 		const topMargin = 200;
+		const inlineMargin = 300;
 		let questionsOnCurrentLevel = new Set();
 		let questionsOnNextLevel = new Set();
 
@@ -106,18 +107,30 @@ export default function DropZone() {
 				prevAnswers.forEach((edge) => {
 					const answer = nodesanswers.find((el) => el.id === edge.source);
 					totalX = totalX + answer.position.x;
-					prevY = answer.position.y;
+					if (prevY < answer.position.y) {
+						prevY = answer.position.y;
+					}
 				});
 				qx = totalX / prevAnswers.length;
 				qy = prevY + topMargin;
 
 				question.position.x = qx;
 				question.position.y = qy;
+
+				const questionOnThisLevel = nodesquestions.filter(
+					(n) => question.position.y == n.position.y
+				);
+				if (questionOnThisLevel.length > 1)
+					for (let i = 0; i < questionOnThisLevel.length; i++) {
+						const question = questionOnThisLevel[i];
+						console.log(question);
+					}
 			}
 
 			const answersToCurrentQuestion = edgeFromQuestion.filter(
 				(el) => el.source === question.id
 			);
+
 			if (answersToCurrentQuestion.length == 1) {
 				const answerId = answersToCurrentQuestion[0].target;
 				const answer = nodesanswers.find((el) => el.id === answerId);
@@ -137,7 +150,7 @@ export default function DropZone() {
 				const answerId = answersToCurrentQuestion[i].target;
 				const answer = nodesanswers.find((el) => el.id === answerId);
 				const align = i - answersToCurrentQuestion.length / 2;
-				const ax = qx + 200 * align;
+				const ax = qx + inlineMargin * align;
 				const ay = qy + topMargin;
 				answer.position.x = ax;
 				answer.position.y = ay;
