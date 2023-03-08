@@ -26,7 +26,7 @@ export default memo(({ data, selected }) => {
 		<Node selected={selected}>
 			<Handle type="target" position="top" />
 			<div>
-				<FontAwesomeIcon icon={faUser} />
+				<strong>{data.type}</strong>
 			</div>
 			<Handle type="source" position="bottom" id="1"></Handle>
 		</Node>

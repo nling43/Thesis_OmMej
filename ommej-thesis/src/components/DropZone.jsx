@@ -75,22 +75,52 @@ export default function DropZone() {
 		}),
 		[isDragAccept, isDragReject]
 	);
+	const genLayoutDagre = (nodes, edges) => {
+		console.log("start layout gen");
+		const dagreGraph = new dagre.graphlib.Graph();
+		dagreGraph.setDefaultEdgeLabel(() => ({}));
+		dagreGraph.setGraph({
+			rankdir: "TB",
+			acyclicer: "greedy",
+			ranker: "tight-tree",
+		});
 
+		nodes.forEach((node) => {
+			let nodeWidth = 100;
+			let nodeHeight = 100;
+
+			dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+		});
+
+		edges.forEach((edge) => {
+			dagreGraph.setEdge(edge.source, edge.target);
+		});
+
+		dagre.layout(dagreGraph);
+		nodes.forEach((node) => {
+			const nodeWithPosition = dagreGraph.node(node.id);
+			node.position = {
+				x: nodeWithPosition.x,
+				y: nodeWithPosition.y,
+			};
+		});
+		console.log("finish layout");
+	};
 	const layout = (
 		nodesquestions,
 		nodesanswers,
 		edgesFromAnswers,
-		edgeFromQuestion,
+		edgesFromQuestion,
 		elseEdges,
 		ifEdges
 	) => {
 		const rootX = 100;
 		const rootY = 0;
 		const topMargin = 200;
-		const inlineMargin = 300;
+		const inlineMargin = 60;
 		let questionsOnCurrentLevel = new Set();
 		let questionsOnNextLevel = new Set();
-
+		let startOfCluster = "";
 		for (let i = 0; i < nodesquestions.length; i++) {
 			const question = nodesquestions[i];
 			let qy = 0;
@@ -104,6 +134,7 @@ export default function DropZone() {
 				);
 				let totalX = 0;
 				let prevY = 0;
+
 				prevAnswers.forEach((edge) => {
 					const answer = nodesanswers.find((el) => el.id === edge.source);
 					totalX = totalX + answer.position.x;
@@ -120,18 +151,48 @@ export default function DropZone() {
 				const questionOnThisLevel = nodesquestions.filter(
 					(n) => question.position.y == n.position.y
 				);
-				if (questionOnThisLevel.length > 1)
-					for (let i = 0; i < questionOnThisLevel.length; i++) {
-						const question = questionOnThisLevel[i];
-						console.log(question);
+				if (questionOnThisLevel.length >= 3 && startOfCluster === "")
+					startOfCluster = questionOnThisLevel[0];
+
+				if (prevAnswers.length > 10 && startOfCluster !== "") {
+					const startNodeIndex = nodesquestions.findIndex(
+						(el) => el === startOfCluster
+					);
+					const endNodeIndex = nodesquestions.findIndex(
+						(el) => el === question
+					);
+					const clusterAnswer = [];
+
+					const clusterQuestion = nodesquestions.slice(
+						startNodeIndex,
+						endNodeIndex + 1
+					);
+					const clusterEdges = new Set();
+					for (let i = 0; i < clusterQuestion.length - 1; i++) {
+						const node = clusterQuestion[i];
+						const edges1 = edgesFromQuestion.filter(
+							(el) => el.source === node.id
+						);
+						const edges2 = edgesFromAnswers.filter(
+							(el) => el.target === node.id
+						);
+						edges1.forEach((edge) => {
+							const answer = nodesanswers.find((el) => el.id == edge.target);
+							clusterAnswer.push(answer);
+						});
+						clusterEdges.add(...edges1);
+						clusterEdges.add(...edges2);
 					}
+
+					genLayoutDagre(clusterQuestion, clusterEdges);
+					startOfCluster = "";
+				}
 			}
 
-			const answersToCurrentQuestion = edgeFromQuestion.filter(
+			const answersToCurrentQuestion = edgesFromQuestion.filter(
 				(el) => el.source === question.id
 			);
-
-			if (answersToCurrentQuestion.length == 1) {
+			if (answersToCurrentQuestion.length === 1) {
 				const answerId = answersToCurrentQuestion[0].target;
 				const answer = nodesanswers.find((el) => el.id === answerId);
 				answer.position.x = qx;
@@ -139,21 +200,36 @@ export default function DropZone() {
 			} else if (answersToCurrentQuestion.length == 2) {
 				let answerId = answersToCurrentQuestion[0].target;
 				let answer = nodesanswers.find((el) => el.id === answerId);
-				answer.position.x = qx + 100;
+				answer.position.x = qx + inlineMargin;
 				answer.position.y = qy + topMargin;
 				answerId = answersToCurrentQuestion[1].target;
 				answer = nodesanswers.find((el) => el.id === answerId);
-				answer.position.x = qx - 100;
+				answer.position.x = qx - inlineMargin * 2;
 				answer.position.y = qy + topMargin;
-			}
-			for (let i = 0; i < answersToCurrentQuestion.length; i++) {
-				const answerId = answersToCurrentQuestion[i].target;
-				const answer = nodesanswers.find((el) => el.id === answerId);
-				const align = i - answersToCurrentQuestion.length / 2;
-				const ax = qx + inlineMargin * align;
-				const ay = qy + topMargin;
-				answer.position.x = ax;
-				answer.position.y = ay;
+			} else if (answersToCurrentQuestion.length % 2 == 0) {
+				for (let i = 0; i < answersToCurrentQuestion.length; i++) {
+					const answerId = answersToCurrentQuestion[i].target;
+					const answer = nodesanswers.find((el) => el.id === answerId);
+
+					const align = i - answersToCurrentQuestion.length / 2 + 0.25;
+
+					const ax = qx + inlineMargin * Math.trunc(align);
+					const ay = qy + topMargin;
+					answer.position.x = ax;
+					answer.position.y = ay;
+				}
+			} else {
+				for (let i = 0; i < answersToCurrentQuestion.length; i++) {
+					const answerId = answersToCurrentQuestion[i].target;
+					const answer = nodesanswers.find((el) => el.id === answerId);
+
+					const align = i - answersToCurrentQuestion.length / 2 + 0.5;
+
+					const ax = qx + inlineMargin * align;
+					const ay = qy + topMargin;
+					answer.position.x = ax;
+					answer.position.y = ay;
+				}
 			}
 		}
 	};
