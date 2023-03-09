@@ -3,18 +3,16 @@ import { Handle } from "reactflow";
 import styled from "styled-components";
 
 const Node = styled.div`
-	padding: 3px 3px;
-		font-size: 0.5rem:
-	witdh :200px;
-	border-radius: 200px;
-	background: ${(props) => props.theme.answerBg};
-	color: ${(props) => props.theme.answerText};
+	padding: 3px 5px;
+	border-radius: 0px;
+	background: ${(props) => props.theme.questionBg};
+	color: ${(props) => props.theme.questionTextSingleAccommodation};
 	border: 2px solid
 		${(props) =>
 			props.selected ? props.theme.handleInputColor : props.theme.nodeBorder};
 	.react-flow__handle {
 		background: ${(props) => props.theme.handleInputColor};
-		width: 8px;
+		width: 13px;
 		height: 10px;
 		border: 0px solid #000;
 		border-radius: 3px;
@@ -24,7 +22,7 @@ const Node = styled.div`
 export default memo(({ data, selected }) => {
 	return (
 		<Node selected={selected}>
-			<Handle type="target" position="top" style={{ width: 13 }} />
+			<Handle type="target" position="top" />
 			<div>
 				<strong>{data.type}</strong>
 			</div>

@@ -202,7 +202,6 @@ export default function DropZone() {
 			const ifEdges = [];
 			const elseEdges = [];
 			const questions = json.questions;
-
 			Object.entries(questions).forEach(([id, data]) => {
 				data.id = id;
 				const question = {
@@ -237,6 +236,8 @@ export default function DropZone() {
 						position: { x: 0, y: -900 },
 						type: data.type,
 					};
+					console.log(answer);
+
 					const edgeFromQuestion = {
 						id: "fromQ " + question.id + " " + id,
 						source: question.id,
