@@ -1,10 +1,10 @@
 import React from "react";
 import ReactFlow, {
-  MiniMap,
-  Controls,
-  Background,
-  useOnSelectionChange,
-  Panel,
+	MiniMap,
+	Controls,
+	Background,
+	useOnSelectionChange,
+	Panel,
 } from "reactflow";
 import { shallow } from "zustand/shallow";
 import styled, { ThemeProvider } from "styled-components";
@@ -33,106 +33,116 @@ import AnswerNodeSkip from "./nodes/Answers/AnswerNodeSkip.jsx";
 import AnswerNodeAccommodations from "./nodes/Answers/AnswerNodeAccommodations";
 
 const nodeTypes = {
-  Question: QuestionNode,
-  //Question Types
-  question_single: Single_QuestionNode,
-  question_article_text: Article_QuestionNode,
-  question_persons: Persons_QuestionNode,
-  question_multiple: Multiple_QuestionNode,
-  question_frequency: Frequency_QuestionNode,
-  question_accommodations: Accommodation_QuestionNode,
-  question_single_accommodation: SingleAccommodation_QuestionNode,
-  question_single_person: SinglePersons,
-  question_multiple_person: MultiplePersons,
+	Question: QuestionNode,
+	//Question Types
+	question_single: Single_QuestionNode,
+	question_article_text: Article_QuestionNode,
+	question_persons: Persons_QuestionNode,
+	question_multiple: Multiple_QuestionNode,
+	question_frequency: Frequency_QuestionNode,
+	question_accommodations: Accommodation_QuestionNode,
+	question_single_accommodation: SingleAccommodation_QuestionNode,
+	question_single_person: SinglePersons,
+	question_multiple_person: MultiplePersons,
 
-  //Answer Types
-  answer_text: AnswerNodeText,
-  answer_persons: AnswerNodePeople,
-  answer_none: AnswerNodeSkip,
-  answer_accommodations: AnswerNodeAccommodations,
+	//Answer Types
+	answer_text: AnswerNodeText,
+	answer_persons: AnswerNodePeople,
+	answer_none: AnswerNodeSkip,
+	answer_accommodations: AnswerNodeAccommodations,
 };
 const selector = (state) => ({
-  nodes: state.nodes,
-  edges: state.edges,
-  onNodesChange: state.onNodesChange,
-  onEdgesChange: state.onEdgesChange,
-  onConnect: state.onConnect,
-  selected: state.selectedNodes,
-  onSelectNodes: state.onSelectNodes,
+	nodes: state.nodes,
+	edges: state.edges,
+	onNodesChange: state.onNodesChange,
+	onEdgesChange: state.onEdgesChange,
+	onConnect: state.onConnect,
+	selected: state.selectedNodes,
+	onSelectNodes: state.onSelectNodes,
 });
 
 const ControlsStyled = styled(Controls)`
-  button {
-    background-color: ${(props) => props.theme.controlsBg};
-    color: ${(props) => props.theme.controlsColor};
-    border-bottom: 1px solid ${(props) => props.theme.controlsBorder};
-    &:hover {
-      background-color: ${(props) => props.theme.controlsBgHover};
-    }
-    path {
-      fill: currentColor;
-    }
-  }
+	button {
+		background-color: ${(props) => props.theme.controlsBg};
+		color: ${(props) => props.theme.controlsColor};
+		border-bottom: 1px solid ${(props) => props.theme.controlsBorder};
+		&:hover {
+			background-color: ${(props) => props.theme.controlsBgHover};
+		}
+		path {
+			fill: currentColor;
+		}
+	}
+`;
+const MiniMapStyled = styled(MiniMap)`
+	background-color: ${(props) => props.theme.minimapMaskBg};
+
+	.react-flow__minimap-mask {
+		fill: ${(props) => props.theme.bg};
+	}
+
+	.react-flow__minimap-node {
+		fill: ${(props) => props.theme.handleInputColor};
+		stroke: none;
+	}
 `;
 const PanelsStyled = styled(Panel)`
-  background-color: ${(props) => props.theme.panelBg};
-  color: ${(props) => props.theme.panelColor};
-  border: 1px solid ${(props) => props.theme.panelBorder};
-  width: 20%;
-  height: 70%;
+	background-color: ${(props) => props.theme.panelBg};
+	color: ${(props) => props.theme.panelColor};
+	border: 1px solid ${(props) => props.theme.panelBorder};
+	width: 20%;
+	height: 70%;
 `;
 
 function Flow() {
-  const {
-    nodes,
-    edges,
-    onNodesChange,
-    onEdgesChange,
-    onConnect,
-    onSelectNodes,
-    selected,
-  } = useStore(selector, shallow);
+	const {
+		nodes,
+		edges,
+		onNodesChange,
+		onEdgesChange,
+		onConnect,
+		onSelectNodes,
+		selected,
+	} = useStore(selector, shallow);
 
-  const sideBar = () => {
-    if (selected.nodes && selected.nodes.length > 0) {
-      return (
-        <PanelsStyled position="top-right">
-          <h1>Node Data</h1>
-          <h2>Node ID: {selected.nodes[0].id}</h2>
-          <h2>Node Type: {selected.nodes[0].type}</h2>
-          <h2>Node Text: {selected.nodes[0].data.text.sv}</h2>
-        </PanelsStyled>
-      );
-    } 
-	else if (selected.nodes && selected.nodes.length > 1 && selected.edges.length> 0) {
-	  return (
-		<PanelsStyled position="top-right">
-			Many Nodes here
-		</PanelsStyled>
-	  );
-	}
-	else return <></>;
-  };
+	const sideBar = () => {
+		if (selected.nodes && selected.nodes.length > 0) {
+			return (
+				<PanelsStyled position="top-right">
+					<h1>Node Data</h1>
+					<h2>Node ID: {selected.nodes[0].id}</h2>
+					<h2>Node Type: {selected.nodes[0].type}</h2>
+					<h2>Node Text: {selected.nodes[0].data.text.sv}</h2>
+				</PanelsStyled>
+			);
+		} else if (
+			selected.nodes &&
+			selected.nodes.length > 1 &&
+			selected.edges.length > 0
+		) {
+			return <PanelsStyled position="top-right">Many Nodes here</PanelsStyled>;
+		} else return <></>;
+	};
 
-  return (
-    <div className="flow_container">
-      <ThemeProvider theme={darkTheme}>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          nodeTypes={nodeTypes}
-          onSelectionChange={onSelectNodes}
-        >
-          <ControlsStyled />
-          <MiniMap />
-          {sideBar()}
-        </ReactFlow>
-      </ThemeProvider>
-    </div>
-  );
+	return (
+		<div className="flow_container">
+			<ThemeProvider theme={darkTheme}>
+				<ReactFlow
+					nodes={nodes}
+					edges={edges}
+					onNodesChange={onNodesChange}
+					onEdgesChange={onEdgesChange}
+					onConnect={onConnect}
+					nodeTypes={nodeTypes}
+					onSelectionChange={onSelectNodes}
+				>
+					<ControlsStyled />
+					<MiniMapStyled />
+					{sideBar()}
+				</ReactFlow>
+			</ThemeProvider>
+		</div>
+	);
 }
 
 export default Flow;
