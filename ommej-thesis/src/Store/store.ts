@@ -11,7 +11,7 @@ import {
     OnConnect,
     applyEdgeChanges,
     applyNodeChanges,
-    useOnSelectionChange
+    
 } from 'reactflow';
 
 
@@ -19,6 +19,7 @@ import {
 type RFState = {
     nodes: Node[];
     edges: Edge[];
+    onClear: ()=>void;
     onNodesChange: OnNodesChange;
     onEdgesChange: OnEdgesChange;
     onConnect: OnConnect;
@@ -46,6 +47,14 @@ const useStore = create<RFState>((set, get) => ({
     onConnect: (connection: Connection) => {
       set({
         edges: addEdge(connection, get().edges),
+      });
+    },
+    onClear: () => {
+      set({
+        nodes: applyNodeChanges([],[]),
+      });
+      set({
+        edges: applyEdgeChanges([],[]),
       });
     },
   }));
