@@ -101,10 +101,17 @@ function Flow() {
           <h2>Node ID: {selected.nodes[0].id}</h2>
           <h2>Node Type: {selected.nodes[0].type}</h2>
           <h2>Node Text: {selected.nodes[0].data.text.sv}</h2>
-		  {console.log(selected.nodes[0])}
         </PanelsStyled>
       );
-    } else return <></>;
+    } 
+	else if (selected.nodes && selected.nodes.length > 1 && selected.edges.length> 0) {
+	  return (
+		<PanelsStyled position="top-right">
+			Many Nodes here
+		</PanelsStyled>
+	  );
+	}
+	else return <></>;
   };
 
   return (
@@ -122,7 +129,6 @@ function Flow() {
           <ControlsStyled />
           <MiniMap />
           {sideBar()}
-		  <sideBar selected/>
         </ReactFlow>
       </ThemeProvider>
     </div>

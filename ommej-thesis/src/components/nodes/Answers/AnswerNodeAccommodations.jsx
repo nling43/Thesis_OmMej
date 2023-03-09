@@ -7,7 +7,7 @@ const Node = styled.div`
   padding: 30px 50px;
   border-radius: 200px;
   background: ${(props) => props.theme.answerBg};
-  color: ${(props) => props.theme.nodeColor};
+  color: ${(props) => props.theme.answerTextAccommodations};
   border: 1px solid ${(props) => (props.selected ? props.theme.primary : props.theme.nodeBorder)};
 
   .react-flow__handle {

@@ -8,7 +8,7 @@ const Node = styled.div`
 		font-size: 0.5rem:
 	border-radius: 200px;
 	background: ${(props) => props.theme.answerBg};
-	color: ${(props) => props.theme.nodeColor};
+	color: ${(props) => props.theme.answerTextPeople};
 	border: 1px solid
 		${(props) => (props.selected ? props.theme.primary : props.theme.nodeBorder)};
 
