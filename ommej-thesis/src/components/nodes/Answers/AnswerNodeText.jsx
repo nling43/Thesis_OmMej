@@ -8,7 +8,7 @@ const Node = styled.div`
 	witdh :200px;
 	border-radius: 200px;
 	background: ${(props) => props.theme.answerBg};
-	color: ${(props) => props.theme.nodeColor};
+	color: ${(props) => props.theme.answerText};
 	border: 2px solid
 		${(props) =>
 			props.selected ? props.theme.handleInputColor : props.theme.nodeBorder};
@@ -22,7 +22,6 @@ const Node = styled.div`
 `;
 
 export default memo(({ data, selected }) => {
-	console.log(data);
 	return (
 		<Node selected={selected}>
 			<Handle type="target" position="top" style={{ width: 13 }} />

@@ -9,7 +9,7 @@ const Node = styled.div`
 
 	border-radius: 200px;
 	background: ${(props) => props.theme.answerBg};
-	color: ${(props) => props.theme.nodeColor};
+	color: ${(props) => props.theme.answerSkip};
 	border: 1px solid
 		${(props) => (props.selected ? props.theme.primary : props.theme.nodeBorder)};
 
