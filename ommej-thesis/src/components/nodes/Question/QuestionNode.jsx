@@ -3,11 +3,11 @@ import { Handle } from "reactflow";
 import styled from "styled-components";
 
 const Node = styled.div`
-	padding: 30px 50px;
+	padding: 3px 5px;
 	border-radius: 0px;
+
 	background: ${(props) => props.theme.questionBg};
 	color: ${(props) => props.theme.nodeColor};
-	font-size: "1rem";
 	border: 2px solid
 		${(props) =>
 			props.selected ? props.theme.handleInputColor : props.theme.nodeBorder};
@@ -25,7 +25,7 @@ export default memo(({ data, selected }) => {
 		<Node selected={selected}>
 			<Handle type="target" position="top" />
 			<div>
-				<strong>{data.text.sv}</strong>
+				<strong>{data.type}</strong>
 			</div>
 			<Handle type="source" position="bottom" id="1"></Handle>
 		</Node>
