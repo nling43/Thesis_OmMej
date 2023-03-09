@@ -3,7 +3,7 @@ import ELK from "elkjs";
 import { useDropzone } from "react-dropzone";
 import Button from "react-bootstrap/Button";
 import "../css/DropZone.css";
-
+import { hierarchy, tree, cluster } from "d3-hierarchy";
 import { shallow } from "zustand/shallow";
 import "reactflow/dist/style.css";
 import useStore from "../Store/store";
@@ -75,37 +75,7 @@ export default function DropZone() {
 		}),
 		[isDragAccept, isDragReject]
 	);
-	const genLayoutDagre = (nodes, edges) => {
-		console.log("start layout gen");
-		const dagreGraph = new dagre.graphlib.Graph();
-		dagreGraph.setDefaultEdgeLabel(() => ({}));
-		dagreGraph.setGraph({
-			rankdir: "TB",
-			acyclicer: "greedy",
-			ranker: "tight-tree",
-		});
 
-		nodes.forEach((node) => {
-			let nodeWidth = 100;
-			let nodeHeight = 100;
-
-			dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
-		});
-
-		edges.forEach((edge) => {
-			dagreGraph.setEdge(edge.source, edge.target);
-		});
-
-		dagre.layout(dagreGraph);
-		nodes.forEach((node) => {
-			const nodeWithPosition = dagreGraph.node(node.id);
-			node.position = {
-				x: nodeWithPosition.x,
-				y: nodeWithPosition.y,
-			};
-		});
-		console.log("finish layout");
-	};
 	const layout = (
 		nodesquestions,
 		nodesanswers,
@@ -117,9 +87,8 @@ export default function DropZone() {
 		const rootX = 100;
 		const rootY = 0;
 		const topMargin = 200;
-		const inlineMargin = 60;
-		let questionsOnCurrentLevel = new Set();
-		let questionsOnNextLevel = new Set();
+		let inlineMargin = 300;
+
 		let startOfCluster = "";
 		for (let i = 0; i < nodesquestions.length; i++) {
 			const question = nodesquestions[i];
@@ -147,55 +116,39 @@ export default function DropZone() {
 
 				question.position.x = qx;
 				question.position.y = qy;
+				const centerX = qx + 200 / 2;
+				const centerY = qy + 200 / 2;
 
-				const questionOnThisLevel = nodesquestions.filter(
-					(n) => question.position.y == n.position.y
+				// find a node where the center point is inside
+				const targetNodes = nodesquestions.filter(
+					(n) =>
+						centerX > n.position.x - inlineMargin &&
+						centerX < n.position.x + 200 + inlineMargin &&
+						centerY > n.position.y &&
+						centerY < n.position.y + 200 &&
+						n.id !== question.id
 				);
-				if (questionOnThisLevel.length >= 3 && startOfCluster === "")
-					startOfCluster = questionOnThisLevel[0];
+				if (targetNodes.length > 0) {
+					console.log(targetNodes);
 
-				if (prevAnswers.length > 10 && startOfCluster !== "") {
-					const startNodeIndex = nodesquestions.findIndex(
-						(el) => el === startOfCluster
-					);
-					const endNodeIndex = nodesquestions.findIndex(
-						(el) => el === question
-					);
-					const clusterAnswer = [];
+					for (let j = 0; j < targetNodes.length; j++) {
+						const target = targetNodes[j];
+						const align = j - targetNodes.length / 2;
 
-					const clusterQuestion = nodesquestions.slice(
-						startNodeIndex,
-						endNodeIndex + 1
-					);
-					const clusterEdges = new Set();
-					for (let i = 0; i < clusterQuestion.length - 1; i++) {
-						const node = clusterQuestion[i];
-						const edges1 = edgesFromQuestion.filter(
-							(el) => el.source === node.id
-						);
-						const edges2 = edgesFromAnswers.filter(
-							(el) => el.target === node.id
-						);
-						edges1.forEach((edge) => {
-							const answer = nodesanswers.find((el) => el.id == edge.target);
-							clusterAnswer.push(answer);
-						});
-						clusterEdges.add(...edges1);
-						clusterEdges.add(...edges2);
+						target.position.x =
+							target.position.x + inlineMargin * Math.trunc(align);
 					}
-
-					genLayoutDagre(clusterQuestion, clusterEdges);
-					startOfCluster = "";
 				}
 			}
 
 			const answersToCurrentQuestion = edgesFromQuestion.filter(
 				(el) => el.source === question.id
 			);
+
 			if (answersToCurrentQuestion.length === 1) {
 				const answerId = answersToCurrentQuestion[0].target;
 				const answer = nodesanswers.find((el) => el.id === answerId);
-				answer.position.x = qx;
+				answer.position.x = qx + 200 / 2;
 				answer.position.y = qy + topMargin;
 			} else if (answersToCurrentQuestion.length == 2) {
 				let answerId = answersToCurrentQuestion[0].target;
@@ -219,6 +172,10 @@ export default function DropZone() {
 					answer.position.y = ay;
 				}
 			} else {
+				if (answersToCurrentQuestion.length > 4) {
+					qx = qx * 3;
+					question.position.x = qx;
+				}
 				for (let i = 0; i < answersToCurrentQuestion.length; i++) {
 					const answerId = answersToCurrentQuestion[i].target;
 					const answer = nodesanswers.find((el) => el.id === answerId);
@@ -247,10 +204,11 @@ export default function DropZone() {
 			const questions = json.questions;
 
 			Object.entries(questions).forEach(([id, data]) => {
+				data.id = id;
 				const question = {
 					id: id,
 					data: data,
-					position: { x: 0, y: 0 },
+					position: { x: 0, y: -900 },
 					type: "Question",
 				};
 				if (!!data.includeIf) {
@@ -276,7 +234,7 @@ export default function DropZone() {
 					const answer = {
 						id: id,
 						data: data,
-						position: { x: 0, y: -100 },
+						position: { x: 0, y: -900 },
 						type: data.type,
 					};
 					const edgeFromQuestion = {
@@ -315,14 +273,11 @@ export default function DropZone() {
 			edges.push(...ifEdges);
 			edges.push(...elseEdges);
 
-			//genLayoutDagre(nodes, edges);
 			onNodesChange(nodes);
 			onEdgesChange(edges);
-			console.log("finish upload");
 		};
 
 		acceptedFiles.forEach((file) => {
-			console.log("start upload");
 			reader.readAsText(file);
 		});
 	};
