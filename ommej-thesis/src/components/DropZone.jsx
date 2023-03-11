@@ -76,125 +76,185 @@ export default function DropZone() {
 		[isDragAccept, isDragReject]
 	);
 
-	const layout = (
-		nodesquestions,
-		nodesanswers,
+	function getPrevAnswers(question, edgesFromAnswers, nodesAnswers) {
+		const prevAEdge = edgesFromAnswers.filter(
+			(el) => el.target === question.id
+		);
+		const answers = [];
+		prevAEdge.forEach((edge) => {
+			answers.push(nodesAnswers.find((el) => el.id === edge.source));
+		});
+		return answers;
+	}
+	function getNextAnswers(question, edgesFromQuestion, nodesAnswers) {
+		const nextAEdge = edgesFromQuestion.filter(
+			(el) => el.source === question.id
+		);
+		const answers = [];
+		nextAEdge.forEach((edge) => {
+			answers.push(nodesAnswers.find((el) => el.id == edge.target));
+		});
+		return answers;
+	}
+
+	function placeQuestion(
+		question,
+		nodesQuestions,
+		nodesAnswers,
+		edgesFromAnswers,
+		edgesFromQuestion
+	) {
+		const prevAnswers = getPrevAnswers(
+			question,
+			edgesFromAnswers,
+			nodesAnswers
+		);
+
+		if (prevAnswers.length === 1) {
+			setNodePosition(
+				question,
+				prevAnswers[0].position.x,
+				prevAnswers[0].position.y + 200
+			);
+		} else {
+			let nextX = 0;
+
+			prevAnswers.forEach((element) => {
+				nextX = nextX + element.position.x;
+			});
+			nextX = Math.round(nextX / prevAnswers.length);
+			nextX = centralizeX(nextX);
+
+			const yPositions = prevAnswers.map((answer) => answer.position.y);
+			const maxY = Math.max(...yPositions);
+			prevAnswers.forEach((answer) => {
+				answer.position.y = maxY;
+			});
+			setNodePosition(question, nextX, maxY + 200);
+		}
+	}
+	function placeAnswers(
+		question,
+		nodesQuestions,
+		nodesAnswers,
+		edgesFromAnswers,
+		edgesFromQuestion
+	) {
+		const questionPosition = getNodePosition(question);
+		const nextAnswers = getNextAnswers(
+			question,
+			edgesFromQuestion,
+			nodesAnswers
+		);
+
+		if (nextAnswers.length === 1) {
+			detectCollision(
+				questionPosition[0],
+				questionPosition[1] + 200,
+				nodesAnswers
+			);
+
+			setNodePosition(
+				nextAnswers[0],
+				questionPosition[0],
+				questionPosition[1] + 200
+			);
+		} else if (nextAnswers.length === 2) {
+			detectCollision(
+				questionPosition[0] - 300,
+				questionPosition[1] + 200,
+				nodesAnswers
+			);
+			setNodePosition(
+				nextAnswers[0],
+				questionPosition[0] - 300,
+				questionPosition[1] + 200
+			);
+			detectCollision(
+				questionPosition[0] + 300,
+				questionPosition[1] + 200,
+				nodesAnswers
+			);
+
+			setNodePosition(
+				nextAnswers[1],
+				questionPosition[0] + 300,
+				questionPosition[1] + 200
+			);
+		} else {
+			for (let index = 0; index < nextAnswers.length; index++) {
+				const answer = nextAnswers[index];
+				let posA = index - nextAnswers.length / 2;
+
+				const answerX = questionPosition[0] + 400 * posA;
+				detectCollision(answerX, questionPosition[1] + 200, nodesAnswers);
+
+				setNodePosition(answer, answerX, questionPosition[1] + 200);
+			}
+		}
+	}
+
+	function getNodePosition(node) {
+		return [node.position.x, node.position.y];
+	}
+	function setNodePosition(node, x, y) {
+		node.position.x = x;
+		node.position.y = y;
+	}
+
+	function centralizeX(x) {
+		return x + 200 / 2;
+	}
+
+	function detectCollision(x, y, nodes) {
+		return nodes.find((el) => el.position.x === x && el.position.y === y);
+	}
+
+	function layout(
+		nodesQuestions,
+		nodesAnswers,
 		edgesFromAnswers,
 		edgesFromQuestion,
 		elseEdges,
 		ifEdges
-	) => {
-		const rootX = 100;
+	) {
+		const rootX = 980;
 		const rootY = 0;
-		const topMargin = 200;
-		let inlineMargin = 300;
-
-		let startOfCluster = "";
-		for (let i = 0; i < nodesquestions.length; i++) {
-			const question = nodesquestions[i];
-			let qy = 0;
-			let qx = 0;
+		for (let i = 0; i < nodesQuestions.length; i++) {
+			const question = nodesQuestions[i];
+			console.log(question);
 			if (i === 0) {
-				question.position.x = rootX;
-				question.position.y = rootY;
-			} else {
-				const prevAnswers = edgesFromAnswers.filter(
-					(el) => el.target === question.id
+				setNodePosition(question, rootX, rootY);
+				placeAnswers(
+					question,
+					nodesQuestions,
+					nodesAnswers,
+					edgesFromAnswers,
+					edgesFromQuestion
 				);
-				let totalX = 0;
-				let prevY = 0;
-
-				prevAnswers.forEach((edge) => {
-					const answer = nodesanswers.find((el) => el.id === edge.source);
-					totalX = totalX + answer.position.x;
-					if (prevY < answer.position.y) {
-						prevY = answer.position.y;
-					}
-				});
-				qx = totalX / prevAnswers.length;
-				qy = prevY + topMargin;
-
-				question.position.x = qx;
-				question.position.y = qy;
-				const centerX = qx + 200 / 2;
-				const centerY = qy + 200 / 2;
-
-				// find a node where the center point is inside
-				const targetNodes = nodesquestions.filter(
-					(n) =>
-						centerX > n.position.x - inlineMargin &&
-						centerX < n.position.x + 200 + inlineMargin &&
-						centerY > n.position.y &&
-						centerY < n.position.y + 200 &&
-						n.id !== question.id
-				);
-				if (targetNodes.length > 0) {
-					console.log(targetNodes);
-
-					for (let j = 0; j < targetNodes.length; j++) {
-						const target = targetNodes[j];
-						const align = j - targetNodes.length / 2;
-
-						target.position.x =
-							target.position.x + inlineMargin * Math.trunc(align);
-					}
-				}
-			}
-
-			const answersToCurrentQuestion = edgesFromQuestion.filter(
-				(el) => el.source === question.id
-			);
-
-			if (answersToCurrentQuestion.length === 1) {
-				const answerId = answersToCurrentQuestion[0].target;
-				const answer = nodesanswers.find((el) => el.id === answerId);
-				answer.position.x = qx + 200 / 2;
-				answer.position.y = qy + topMargin;
-			} else if (answersToCurrentQuestion.length == 2) {
-				let answerId = answersToCurrentQuestion[0].target;
-				let answer = nodesanswers.find((el) => el.id === answerId);
-				answer.position.x = qx + inlineMargin;
-				answer.position.y = qy + topMargin;
-				answerId = answersToCurrentQuestion[1].target;
-				answer = nodesanswers.find((el) => el.id === answerId);
-				answer.position.x = qx - inlineMargin * 2;
-				answer.position.y = qy + topMargin;
-			} else if (answersToCurrentQuestion.length % 2 == 0) {
-				for (let i = 0; i < answersToCurrentQuestion.length; i++) {
-					const answerId = answersToCurrentQuestion[i].target;
-					const answer = nodesanswers.find((el) => el.id === answerId);
-
-					const align = i - answersToCurrentQuestion.length / 2 + 0.25;
-
-					const ax = qx + inlineMargin * Math.trunc(align);
-					const ay = qy + topMargin;
-					answer.position.x = ax;
-					answer.position.y = ay;
-				}
 			} else {
-				if (answersToCurrentQuestion.length > 4) {
-					qx = qx * 3;
-					question.position.x = qx;
-				}
-				for (let i = 0; i < answersToCurrentQuestion.length; i++) {
-					const answerId = answersToCurrentQuestion[i].target;
-					const answer = nodesanswers.find((el) => el.id === answerId);
-
-					const align = i - answersToCurrentQuestion.length / 2 + 0.5;
-
-					const ax = qx + inlineMargin * align;
-					const ay = qy + topMargin;
-					answer.position.x = ax;
-					answer.position.y = ay;
-				}
+				placeQuestion(
+					question,
+					nodesQuestions,
+					nodesAnswers,
+					edgesFromAnswers,
+					edgesFromQuestion
+				);
+				placeAnswers(
+					question,
+					nodesQuestions,
+					nodesAnswers,
+					edgesFromAnswers,
+					edgesFromQuestion
+				);
 			}
 		}
-	};
+	}
 	const handleUpload = () => {
 		const reader = new FileReader();
 		reader.onload = function (e) {
-			const nodesquestion = [];
-			const nodesanswers = [];
+			const nodesQuestions = [];
+			const nodesAnswers = [];
 			const contents = e.target.result;
 			const json = JSON.parse(contents);
 			const edgesFromQuestions = [];
@@ -230,13 +290,14 @@ export default function DropZone() {
 				}
 				const answers = data.answers;
 				Object.entries(answers).forEach(([id, data]) => {
+					data.id = id;
+
 					const answer = {
 						id: id,
 						data: data,
 						position: { x: 0, y: -900 },
-						type: data.type,
+						type: "answer_" + data.type,
 					};
-					console.log(answer);
 
 					const edgeFromQuestion = {
 						id: "fromQ " + question.id + " " + id,
@@ -253,27 +314,26 @@ export default function DropZone() {
 						edgesFromAnswers.push(edgeFromAnswer);
 					}
 					edgesFromQuestions.push(edgeFromQuestion);
-					nodesanswers.push(answer);
+					nodesAnswers.push(answer);
 				});
-				nodesquestion.push(question);
+				nodesQuestions.push(question);
 			});
 
 			layout(
-				nodesquestion,
-				nodesanswers,
+				nodesQuestions,
+				nodesAnswers,
 				edgesFromAnswers,
 				edgesFromQuestions,
 				elseEdges,
 				ifEdges
 			);
 
-			nodes.push(...nodesquestion);
-			nodes.push(...nodesanswers);
+			nodes.push(...nodesQuestions);
+			nodes.push(...nodesAnswers);
 			edges.push(...edgesFromAnswers);
 			edges.push(...edgesFromQuestions);
 			edges.push(...ifEdges);
 			edges.push(...elseEdges);
-
 			onNodesChange(nodes);
 			onEdgesChange(edges);
 		};

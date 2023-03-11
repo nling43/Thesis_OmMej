@@ -247,7 +247,7 @@ export default function DropZone() {
 						id: id,
 						data: data,
 						position: { x: answerX, y: y + 50 + nodeHeight },
-						type: data.type,
+						type: "answer_" + data.type,
 					};
 					const edgeFromQuestion = {
 						id: "fromQ " + question.id + " " + id,

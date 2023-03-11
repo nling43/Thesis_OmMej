@@ -4,14 +4,13 @@ import styled from "styled-components";
 
 const Node = styled.div`
 	padding: 3px 3px;
-		font-size: 0.5rem:
-	witdh :200px;
-	border-radius: 200px;
+	font-size: 0.5rem;
 	background: ${(props) => props.theme.answerBg};
 	color: ${(props) => props.theme.answerText};
-	border: 2px solid
-		${(props) =>
-			props.selected ? props.theme.handleInputColor : props.theme.nodeBorder};
+	width: 200px;
+	height: 100px;
+	${(props) =>
+		props.selected ? props.theme.handleInputColor : props.theme.nodeBorder};
 	.react-flow__handle {
 		background: ${(props) => props.theme.handleInputColor};
 		width: 8px;
@@ -26,7 +25,7 @@ export default memo(({ data, selected }) => {
 		<Node selected={selected}>
 			<Handle type="target" position="top" style={{ width: 13 }} />
 			<div>
-				<strong>{data.type}</strong>
+				<strong>{data.id}</strong>
 			</div>
 			<Handle type="source" position="bottom" id="1"></Handle>
 		</Node>

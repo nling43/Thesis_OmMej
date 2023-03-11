@@ -5,13 +5,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowDownLong } from "@fortawesome/free-solid-svg-icons";
 const Node = styled.div`
 	padding: 3px 5px;
-		font-size: 0.5rem:
-
-	border-radius: 200px;
+	font-size: 0.5rem;
+	width: 200px;
+	height: 100px;
 	background: ${(props) => props.theme.answerBg};
 	color: ${(props) => props.theme.answerSkip};
 	border: 1px solid
-		${(props) => (props.selected ? props.theme.primary : props.theme.nodeBorder)};
+		${(props) =>
+			props.selected ? props.theme.primary : props.theme.nodeBorder};
 
 	.react-flow__handle {
 		background: ${(props) => props.theme.handleInputColor};
@@ -27,7 +28,7 @@ export default memo(({ data, selected }) => {
 		<Node selected={selected}>
 			<Handle type="target" position="top" style={{ width: 13 }} />
 			<div>
-				<strong>{data.type}</strong>
+				<strong>{data.id}</strong>
 			</div>
 			<Handle type="source" position="bottom" id="1"></Handle>
 		</Node>
