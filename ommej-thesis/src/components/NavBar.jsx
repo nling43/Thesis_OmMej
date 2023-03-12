@@ -17,7 +17,6 @@ const selector = (state) => ({
 export default function NavBar() {
 	const { onClear, onEdgesChange } = useStore(selector, shallow);
 	const handleImport = () => {
-		console.log("test");
 		onClear();
 		onEdgesChange([]);
 	};
