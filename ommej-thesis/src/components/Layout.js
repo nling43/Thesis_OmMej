@@ -1,30 +1,38 @@
-function getPrevAnswers(question, edgesFromAnswers, nodesAnswers) {
+let questions = [];
+let answers = [];
+let edgesFromAnswers = [];
+let edgesFromQuestion = [];
+let elseEdges = [];
+let ifEdges = [];
+const rootX = 980;
+const rootY = 0;
+const nodeHeight = 200;
+const nodeWidth = 200;
+
+function getPrevAnswers(question) {
 	const prevAEdge = edgesFromAnswers.filter((el) => el.target === question.id);
-	const answers = [];
+	const prevAnswers = [];
 	prevAEdge.forEach((edge) => {
-		answers.push(nodesAnswers.find((el) => el.id === edge.source));
+		prevAnswers.push(answers.find((el) => el.id === edge.source));
 	});
-	return answers;
+	return prevAnswers;
 }
-function getNextAnswers(question, edgesFromQuestion, nodesAnswers) {
-	const nextAEdge = edgesFromQuestion.filter((el) => el.source === question.id);
-	const answers = [];
-	nextAEdge.forEach((edge) => {
-		answers.push(nodesAnswers.find((el) => el.id == edge.target));
+function getNextAnswers(question) {
+	const nextQEdge = edgesFromQuestion.filter((el) => el.source === question.id);
+	const nextanswers = [];
+	nextQEdge.forEach((edge) => {
+		nextanswers.push(answers.find((el) => el.id == edge.target));
 	});
-	return answers;
+	return nextanswers;
 }
 
-function getNextQuestions() {}
+function getNextQuestions(question) {
+	const nextAnswers = getNextAnswers(question);
+	const prevAEdge = edgesFromAnswers.filter((el) => el.target === question.id);
+}
 
-function placeQuestion(
-	question,
-	nodesQuestions,
-	nodesAnswers,
-	edgesFromAnswers,
-	edgesFromQuestion
-) {
-	const prevAnswers = getPrevAnswers(question, edgesFromAnswers, nodesAnswers);
+function placeQuestion(question) {
+	const prevAnswers = getPrevAnswers(question);
 	if (question.id === "897f6b3e-ed1f-40ce-9d24-9c19720547bc") {
 		console.log(prevAnswers);
 	}
@@ -32,7 +40,7 @@ function placeQuestion(
 		setNodePosition(
 			question,
 			prevAnswers[0].position.x,
-			prevAnswers[0].position.y + 200
+			prevAnswers[0].position.y + nodeHeight
 		);
 	} else {
 		let nextX = 0;
@@ -45,74 +53,44 @@ function placeQuestion(
 		nextX = centralizeX(nextX);
 
 		const yPositions = prevAnswers.map((answer) => answer.position.y);
-		const maxY = Math.max(...yPositions);
+		let maxY = Math.max(...yPositions);
+
 		prevAnswers.forEach((answer) => {
 			answer.position.y = maxY;
 		});
-		if (question.id === "897f6b3e-ed1f-40ce-9d24-9c19720547bc") {
-			console.log(...yPositions);
-			console.log(maxY);
+		if (prevAnswers.length >= 5) {
+			maxY = maxY + nodeHeight;
 		}
-		setNodePosition(question, nextX, maxY + 200);
+		setNodePosition(question, nextX, maxY + nodeHeight);
 	}
 }
-function placeAnswers(
-	question,
-	nodesQuestions,
-	nodesAnswers,
-	edgesFromAnswers,
-	edgesFromQuestion
-) {
+function placeAnswers(question) {
 	let questionPosition = getNodePosition(question);
-	const nextAnswers = getNextAnswers(question, edgesFromQuestion, nodesAnswers);
+	const nextAnswers = getNextAnswers(question);
 
 	if (nextAnswers.length === 1) {
-		detectCollision(
-			questionPosition[0],
-			questionPosition[1] + 200,
-			nodesAnswers
-		);
-
 		setNodePosition(
 			nextAnswers[0],
 			questionPosition[0],
-			questionPosition[1] + 200
+			questionPosition[1] + nodeHeight
 		);
 	} else if (nextAnswers.length === 2) {
-		detectCollision(
-			questionPosition[0] - 300,
-			questionPosition[1] + 200,
-			nodesAnswers
-		);
 		setNodePosition(
 			nextAnswers[0],
 			questionPosition[0] - 300,
-			questionPosition[1] + 200
-		);
-		detectCollision(
-			questionPosition[0] + 300,
-			questionPosition[1] + 200,
-			nodesAnswers
+			questionPosition[1] + nodeHeight
 		);
 
 		setNodePosition(
 			nextAnswers[1],
 			questionPosition[0] + 300,
-			questionPosition[1] + 200
+			questionPosition[1] + nodeHeight
 		);
 	} else if (nextAnswers.length >= 10) {
 		if (questionPosition[0] - 980 < 0)
-			setNodePosition(
-				question,
-				questionPosition[0] - 1500,
-				questionPosition[1]
-			);
+			setNodePosition(question, questionPosition[0] - 500, questionPosition[1]);
 		else {
-			setNodePosition(
-				question,
-				questionPosition[0] + 1500,
-				questionPosition[1]
-			);
+			setNodePosition(question, questionPosition[0] + 500, questionPosition[1]);
 		}
 		questionPosition = getNodePosition(question);
 
@@ -120,9 +98,8 @@ function placeAnswers(
 			const answer = nextAnswers[index];
 
 			const answerX = questionPosition[0] + 1200 * index;
-			detectCollision(answerX, questionPosition[1] + 200, nodesAnswers);
 
-			setNodePosition(answer, answerX, questionPosition[1] + 200);
+			setNodePosition(answer, answerX, questionPosition[1] + nodeHeight);
 		}
 	} else {
 		for (let index = 0; index < nextAnswers.length; index++) {
@@ -130,9 +107,11 @@ function placeAnswers(
 			let posA = index - nextAnswers.length / 2;
 
 			const answerX = questionPosition[0] + 400 * posA;
-			detectCollision(answerX, questionPosition[1] + 200, nodesAnswers);
-
-			setNodePosition(answer, answerX, questionPosition[1] + 200);
+			let answerY = questionPosition[1] + nodeHeight;
+			while (typeof detectCollision(answerX, answerY, answers) != "undefined") {
+				answerY = answerY + nodeHeight;
+			}
+			setNodePosition(answer, answerX, answerY);
 		}
 	}
 }
@@ -158,40 +137,27 @@ function detectCollision(x, y, nodes) {
 
 export function layout(
 	nodesQuestions,
-	nodesAnswers,
-	edgesFromAnswers,
-	edgesFromQuestion,
+	nodeAnswers,
+	edgesAnswers,
+	edgesQuestion,
 	elseEdges,
 	ifEdges
 ) {
-	const rootX = 980;
-	const rootY = 0;
-	for (let i = 0; i < nodesQuestions.length; i++) {
-		const question = nodesQuestions[i];
+	questions = nodesQuestions;
+	answers = nodeAnswers;
+	edgesFromAnswers = edgesAnswers;
+	edgesFromQuestion = edgesQuestion;
+	elseEdges = elseEdges;
+	ifEdges = ifEdges;
+	console.log(answers);
+	for (let i = 0; i < questions.length; i++) {
+		const question = questions[i];
 		if (i === 0) {
 			setNodePosition(question, rootX, rootY);
-			placeAnswers(
-				question,
-				nodesQuestions,
-				nodesAnswers,
-				edgesFromAnswers,
-				edgesFromQuestion
-			);
+			placeAnswers(question);
 		} else {
-			placeQuestion(
-				question,
-				nodesQuestions,
-				nodesAnswers,
-				edgesFromAnswers,
-				edgesFromQuestion
-			);
-			placeAnswers(
-				question,
-				nodesQuestions,
-				nodesAnswers,
-				edgesFromAnswers,
-				edgesFromQuestion
-			);
+			placeQuestion(question);
+			placeAnswers(question);
 		}
 	}
 }

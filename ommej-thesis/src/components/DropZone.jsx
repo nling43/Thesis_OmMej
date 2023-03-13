@@ -137,9 +137,6 @@ export default function DropZone() {
 							target: data.next,
 						};
 
-						if (id === "b16ace36-6503-4f4f-b822-7917de51e688")
-							console.log(data.next);
-
 						edgesFromAnswers.push(edgeFromAnswer);
 					}
 					edgesFromQuestions.push(edgeFromQuestion);
