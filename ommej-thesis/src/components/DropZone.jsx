@@ -100,8 +100,8 @@ export default function DropZone() {
 					data.includeIf.answers.forEach((element) => {
 						const ifEdge = {
 							id: "if " + id + " " + element,
-							source: id,
-							target: element,
+							source: element,
+							target: id,
 							style: { stroke: "green" },
 						};
 						ifEdges.push(ifEdge);
@@ -128,6 +128,7 @@ export default function DropZone() {
 						id: "fromQ " + question.id + " " + id,
 						source: question.id,
 						target: id,
+						type: "step",
 					};
 
 					if (!!data.next) {
@@ -135,6 +136,7 @@ export default function DropZone() {
 							id: "fromA " + id + " " + data.next,
 							source: id,
 							target: data.next,
+							type: "step",
 						};
 
 						edgesFromAnswers.push(edgeFromAnswer);

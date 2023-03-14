@@ -1,11 +1,5 @@
 import React from "react";
-import ReactFlow, {
-	MiniMap,
-	Controls,
-	Background,
-	useOnSelectionChange,
-	Panel,
-} from "reactflow";
+import ReactFlow, { MiniMap, Controls, Panel } from "reactflow";
 import { shallow } from "zustand/shallow";
 import styled, { ThemeProvider } from "styled-components";
 import { darkTheme } from "../theme";
@@ -111,21 +105,25 @@ function Flow() {
 
 	const sideBar = () => {
 		if (selected.nodes && selected.nodes.length > 0) {
-			if (selected.nodes[0].data.type === "text")
+			if (selected.nodes[0].data.type === "text") {
 				return (
 					<PanelsStyled position="top-right">
-						<h1>Node Data</h1>
-						<h2>Node ID: {selected.nodes[0].id}</h2>
-						<h2>Node Type: {selected.nodes[0].type}</h2>
-						<h2>Node Text: {selected.nodes[0].data.text.sv}</h2>
+						<p>Node Data</p>
+						<p>Node ID: {selected.nodes[0].id}</p>
+						<p>Node Type: {selected.nodes[0].type}</p>
+						<p>Node Text: {selected.nodes[0].data.text.sv}</p>
+						<p>Node x: {selected.nodes[0].position.x}</p>
+						<p>Node y: {selected.nodes[0].position.y}</p>
 					</PanelsStyled>
 				);
-			else {
+			} else {
 				return (
 					<PanelsStyled position="top-right">
-						<h1>Node Data</h1>
-						<h2>Node ID: {selected.nodes[0].id}</h2>
-						<h2>Node Type: {selected.nodes[0].type}</h2>
+						<p>Node Data</p>
+						<p>Node ID: {selected.nodes[0].id}</p>
+						<p>Node Type: {selected.nodes[0].type}</p>
+						<p>Node x: {selected.nodes[0].position.x}</p>
+						<p>Node y: {selected.nodes[0].position.y}</p>
 					</PanelsStyled>
 				);
 			}
