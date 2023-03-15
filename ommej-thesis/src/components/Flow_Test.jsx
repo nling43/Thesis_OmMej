@@ -5,7 +5,6 @@ import styled, { ThemeProvider } from "styled-components";
 import { darkTheme } from "../theme";
 import "reactflow/dist/style.css";
 import "../css/Flow.css";
-import { SmartStraightEdge } from "@tisoap/react-flow-smart-edge";
 import useStore from "../Store/store";
 
 //Question nodes design and presentation
@@ -46,9 +45,6 @@ const nodeTypes = {
 	answer_accommodations: AnswerNodeAccommodations,
 };
 
-const edgeTypes = {
-	smart: SmartStraightEdge,
-};
 const selector = (state) => ({
 	nodes: state.nodes,
 	edges: state.edges,
@@ -146,7 +142,6 @@ function Flow() {
 					onEdgesChange={onEdgesChange}
 					onConnect={onConnect}
 					nodeTypes={nodeTypes}
-					edgeTypes={edgeTypes}
 					onSelectionChange={onSelectNodes}
 				>
 					<ControlsStyled />

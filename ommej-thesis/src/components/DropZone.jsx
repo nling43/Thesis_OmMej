@@ -1,13 +1,10 @@
 import React, { useMemo } from "react";
-import ELK from "elkjs";
 import { useDropzone } from "react-dropzone";
 import Button from "react-bootstrap/Button";
 import "../css/DropZone.css";
-import { hierarchy, tree, cluster } from "d3-hierarchy";
 import { shallow } from "zustand/shallow";
 import "reactflow/dist/style.css";
 import useStore from "../Store/store";
-import dagre from "dagre";
 import { layout } from "./Layout.js";
 export default function DropZone() {
 	const selector = (state) => ({
@@ -128,7 +125,6 @@ export default function DropZone() {
 						id: "fromQ " + question.id + " " + id,
 						source: question.id,
 						target: id,
-						type: "step",
 					};
 
 					if (!!data.next) {
@@ -136,7 +132,6 @@ export default function DropZone() {
 							id: "fromA " + id + " " + data.next,
 							source: id,
 							target: data.next,
-							type: "step",
 						};
 
 						edgesFromAnswers.push(edgeFromAnswer);

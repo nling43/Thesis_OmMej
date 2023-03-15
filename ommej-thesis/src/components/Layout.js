@@ -17,7 +17,6 @@ function getPrevAnswers(question) {
 	const prevAEdge = edgesFromAnswers.filter((el) => el.target === question.id);
 	const prevIfEdge = ifEdges.filter((el) => el.target === question.id);
 	const prevElseEdge = elseEdges.filter((el) => el.target === question.id);
-	console.log(prevIfEdge);
 	const prevAnswers = [];
 	prevAEdge.forEach((edge) => {
 		prevAnswers.push(answers.find((el) => el.id === edge.source));
@@ -29,7 +28,6 @@ function getPrevAnswers(question) {
 		prevElseEdge.forEach((edge) => {
 			prevAnswers.push(questions.find((el) => el.id === edge.source));
 		});
-		console.log(prevAnswers);
 	}
 
 	return prevAnswers;
@@ -65,16 +63,29 @@ function getNextQuestions(question) {
 	return [...nextquestions];
 }
 
+function getPrevQuestions(question) {
+	const prevAEdge = edgesFromAnswers.filter((el) => el.target === question.id); // get answer edges where target is the question
+	const prevQuestions = new Set();
+	const prevQEdge = [];
+	prevAEdge.forEach((edge) => {
+		prevQEdge.push(edgesFromQuestion.find((el) => el.target === edge.sorce)); // push edges where the prev answer is the target
+	});
+	if (prevAEdge.length > 0)
+		prevAEdge.forEach((edge) => {
+			const nextQ = questions.find((el) => el.id == edge.source);
+			prevQuestions.add(nextQ);
+		});
+	return [...prevQuestions];
+}
 function placeQuestion(question) {
 	const prevAnswers = getPrevAnswers(question);
-	const margin = nodeWidth;
-	const bigMargin = doubleNodeHeight;
 
 	if (prevAnswers.length === 1) {
-		setNodePosition(
-			question,
+		setQuestion(
 			prevAnswers[0].position.x,
-			prevAnswers[0].position.y + nodeHeight
+			prevAnswers[0].position.y + doubleNodeHeight,
+			questions,
+			question
 		);
 	} else {
 		let nextX = 0;
@@ -83,7 +94,6 @@ function placeQuestion(question) {
 			nextX = nextX + element.position.x;
 		});
 		nextX = Math.round(nextX / prevAnswers.length);
-		nextX = centralizeX(nextX);
 		const yPositions = prevAnswers.map((answer) => answer.position.y);
 		let maxY = Math.max(...yPositions);
 
@@ -91,35 +101,44 @@ function placeQuestion(question) {
 			if (!isColliding(answer.position.x, maxY, answers, answer))
 				setNodePosition(answer, answer.position.x, maxY);
 		});
-		if (prevAnswers.length >= 5) {
-			maxY = maxY + bigMargin;
+		if (prevAnswers.length > 6) {
+			maxY = maxY + doubleNodeHeight * 2;
 		}
-		setNodePosition(question, nextX, maxY + margin);
+		maxY = maxY + doubleNodeHeight;
+
+		setQuestion(nextX, maxY, questions, question);
 	}
 }
 function placeAnswers(question) {
 	let questionPosition = getNodePosition(question);
 	const nextAnswers = getNextAnswers(question);
-	let margin = nodeWidth + 100;
+
+	let margin = nodeWidth + 300;
 	const bigMargin = doubleNodeWidth;
 	if (getNextQuestions(question).length > 1) margin = bigMargin + 200;
 	if (nextAnswers.length === 1) {
-		setNodePosition(
-			nextAnswers[0],
+		setAnswer(
 			questionPosition[0],
-			questionPosition[1] + nodeHeight
+			questionPosition[1] + doubleNodeHeight,
+			answers,
+			nextAnswers[0],
+			questionPosition[0]
 		);
 	} else if (nextAnswers.length === 2) {
-		setNodePosition(
+		setAnswer(
+			questionPosition[0] - nodeWidth,
+			questionPosition[1] + doubleNodeHeight,
+			answers,
 			nextAnswers[0],
-			centralizeX(questionPosition[0]) - margin,
-			questionPosition[1] + nodeHeight
+			questionPosition[0]
 		);
 
-		setNodePosition(
+		setAnswer(
+			questionPosition[0] + doubleNodeWidth,
+			questionPosition[1] + doubleNodeHeight,
+			answers,
 			nextAnswers[1],
-			centralizeX(questionPosition[0]) + margin,
-			questionPosition[1] + nodeHeight
+			questionPosition[0]
 		);
 	} else if (nextAnswers.length >= 10) {
 		if (questionPosition[0] < 980)
@@ -132,22 +151,60 @@ function placeAnswers(question) {
 		for (let index = 0; index < nextAnswers.length; index++) {
 			const answer = nextAnswers[index];
 
-			const answerX = questionPosition[0] + 1200 * index;
-			let answerY = questionPosition[1] + nodeHeight;
+			const answerX = questionPosition[0] + 1800 * index;
+			let answerY = questionPosition[1] + doubleNodeHeight;
 
-			setNodePosition(answer, answerX, answerY);
+			setAnswer(answerX, answerY, answers, answer, questionPosition[0]);
 		}
-	} else {
+	} else if (nextAnswers.length % 2 == 0) {
 		for (let index = 0; index < nextAnswers.length; index++) {
 			const answer = nextAnswers[index];
-			let posA = index - nextAnswers.length / 2;
+			let posA = index - nextAnswers.length / 2 + 0.25;
+
+			const answerX = questionPosition[0] + margin * Math.trunc(posA);
+			let answerY = questionPosition[1] + doubleNodeHeight;
+
+			setAnswer(answerX, answerY, answers, answer, questionPosition[0]);
+		}
+	} else {
+		for (let i = 0; i < nextAnswers.length; i++) {
+			const answer = nextAnswers[i];
+
+			let posA = i - nextAnswers.length / 2 + 0.5;
 
 			const answerX = questionPosition[0] + margin * posA;
-			let answerY = questionPosition[1] + nodeHeight;
+			let answerY = questionPosition[1] + doubleNodeHeight;
 
-			setNodePosition(answer, answerX, answerY);
+			setAnswer(answerX, answerY, answers, answer, questionPosition[0]);
 		}
 	}
+}
+
+function setAnswer(answerX, answerY, answers, answer, questionX) {
+	console.log(answer.id);
+
+	let x = answerX;
+	let y = answerY;
+	while (isAnswerColliding(x, y, answers, answer)) {
+		if (questionX > answerX) {
+			x = x + 10;
+		} else {
+			x = x - 10;
+		}
+	}
+	setNodePosition(answer, x, y);
+}
+function setQuestion(qX, qY, questions, question) {
+	let x = qX;
+	let y = qY;
+	while (isColliding(x, y, questions, question)) {
+		if (x > rootX) {
+			x = x + 1000;
+		} else {
+			x = x - 1000;
+		}
+	}
+	setNodePosition(question, x, y);
 }
 
 function getNodePosition(node) {
@@ -177,7 +234,29 @@ function isColliding(x, y, nodes, node) {
 
 	if (typeof collision === "undefined" || node.id === collision.id)
 		return false;
-	else return true;
+	else {
+		return true;
+	}
+}
+
+function isAnswerColliding(x, y, nodes, node) {
+	const collision = nodes.find(
+		(node) =>
+			(x >= node.position.x &&
+				x <= node.position.x + nodeWidth &&
+				y >= node.position.y &&
+				y <= node.position.y + nodeHeight) ||
+			(x + 200 >= node.position.x &&
+				x + 200 <= node.position.x + nodeWidth &&
+				y >= node.position.y &&
+				y <= node.position.y + nodeHeight)
+	);
+
+	if (typeof collision === "undefined" || node.id === collision.id)
+		return false;
+	else {
+		return true;
+	}
 }
 
 export function layout(

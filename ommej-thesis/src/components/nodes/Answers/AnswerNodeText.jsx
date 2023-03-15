@@ -7,7 +7,7 @@ const Node = styled.div`
 	font-size: 0.5rem;
 	background: ${(props) => props.theme.answerBg};
 	color: ${(props) => props.theme.answerText};
-	width: 200px;
+	width: 100px;
 	height: 100px;
 	${(props) =>
 		props.selected ? props.theme.handleInputColor : props.theme.nodeBorder};
