@@ -1,17 +1,10 @@
 import React from "react";
-import ReactFlow, {
-	MiniMap,
-	Controls,
-	Background,
-	useOnSelectionChange,
-	Panel,
-} from "reactflow";
+import ReactFlow, { MiniMap, Controls, Panel } from "reactflow";
 import { shallow } from "zustand/shallow";
 import styled, { ThemeProvider } from "styled-components";
 import { darkTheme } from "../theme";
 import "reactflow/dist/style.css";
 import "../css/Flow.css";
-
 import useStore from "../Store/store";
 
 //Question nodes design and presentation
@@ -51,6 +44,7 @@ const nodeTypes = {
 	answer_none: AnswerNodeSkip,
 	answer_accommodations: AnswerNodeAccommodations,
 };
+
 const selector = (state) => ({
 	nodes: state.nodes,
 	edges: state.edges,
@@ -107,14 +101,28 @@ function Flow() {
 
 	const sideBar = () => {
 		if (selected.nodes && selected.nodes.length > 0) {
-			return (
-				<PanelsStyled position="top-right">
-					<h1>Node Data</h1>
-					<h2>Node ID: {selected.nodes[0].id}</h2>
-					<h2>Node Type: {selected.nodes[0].type}</h2>
-					<h2>Node Text: {selected.nodes[0].data.text.sv}</h2>
-				</PanelsStyled>
-			);
+			if (selected.nodes[0].data.type === "text") {
+				return (
+					<PanelsStyled position="top-right">
+						<p>Node Data</p>
+						<p>Node ID: {selected.nodes[0].id}</p>
+						<p>Node Type: {selected.nodes[0].type}</p>
+						<p>Node Text: {selected.nodes[0].data.text.sv}</p>
+						<p>Node x: {selected.nodes[0].position.x}</p>
+						<p>Node y: {selected.nodes[0].position.y}</p>
+					</PanelsStyled>
+				);
+			} else {
+				return (
+					<PanelsStyled position="top-right">
+						<p>Node Data</p>
+						<p>Node ID: {selected.nodes[0].id}</p>
+						<p>Node Type: {selected.nodes[0].type}</p>
+						<p>Node x: {selected.nodes[0].position.x}</p>
+						<p>Node y: {selected.nodes[0].position.y}</p>
+					</PanelsStyled>
+				);
+			}
 		} else if (
 			selected.nodes &&
 			selected.nodes.length > 1 &&
@@ -137,7 +145,6 @@ function Flow() {
 					onSelectionChange={onSelectNodes}
 				>
 					<ControlsStyled />
-					<MiniMapStyled />
 					{sideBar()}
 				</ReactFlow>
 			</ThemeProvider>
