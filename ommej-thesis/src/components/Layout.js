@@ -1,3 +1,7 @@
+// todo !
+// fix so it doesnt need 2 passes, reason for it is we follow the flow of the json but json is only one dimension, first pass gets weird when the answers hasnt been initialized with anything yet, should follow the flow for edges instead
+//fix so the layout uses the if else edges to decide the layout somehow.
+
 let questions = [];
 let answers = [];
 let edgesFromAnswers = [];
@@ -16,7 +20,6 @@ const doubleNodeHeight = 2 * nodeHeight;
 function getPrevAnswers(question) {
 	const prevAEdge = edgesFromAnswers.filter((el) => el.target === question.id);
 	const prevIfEdge = ifEdges.filter((el) => el.target === question.id);
-	const prevElseEdge = elseEdges.filter((el) => el.target === question.id);
 	const prevAnswers = [];
 	prevAEdge.forEach((edge) => {
 		prevAnswers.push(answers.find((el) => el.id === edge.source));
@@ -24,9 +27,6 @@ function getPrevAnswers(question) {
 	if (prevAnswers.length === 0) {
 		prevIfEdge.forEach((edge) => {
 			prevAnswers.push(answers.find((el) => el.id === edge.source));
-		});
-		prevElseEdge.forEach((edge) => {
-			prevAnswers.push(questions.find((el) => el.id === edge.source));
 		});
 	}
 
@@ -97,17 +97,20 @@ function placeQuestion(question) {
 		const yPositions = prevAnswers.map((answer) => answer.position.y);
 		let maxY = Math.max(...yPositions);
 
+		/*
+		this was used to get all the answers to a question on the same level close to the next question without it answers from a question is close to the current question
+		
 		prevAnswers.forEach((answer) => {
 			if (!isColliding(answer.position.x, maxY, answers, answer))
 				setNodePosition(answer, answer.position.x, maxY);
 		});
+		*/
 		if (prevAnswers.length > 6) {
 			maxY = maxY + doubleNodeHeight * 2;
 		}
 		maxY = maxY + doubleNodeHeight;
 
 		setQuestion(nextX, maxY, questions, question);
-		getQuestionsOnCurrentDepth(question);
 	}
 }
 function placeAnswers(question) {
@@ -140,7 +143,10 @@ function placeAnswers(question) {
 			nextAnswers[1],
 			questionPosition[0]
 		);
-	} else if (nextAnswers.length >= 10) {
+	} else if (
+		nextAnswers.length >= 10 &&
+		getNextQuestions(question).length > 3
+	) {
 		if (questionPosition[0] < 980)
 			setNodePosition(question, questionPosition[0] - 500, questionPosition[1]);
 		else {
@@ -237,17 +243,15 @@ function isColliding(x, y, nodes, node) {
 	}
 }
 
-function getQuestionsOnCurrentDepth(question) {
+function setQuestionsOnCurrentDepth(question) {
 	const questionOnCurrentDepth = questions.filter(
 		(el) => el.position.y === question.position.y
 	);
-
-	if (questionOnCurrentDepth.length > 7) {
-		const sortedXPositions = questionOnCurrentDepth.sort((a, b) => {
-			// left to right
-			return a.position.x > b.position.x;
-		});
-
+	const sortedXPositions = questionOnCurrentDepth.sort((a, b) => {
+		// left to right
+		return a.position.x > b.position.x;
+	});
+	if (questionOnCurrentDepth.length > 2) {
 		for (let index = 1; index < sortedXPositions.length; index++) {
 			const currentQuestion = sortedXPositions[index];
 			const prevQuestion = sortedXPositions[index - 1];
@@ -259,8 +263,16 @@ function getQuestionsOnCurrentDepth(question) {
 
 		for (let index = sortedXPositions.length - 1; index > -1; index--) {
 			const currentQuestion = sortedXPositions[index];
-			console.log(currentQuestion);
 			placeAnswers(currentQuestion);
+		}
+	} else if (questionOnCurrentDepth.length === 2) {
+		const currentQuestion = sortedXPositions[1];
+		const prevQuestion = sortedXPositions[0];
+		if (currentQuestion.position.x - prevQuestion.position.x < 2000) {
+			currentQuestion.position.x = prevQuestion.position.x + 2000;
+
+			placeAnswers(currentQuestion);
+			placeAnswers(prevQuestion);
 		}
 	}
 }
@@ -286,6 +298,17 @@ export function layout(
 			placeAnswers(question);
 		} else {
 			placeQuestion(question);
+			placeAnswers(question);
+		}
+	}
+	for (let i = 0; i < questions.length; i++) {
+		const question = questions[i];
+		if (i === 0) {
+			setNodePosition(question, rootX, rootY);
+			placeAnswers(question);
+		} else {
+			placeQuestion(question);
+			setQuestionsOnCurrentDepth(question);
 			placeAnswers(question);
 		}
 	}
