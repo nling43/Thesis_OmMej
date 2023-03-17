@@ -107,12 +107,12 @@ function placeQuestion(question) {
 		maxY = maxY + doubleNodeHeight;
 
 		setQuestion(nextX, maxY, questions, question);
+		getQuestionsOnCurrentDepth(question);
 	}
 }
 function placeAnswers(question) {
 	let questionPosition = getNodePosition(question);
 	const nextAnswers = getNextAnswers(question);
-
 	let margin = nodeWidth + 300;
 	const bigMargin = doubleNodeWidth;
 	if (getNextQuestions(question).length > 1) margin = bigMargin + 200;
@@ -181,11 +181,9 @@ function placeAnswers(question) {
 }
 
 function setAnswer(answerX, answerY, answers, answer, questionX) {
-	console.log(answer.id);
-
 	let x = answerX;
 	let y = answerY;
-	while (isAnswerColliding(x, y, answers, answer)) {
+	while (isColliding(x, y, answers, answer)) {
 		if (questionX > answerX) {
 			x = x + 10;
 		} else {
@@ -239,23 +237,31 @@ function isColliding(x, y, nodes, node) {
 	}
 }
 
-function isAnswerColliding(x, y, nodes, node) {
-	const collision = nodes.find(
-		(node) =>
-			(x >= node.position.x &&
-				x <= node.position.x + nodeWidth &&
-				y >= node.position.y &&
-				y <= node.position.y + nodeHeight) ||
-			(x + 200 >= node.position.x &&
-				x + 200 <= node.position.x + nodeWidth &&
-				y >= node.position.y &&
-				y <= node.position.y + nodeHeight)
+function getQuestionsOnCurrentDepth(question) {
+	const questionOnCurrentDepth = questions.filter(
+		(el) => el.position.y === question.position.y
 	);
 
-	if (typeof collision === "undefined" || node.id === collision.id)
-		return false;
-	else {
-		return true;
+	if (questionOnCurrentDepth.length > 7) {
+		const sortedXPositions = questionOnCurrentDepth.sort((a, b) => {
+			// left to right
+			return a.position.x > b.position.x;
+		});
+
+		for (let index = 1; index < sortedXPositions.length; index++) {
+			const currentQuestion = sortedXPositions[index];
+			const prevQuestion = sortedXPositions[index - 1];
+			if (currentQuestion.position.x - prevQuestion.position.x < 2000) {
+				currentQuestion.position.x = prevQuestion.position.x + 2000;
+				placeAnswers(currentQuestion);
+			}
+		}
+
+		for (let index = sortedXPositions.length - 1; index > -1; index--) {
+			const currentQuestion = sortedXPositions[index];
+			console.log(currentQuestion);
+			placeAnswers(currentQuestion);
+		}
 	}
 }
 
