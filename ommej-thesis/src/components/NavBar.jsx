@@ -34,6 +34,7 @@ export default function NavBar() {
 		"answer_persons",
 		"answer_none",
 		"answer_accommodations",
+		"test"
 	];
 	return (
 		<>
