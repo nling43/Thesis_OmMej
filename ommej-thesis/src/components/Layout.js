@@ -243,6 +243,8 @@ function isColliding(x, y, nodes, node) {
 	}
 }
 
+// Adjust the position of questions on the same depth to avoid overlaps
+
 function setQuestionsOnCurrentDepth(question) {
 	const questionOnCurrentDepth = questions.filter(
 		(el) => el.position.y === question.position.y
@@ -291,25 +293,24 @@ export function layout(
 	edgesFromQuestion = edgesQuestion;
 	elseEdges = fromFileElseEdges;
 	ifEdges = fromFileifEdges;
-	for (let i = 0; i < questions.length; i++) {
+
+	setNodePosition(questions[0], rootX, rootY);
+	placeAnswers(questions[0]);
+	for (let i = 1; i < questions.length; i++) {
 		const question = questions[i];
-		if (i === 0) {
-			setNodePosition(question, rootX, rootY);
-			placeAnswers(question);
-		} else {
-			placeQuestion(question);
-			placeAnswers(question);
-		}
+		// First attempt to position the question based on its previous answers
+		placeQuestion(question);
+		// Position the answers after each question
+		placeAnswers(question);
 	}
-	for (let i = 0; i < questions.length; i++) {
+
+	// fix so it doesnt need 2 passes, reason for it is we follow the flow of the json but json is only one dimension, first pass gets weird when the answers hasnt been initialized with anything yet, should follow the flow for edges instead
+	for (let i = 1; i < questions.length; i++) {
 		const question = questions[i];
-		if (i === 0) {
-			setNodePosition(question, rootX, rootY);
-			placeAnswers(question);
-		} else {
-			placeQuestion(question);
-			setQuestionsOnCurrentDepth(question);
-			placeAnswers(question);
-		}
+		placeQuestion(question);
+		// If multiple questions have the same depth, adjust their positions
+		// to prevent overlapping answers
+		setQuestionsOnCurrentDepth(question);
+		placeAnswers(question);
 	}
 }

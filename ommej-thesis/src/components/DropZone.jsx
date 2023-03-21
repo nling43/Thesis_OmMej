@@ -20,7 +20,6 @@ export default function DropZone() {
 
 	const {
 		acceptedFiles,
-		fileRejections,
 		getRootProps,
 		getInputProps,
 		isDragAccept,
@@ -73,7 +72,7 @@ export default function DropZone() {
 		[isDragAccept, isDragReject]
 	);
 
-	const handleUpload = () => {
+	const handleUpload = (acceptedFiles) => {
 		const reader = new FileReader();
 		reader.onload = function (e) {
 			const nodesQuestions = [];
