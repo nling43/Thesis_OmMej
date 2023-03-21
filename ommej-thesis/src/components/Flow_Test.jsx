@@ -94,24 +94,37 @@ function Flow() {
   } = useStore(selector, shallow);
 
   const sideBar = () => {
-    if (selected.nodes && selected.nodes.length > 0) {
+    if (selected.nodes && selected.nodes.length === 1) {
       return (
         <PanelsStyled position="top-right">
           <h1>Node Data</h1>
           <h2>Node ID: {selected.nodes[0].id}</h2>
           <h2>Node Type: {selected.nodes[0].type}</h2>
           <h2>Node Text: {selected.nodes[0].data.text.sv}</h2>
+          <h2>Node Data Type:{selected.nodes[0].data.type}</h2>
         </PanelsStyled>
       );
-    } 
-	else if (selected.nodes && selected.nodes.length > 1 && selected.edges.length> 0) {
-	  return (
-		<PanelsStyled position="top-right">
-			Many Nodes here
-		</PanelsStyled>
-	  );
-	}
-	else return <></>;
+    } else if (selected.nodes && selected.nodes.length > 1) {
+      return (
+        <PanelsStyled position="top-right">
+          <h1>Node Data</h1>
+          {selected.nodes.map((node) =>
+            typeof node.data.text.sv !== "undefined" ? (
+              <button>{node.data.text.sv}</button>
+
+            ) : (
+              <button>{node.data.id}</button>
+
+
+
+            )
+          )}
+        </PanelsStyled>
+      );
+    } else {
+      console.log(selected);
+      return <></>;
+    }
   };
 
   return (
