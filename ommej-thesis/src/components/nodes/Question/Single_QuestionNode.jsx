@@ -5,6 +5,8 @@ import styled from "styled-components";
 const Node = styled.div`
 	padding: 3px 5px;
 	border-radius: 0px;
+	width: 200px;
+	height: 100px;
 	background: ${(props) => props.theme.questionBg};
 	color: ${(props) => props.theme.questionTextSingle};
 	border: 2px solid

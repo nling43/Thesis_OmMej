@@ -6,7 +6,7 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 const Node = styled.div`
 	padding: 3px 5px;
 	font-size: 0.5rem;
-	width: 200px;
+	width: 100px;
 	height: 100px;
 	background: ${(props) => props.theme.answerBg};
 	color: ${(props) => props.theme.answerTextPeople};
@@ -28,7 +28,7 @@ export default memo(({ data, selected }) => {
 		<Node selected={selected}>
 			<Handle type="target" position="top" />
 			<div>
-				<strong>{data.id}</strong>
+				<strong>{data.type}</strong>
 			</div>
 			<Handle type="source" position="bottom" id="1"></Handle>
 		</Node>

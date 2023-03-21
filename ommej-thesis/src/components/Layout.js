@@ -148,9 +148,9 @@ function placeAnswers(question) {
 		getNextQuestions(question).length > 3
 	) {
 		if (questionPosition[0] < 980)
-			setNodePosition(question, questionPosition[0] - 500, questionPosition[1]);
+			setNodePosition(question, questionPosition[0], questionPosition[1]);
 		else {
-			setNodePosition(question, questionPosition[0] + 500, questionPosition[1]);
+			setNodePosition(question, questionPosition[0], questionPosition[1]);
 		}
 		questionPosition = getNodePosition(question);
 

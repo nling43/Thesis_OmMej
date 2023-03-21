@@ -90,7 +90,7 @@ export default function DropZone() {
 					id: id,
 					data: data,
 					position: { x: 0, y: -900 },
-					type: "Question",
+					type: "question_" + data.type,
 				};
 				if (!!data.includeIf) {
 					data.includeIf.answers.forEach((element) => {
