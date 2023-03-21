@@ -49,6 +49,7 @@ const useStore = create<RFState>((set, get) => ({
         edges: addEdge(connection, get().edges),
       });
     },
+
     onClear: () => {
       set({
         nodes: applyNodeChanges([],[]),

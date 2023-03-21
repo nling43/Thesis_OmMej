@@ -5,6 +5,8 @@ import styled from "styled-components";
 const Node = styled.div`
 	padding: 3px 5px;
 	border-radius: 0px;
+	width: 200px;
+	height: 100px;
 
 	background: ${(props) => props.theme.questionBg};
 	color: ${(props) => props.theme.nodeColor};
@@ -25,7 +27,7 @@ export default memo(({ data, selected }) => {
 		<Node selected={selected}>
 			<Handle type="target" position="top" />
 			<div>
-				<strong>{data.type}</strong>
+				<strong>{data.id}</strong>
 			</div>
 			<Handle type="source" position="bottom" id="1"></Handle>
 		</Node>
