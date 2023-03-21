@@ -23,7 +23,7 @@ type RFState = {
     onNodesChange: OnNodesChange;
     onEdgesChange: OnEdgesChange;
     onConnect: OnConnect;
-    selectedNodes : any;
+    selectedNodes : any; 
     onSelectNodes : (newSelectedNodes: Node[]) => void;
 }
 
@@ -33,7 +33,6 @@ const useStore = create<RFState>((set, get) => ({
     edges: [],
     selectedNodes:{},
     onSelectNodes: (selected: any) => set(() => ({ selectedNodes: selected })),
-
     onNodesChange: (changes: NodeChange[]) => {
       set({
         nodes: applyNodeChanges(changes, get().nodes),
@@ -49,7 +48,6 @@ const useStore = create<RFState>((set, get) => ({
         edges: addEdge(connection, get().edges),
       });
     },
-
     onClear: () => {
       set({
         nodes: applyNodeChanges([],[]),
