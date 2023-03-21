@@ -85,7 +85,6 @@ export default function DropZone() {
 			const elseEdges = [];
 			const questions = json.questions;
 			Object.entries(questions).forEach(([id, data]) => {
-				data.id = id;
 				const question = {
 					id: id,
 					data: data,
@@ -112,7 +111,6 @@ export default function DropZone() {
 				}
 				const answers = data.answers;
 				Object.entries(answers).forEach(([id, data]) => {
-					data.id = id;
 					const answer = {
 						id: id,
 						data: data,
@@ -175,7 +173,11 @@ export default function DropZone() {
 				</div>
 			</div>
 			<div className="buttonContainer">
-				<Button className="button" variant="primary" onClick={handleUpload()}>
+				<Button
+					className="button"
+					variant="primary"
+					onClick={() => handleUpload()}
+				>
 					Load
 				</Button>
 			</div>
