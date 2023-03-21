@@ -4,6 +4,8 @@ import styled from "styled-components";
 
 const Node = styled.div`
 	padding: 3px 5px;
+	width: 200px;
+	height: 100px;
 	border-radius: 0px;
 	background: ${(props) => props.theme.questionBg};
 	color: ${(props) => props.theme.questionTextSingleAccommodation};

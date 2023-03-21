@@ -8,7 +8,6 @@ import "../css/Flow.css";
 import useStore from "../Store/store";
 
 //Question nodes design and presentation
-import QuestionNode from "./nodes/Question/QuestionNode.jsx";
 import Single_QuestionNode from "./nodes/Question/Single_QuestionNode";
 import Persons_QuestionNode from "./nodes/Question/Persons_QuestionNode";
 import Article_QuestionNode from "./nodes/Question/Article_QuestionNode";
@@ -26,7 +25,6 @@ import AnswerNodeSkip from "./nodes/Answers/AnswerNodeSkip.jsx";
 import AnswerNodeAccommodations from "./nodes/Answers/AnswerNodeAccommodations";
 
 const nodeTypes = {
-	Question: QuestionNode,
 	//Question Types
 	question_single: Single_QuestionNode,
 	question_article_text: Article_QuestionNode,
@@ -103,17 +101,16 @@ function Flow() {
 		if (selected.nodes && selected.nodes.length === 1) {
 			return (
 				<PanelsStyled position="top-right">
-					<h1>Node Data</h1>
-					<h2>Node ID: {selected.nodes[0].id}</h2>
-					<h2>Node Type: {selected.nodes[0].type}</h2>
-					<h2>Node Text: {selected.nodes[0].data.text.sv}</h2>
-					<h2>Node Data Type:{selected.nodes[0].data.type}</h2>
+					<p>Node Data</p>
+					<p>Node ID: {selected.nodes[0].id}</p>
+					<p>Node Type: {selected.nodes[0].type}</p>
+					<p>Node Text: {selected.nodes[0].data.text.sv}</p>
+					<p>Node Datatype:{selected.nodes[0].data.type}</p>
 				</PanelsStyled>
 			);
 		} else if (selected.nodes && selected.nodes.length > 1) {
 			return (
 				<PanelsStyled position="top-right">
-					<h1>Node Data</h1>
 					{selected.nodes.map((node) =>
 						typeof node.data.text.sv !== "undefined" ? (
 							<button>{node.data.text.sv}</button>

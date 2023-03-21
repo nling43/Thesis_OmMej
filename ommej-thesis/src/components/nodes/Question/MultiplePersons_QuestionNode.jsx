@@ -3,6 +3,8 @@ import { Handle } from "reactflow";
 import styled from "styled-components";
 
 const Node = styled.div`
+	width: 200px;
+	height: 100px;
 	padding: 3px 5px;
 	border-radius: 0px;
 	background: ${(props) => props.theme.questionBg};
