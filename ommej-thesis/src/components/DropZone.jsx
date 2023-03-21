@@ -72,7 +72,7 @@ export default function DropZone() {
 		[isDragAccept, isDragReject]
 	);
 
-	const handleUpload = (acceptedFiles) => {
+	const handleUpload = () => {
 		const reader = new FileReader();
 		reader.onload = function (e) {
 			const nodesQuestions = [];
@@ -175,7 +175,7 @@ export default function DropZone() {
 				</div>
 			</div>
 			<div className="buttonContainer">
-				<Button className="button" variant="primary" onClick={handleUpload}>
+				<Button className="button" variant="primary" onClick={handleUpload()}>
 					Load
 				</Button>
 			</div>
