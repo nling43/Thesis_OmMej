@@ -84,6 +84,9 @@ export default function DropZone() {
 			const ifEdges = [];
 			const elseEdges = [];
 			const questions = json.questions;
+			const dataParameter = new Set();
+			const dataAnswerParameter = new Set();
+
 			Object.entries(questions).forEach(([id, data]) => {
 				const question = {
 					id: id,
@@ -91,6 +94,11 @@ export default function DropZone() {
 					position: { x: 0, y: -900 },
 					type: "question_" + data.type,
 				};
+
+				Object.entries(data).forEach(([parameter, data]) => {
+					dataParameter.add(parameter);
+				});
+
 				if (!!data.includeIf) {
 					data.includeIf.answers.forEach((element) => {
 						const ifEdge = {
@@ -110,7 +118,11 @@ export default function DropZone() {
 					elseEdges.push(elseEdge);
 				}
 				const answers = data.answers;
+
 				Object.entries(answers).forEach(([id, data]) => {
+					Object.entries(data).forEach(([parameter, data]) => {
+						dataAnswerParameter.add(parameter);
+					});
 					const answer = {
 						id: id,
 						data: data,
@@ -138,6 +150,9 @@ export default function DropZone() {
 				});
 				nodesQuestions.push(question);
 			});
+
+			console.log(dataParameter);
+			console.log(dataAnswerParameter);
 
 			layout(
 				nodesQuestions,
