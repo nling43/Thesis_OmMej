@@ -86,7 +86,7 @@ export default function DropZone() {
 			const questions = json.questions;
 			const dataParameter = new Set();
 			const dataAnswerParameter = new Set();
-
+			const dataType = new Set();
 			Object.entries(questions).forEach(([id, data]) => {
 				const question = {
 					id: id,
@@ -94,7 +94,7 @@ export default function DropZone() {
 					position: { x: 0, y: -900 },
 					type: "question_" + data.type,
 				};
-
+				dataType.add(data.type);
 				Object.entries(data).forEach(([parameter, data]) => {
 					dataParameter.add(parameter);
 				});
@@ -150,7 +150,7 @@ export default function DropZone() {
 				});
 				nodesQuestions.push(question);
 			});
-
+			console.log(dataType);
 			console.log(dataParameter);
 			console.log(dataAnswerParameter);
 
