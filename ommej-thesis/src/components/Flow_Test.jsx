@@ -104,7 +104,6 @@ function Flow() {
 					<p>Node Data</p>
 					<p>Node ID: {selected.nodes[0].id}</p>
 					<p>Node Type: {selected.nodes[0].type}</p>
-					<p>Node Text: {selected.nodes[0].data.text.sv}</p>
 					<p>Node Datatype:{selected.nodes[0].data.type}</p>
 				</PanelsStyled>
 			);

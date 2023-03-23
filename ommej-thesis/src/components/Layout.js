@@ -12,7 +12,7 @@ let ifEdges = [];
 const rootX = 980;
 const rootY = 0;
 
-const nodeHeight = 200;
+const nodeHeight = 150;
 const nodeWidth = 200;
 const doubleNodeWidth = 2 * nodeWidth;
 const doubleNodeHeight = 2 * nodeHeight;
