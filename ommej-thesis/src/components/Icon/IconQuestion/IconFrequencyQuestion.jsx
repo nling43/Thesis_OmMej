@@ -1,10 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCalendar , faSquare} from "@fortawesome/free-solid-svg-icons"
+import {faSquare} from "@fortawesome/free-solid-svg-icons"
+import {faCalendar} from "@fortawesome/free-regular-svg-icons"
 function IconFrequencyQuestion() {
   return (
     <span className="fa-layers fa-fw fa-lg">
-        <FontAwesomeIcon icon={faSquare} transform="grow-10"/>
-        <FontAwesomeIcon icon={faCalendar} transform="shrink-4" inverse />
+        <FontAwesomeIcon icon={faSquare} transform="grow-30"/>
+        <FontAwesomeIcon icon={faCalendar} transform="grow-7" color='black' />
     </span>
   )
 }

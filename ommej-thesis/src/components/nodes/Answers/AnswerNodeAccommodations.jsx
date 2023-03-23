@@ -10,7 +10,6 @@ const Node = styled.div`
   height: 50px;
   width: 50px;
   border-radius: 15px;
-  border-radius: 15px;
 
   background: ${(props) => props.theme.answerBg};
   color: ${(props) => props.theme.questionTextSingleAccommodation};
@@ -19,7 +18,7 @@ const Node = styled.div`
       props.selected ? props.theme.primary : props.theme.nodeBorder};
 
   .react-flow__handle {
-    background: ${(props) => props.theme.handleInputColor};
+    background: ${(props) => props.theme.handleInputAnswerColor};
     width: 8px;
     height: 10px;
     border: 0px solid #000;
