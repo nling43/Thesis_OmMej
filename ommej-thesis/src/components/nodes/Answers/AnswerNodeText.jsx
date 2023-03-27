@@ -1,33 +1,47 @@
 import React, { memo } from "react";
 import { Handle } from "reactflow";
 import styled from "styled-components";
+import IconText from "../../Icon/IconAnswer/IconTextAnswer";
 
 const Node = styled.div`
-	padding: 3px 3px;
-	font-size: 0.5rem;
-	background: ${(props) => props.theme.answerBg};
-	color: ${(props) => props.theme.answerText};
-	width: 100px;
-	height: 100px;
-	${(props) =>
-		props.selected ? props.theme.handleInputColor : props.theme.nodeBorder};
-	.react-flow__handle {
-		background: ${(props) => props.theme.handleInputColor};
-		width: 8px;
-		height: 10px;
-		border: 0px solid #000;
-		border-radius: 3px;
-	}
+  display: flex;
+  gap: 20px;
+  height: auto;
+  width: auto;
+  max-width: 150px;
+  border-radius: 15px;
+  padding: 3px 6px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+
+  background: ${(props) => props.theme.answerBg};
+  color: ${(props) => props.theme.answerText};
+
+  border: 1px solid
+    ${(props) =>
+      props.selected ? props.theme.primary : props.theme.nodeBorder};
+
+  .react-flow__handle {
+    background: ${(props) => props.theme.handleInputAnswerColor};
+    width: 8px;
+    height: 10px;
+    border: 0px solid #000;
+    border-radius: 3px;
+  }
 `;
 
 export default memo(({ data, selected }) => {
-	return (
-		<Node selected={selected}>
-			<Handle type="target" position="top" style={{ width: 13 }} />
-			<div>
-				<strong>{data.type}</strong>
-			</div>
-			<Handle type="source" position="bottom" id="1"></Handle>
-		</Node>
-	);
+  return (
+    <Node selected={selected}>
+      <Handle type="target" position="top" style={{ width: 13 }} />
+      <div>
+        <IconText />
+      </div>
+      <div>
+        <strong>{data.text.sv}</strong>
+      </div>
+      <Handle type="source" position="bottom" id="1"></Handle>
+    </Node>
+  );
 });

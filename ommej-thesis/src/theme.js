@@ -8,7 +8,8 @@ export const darkTheme = {
 
 	nodeColor: "#f9f9f9",
 	nodeBorder: "#888",
-	handleInputColor: "#ffff",
+	handleInputQuestionColor: "#ffff",
+	handleInputAnswerColor: "#FFB140",
 	
 
 	minimapMaskBg: "#343435",
