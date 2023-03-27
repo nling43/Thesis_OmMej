@@ -1,5 +1,11 @@
 import React from "react";
-import ReactFlow, { MiniMap, Controls, Panel } from "reactflow";
+import ReactFlow, {
+	onlyRenderVisibleElements,
+	SelectionMode,
+	MiniMap,
+	Controls,
+	Panel,
+} from "reactflow";
 import { shallow } from "zustand/shallow";
 import styled, { ThemeProvider } from "styled-components";
 import { darkTheme } from "../theme";
@@ -136,6 +142,14 @@ function Flow() {
 					onConnect={onConnect}
 					nodeTypes={nodeTypes}
 					onSelectionChange={onSelectNodes}
+					panOnScroll
+					minZoom={0.08}
+					maxZoom={1}
+					defaultViewport={{ x: 0, y: 0, zoom: 0.1 }}
+					onlyRenderVisibleElements={true}
+					selectionOnDrag
+					panOnDrag={[1, 2]}
+					selectionMode={SelectionMode.Partial}
 				>
 					<ControlsStyled />
 					{sideBar()}
