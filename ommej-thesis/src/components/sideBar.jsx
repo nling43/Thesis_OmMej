@@ -128,6 +128,7 @@ function nodeButton(node) {
 	}
 }
 
+
 export function SideBar() {
 	const { selected, instance } = useStore(selector, shallow);
 
