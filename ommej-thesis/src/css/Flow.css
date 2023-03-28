@@ -1,22 +1,14 @@
 * {
 	-ms-overflow-style: none;
+	overflow-y: none;
 }
 ::-webkit-scrollbar {
 	display: none;
 }
 
 .flow_container {
-	height: calc(100vh - 50px);
+	height: 93vh;
 }
-
-.sidebarFlow {
-	height: 100%;
-	background-color: rgb(0, 0, 0);
-	color: rgb(252, 3, 206);
-	width: 250px;
-	margin: 0;
-}
-
 
 .hidden {
 	width: 0px;

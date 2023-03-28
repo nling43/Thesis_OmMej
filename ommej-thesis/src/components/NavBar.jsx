@@ -63,30 +63,57 @@ export default function NavBar() {
 		// Save the file
 		saveAs(fileToSave, fileName);
 	};
-
+	function handleDefualt(e) {
+		e.preventDefault();
+		handleSearch(1, search);
+	}
 	function handleSearch(number, search) {
+		let result = [];
+		const questions = nodes.filter((node) => node.type.includes("question"));
 		switch (number) {
 			case 1:
-				const questions = nodes.filter((node) =>
-					node.type.includes("question")
-				);
-				const result_question = questions.filter((question) =>
-					question.data.text.sv.includes(search)
-				);
-
-				onSelectNodes({ nodes: result_question, edges: [] });
-				console.log(selectedNodes);
+				if (search.includes('"')) {
+					const searchWithoutSign = search.replaceAll('"', "");
+					result = questions.filter(
+						(question) =>
+							question.data.text.sv.toLowerCase() ===
+							searchWithoutSign.toLowerCase()
+					);
+				} else {
+					result = questions.filter((question) =>
+						question.data.text.sv.toLowerCase().includes(search.toLowerCase())
+					);
+				}
+				onSelectNodes({ nodes: result, edges: [] });
 				break;
 			case 2:
-				const types = nodes.filter((node) => node.type.includes("question"));
-				const result_types = types.filter((type) =>
-					type.data.type.includes(search)
-				);
-				onSelectNodes({ nodes: result_types, edges: [] });
+				if (search.includes('"')) {
+					const searchWithoutSign = search.replaceAll('"', "");
+					result = questions.filter(
+						(question) =>
+							question.data.type.toLowerCase() ===
+							searchWithoutSign.toLowerCase()
+					);
+				} else {
+					result = questions.filter((question) =>
+						question.data.type.toLowerCase().includes(search.toLowerCase())
+					);
+				}
+				onSelectNodes({ nodes: result, edges: [] });
 				break;
 			case 3:
-				const result = nodes.filter((node) => node.id.includes(search));
+				result = nodes.filter((node) => node.id.includes(search.toLowerCase()));
 				onSelectNodes({ nodes: result, edges: [] });
+				break;
+
+			case 4:
+				result = nodes.filter(
+					(node) =>
+						node.data.tags != undefined &&
+						node.data.tags.includes(search.toUpperCase())
+				);
+				onSelectNodes({ nodes: result, edges: [] });
+				break;
 			default:
 				console.log("Error");
 		}
@@ -111,7 +138,7 @@ export default function NavBar() {
 					</Button>{" "}
 				</Nav>
 				<Nav>
-					<Form className="d-flex">
+					<Form className="d-flex" onSubmit={(e) => handleDefualt(e)}>
 						<Form.Control
 							type="search"
 							placeholder="Search"
@@ -126,13 +153,16 @@ export default function NavBar() {
 						</Dropdown.Toggle>
 						<Dropdown.Menu>
 							<Dropdown.Item onClick={() => handleSearch(1, search)}>
-								Question
+								Question Text
 							</Dropdown.Item>
 							<Dropdown.Item onClick={() => handleSearch(2, search)}>
 								Question Type
 							</Dropdown.Item>
 							<Dropdown.Item onClick={() => handleSearch(3, search)}>
 								Node ID
+							</Dropdown.Item>
+							<Dropdown.Item onClick={() => handleSearch(4, search)}>
+								Tags
 							</Dropdown.Item>
 						</Dropdown.Menu>
 					</Dropdown>

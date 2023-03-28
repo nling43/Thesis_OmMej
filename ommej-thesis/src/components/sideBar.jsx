@@ -66,7 +66,19 @@ function sideBarForSingularQuestion(selected) {
 		</Panel>
 	);
 }
+function sideBarForSingularAnswer(selected) {
+	return (
+		<Panel className="sidebar" position="top-right">
+			<h5>{selected.nodes[0].id}</h5>
+
+			<Button variant="primary" type="save">
+				Save
+			</Button>
+		</Panel>
+	);
+}
 function moveToNode(id, instance, nodes) {
+	console.log(id);
 	const node = nodes.find((node) => node.id === id);
 	console.log(node.position);
 	instance.setCenter(node.position.x, node.position.y, { zoom: 0.5 });
@@ -75,24 +87,47 @@ function moveToNode(id, instance, nodes) {
 function multi(nodes, instance) {
 	return (
 		<Panel className="sidebar" position="top-right">
-			{nodes.map((node) =>
-				node.data.text !== undefined ? (
-					<Button
-						key={node.id}
-						id={node.id}
-						onClick={(event) => moveToNode(event.target.id, instance, nodes)}
-					>
-						{node.data.text.sv}
-					</Button>
-				) : (
-					<button>{node.id}</button>
-				)
-			)}
+			{nodes.map((node) => (
+				<Button
+					key={node.id}
+					id={node.id}
+					className="nodeButton"
+					onClick={(event) => moveToNode(event.target.id, instance, nodes)}
+				>
+					{nodeButton(node)}
+				</Button>
+			))}
 		</Panel>
 	);
 }
 
-function nodeButton() {}
+function nodeButton(node) {
+	if (node.data.type.includes("article")) {
+		return node.data.header !== undefined ? (
+			<div>
+				<p>{node.id}</p> <p>{node.data.header.sv} </p>
+				<p>{node.data.type}</p>
+			</div>
+		) : (
+			<div>
+				<p>{node.id}</p>
+				<p>{node.data.text.sv.substring(0, 60)} </p>
+				<p>{node.data.type}</p>
+			</div>
+		);
+	} else if (!node.type.includes("answer")) {
+		return (
+			<div>
+				<p>{node.id}</p> <p>{node.data.text.sv} </p> <p>{node.data.type}</p>
+			</div>
+		);
+	} else {
+		<div>
+			<p>{node.id}</p> <p>{node.data.type}</p>
+		</div>;
+	}
+}
+
 
 export function SideBar() {
 	const { selected, instance } = useStore(selector, shallow);
@@ -105,6 +140,12 @@ export function SideBar() {
 		return sideBarForSingularQuestion(selected);
 	} else if (selected.nodes && selected.nodes.length > 1) {
 		return multi(selected.nodes, instance);
+	} else if (
+		selected.nodes &&
+		selected.nodes.length === 1 &&
+		selected.nodes[0].type.includes("answer")
+	) {
+		return sideBarForSingularAnswer(selected);
 	} else {
 		return <></>;
 	}

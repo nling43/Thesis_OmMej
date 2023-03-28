@@ -9,6 +9,13 @@
 	overflow-y: scroll;
 	display: grid;
 	gap: 2rem;
+	grid-auto-rows: 10rem;
+}
+.nodeButton * {
+	pointer-events: none;
+}
+.nodeButton {
+	height: 10rem;
 }
 .parameter {
 	display: grid;
@@ -19,8 +26,6 @@
 	padding: 1rem;
 }
 
-.nodeButton {
-}
 h5 {
 	margin: 2rem;
 }
