@@ -92,6 +92,8 @@ function multi(nodes, instance) {
 	);
 }
 
+function nodeButton() {}
+
 export function SideBar() {
 	const { selected, instance } = useStore(selector, shallow);
 
