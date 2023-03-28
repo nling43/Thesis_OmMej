@@ -9,6 +9,7 @@ import { useState } from "react";
 
 const selector = (state) => ({
 	selected: state.selectedNodes,
+	instance: state.reactFlowInstance,
 });
 
 const PanelsStyled = styled(Panel)`
@@ -65,9 +66,35 @@ function sideBarForSingularQuestion(selected) {
 		</Panel>
 	);
 }
+function moveToNode(id, instance, nodes) {
+	const node = nodes.find((node) => node.id === id);
+	console.log(node.position);
+	instance.setCenter(node.position.x, node.position.y, { zoom: 0.5 });
+	console.log(instance.getViewport());
+}
+function multi(nodes, instance) {
+	return (
+		<Panel className="sidebar" position="top-right">
+			{nodes.map((node) =>
+				node.data.text !== undefined ? (
+					<Button
+						key={node.id}
+						id={node.id}
+						onClick={(event) => moveToNode(event.target.id, instance, nodes)}
+					>
+						{node.data.text.sv}
+					</Button>
+				) : (
+					<button>{node.id}</button>
+				)
+			)}
+		</Panel>
+	);
+}
 
 export function SideBar() {
-	const { selected } = useStore(selector, shallow);
+	const { selected, instance } = useStore(selector, shallow);
+
 	if (
 		selected.nodes &&
 		selected.nodes.length === 1 &&
@@ -75,19 +102,8 @@ export function SideBar() {
 	) {
 		return sideBarForSingularQuestion(selected);
 	} else if (selected.nodes && selected.nodes.length > 1) {
-		return (
-			<PanelsStyled position="top-right">
-				{selected.nodes.map((node) =>
-					typeof node.data.text.sv !== "undefined" ? (
-						<button>{node.data.text.sv}</button>
-					) : (
-						<button>{node.data.id}</button>
-					)
-				)}
-			</PanelsStyled>
-		);
+		return multi(selected.nodes, instance);
 	} else {
-		console.log(selected);
 		return <></>;
 	}
 }

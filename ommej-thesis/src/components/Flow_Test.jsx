@@ -1,5 +1,6 @@
 import React from "react";
 import ReactFlow, {
+	useReactFlow,
 	onlyRenderVisibleElements,
 	SelectionMode,
 	MiniMap,
@@ -57,6 +58,7 @@ const selector = (state) => ({
 	onConnect: state.onConnect,
 	selected: state.selectedNodes,
 	onSelectNodes: state.onSelectNodes,
+	setReactFlowInstance: state.setReactFlowInstance,
 });
 
 const ControlsStyled = styled(Controls)`
@@ -81,13 +83,16 @@ function Flow() {
 		onEdgesChange,
 		onConnect,
 		onSelectNodes,
-		selected,
+		setReactFlowInstance,
 	} = useStore(selector, shallow);
-
+	const onFlowInit = (reactFlowInstance) => {
+		setReactFlowInstance(reactFlowInstance);
+	};
 	return (
 		<div className="flow_container">
 			<ThemeProvider theme={darkTheme}>
 				<ReactFlow
+					onInit={onFlowInit}
 					nodes={nodes}
 					edges={edges}
 					onNodesChange={onNodesChange}
@@ -96,7 +101,7 @@ function Flow() {
 					nodeTypes={nodeTypes}
 					onSelectionChange={onSelectNodes}
 					panOnScroll
-					minZoom={0.08}
+					minZoom={0.05}
 					maxZoom={1}
 					defaultViewport={{ x: 0, y: 0, zoom: 0.1 }}
 					onlyRenderVisibleElements={true}
@@ -105,7 +110,7 @@ function Flow() {
 					selectionMode={SelectionMode.Partial}
 				>
 					<ControlsStyled />
-					{SideBar()}
+					<SideBar />
 				</ReactFlow>
 			</ThemeProvider>
 		</div>

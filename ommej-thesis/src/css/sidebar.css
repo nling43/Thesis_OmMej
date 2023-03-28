@@ -6,6 +6,9 @@
 	width: 500px;
 	height: 100%;
 	text-align: center;
+	overflow-y: scroll;
+	display: grid;
+	gap: 2rem;
 }
 .parameter {
 	display: grid;
@@ -14,6 +17,9 @@
 	text-align: center;
 	align-items: center;
 	padding: 1rem;
+}
+
+.nodeButton {
 }
 h5 {
 	margin: 2rem;
