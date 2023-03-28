@@ -1,0 +1,29 @@
+.sidebar {
+	color: aliceblue;
+	background-color: rgb(27, 27, 27);
+	border-left: 5px solid aliceblue;
+	margin: 0;
+	width: 500px;
+	height: 100%;
+	text-align: center;
+	overflow-y: scroll;
+	display: grid;
+	gap: 2rem;
+}
+.parameter {
+	display: grid;
+	grid-template-columns: 1fr 2fr;
+	grid-template-rows: 1fr;
+	text-align: center;
+	align-items: center;
+	padding: 1rem;
+}
+
+.nodeButton {
+}
+h5 {
+	margin: 2rem;
+}
+h6 {
+	margin: 2rem;
+}

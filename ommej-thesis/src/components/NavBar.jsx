@@ -73,7 +73,6 @@ export default function NavBar() {
 				const result_question = questions.filter((question) =>
 					question.data.text.sv.includes(search)
 				);
-				console.log(result_question.length);
 
 				onSelectNodes({ nodes: result_question, edges: [] });
 				console.log(selectedNodes);
@@ -83,15 +82,11 @@ export default function NavBar() {
 				const result_types = types.filter((type) =>
 					type.data.type.includes(search)
 				);
-				console.log(result_types.length);
 				onSelectNodes({ nodes: result_types, edges: [] });
-				console.log(selectedNodes);
 				break;
 			case 3:
 				const result = nodes.filter((node) => node.id.includes(search));
-				console.log(result.length);
 				onSelectNodes({ nodes: result, edges: [] });
-				console.log(selectedNodes);
 			default:
 				console.log("Error");
 		}
