@@ -81,7 +81,7 @@ function moveToNode(id, instance, nodes) {
 	console.log(id);
 	const node = nodes.find((node) => node.id === id);
 	console.log(node.position);
-	instance.setCenter(node.position.x, node.position.y, { zoom: 0.5 });
+	instance.setCenter(node.position.x + 450, node.position.y, { zoom: 0.7 ,duration : 2000});
 	console.log(instance.getViewport());
 }
 function multi(nodes, instance) {
