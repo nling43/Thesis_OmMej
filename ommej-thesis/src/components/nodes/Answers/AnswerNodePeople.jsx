@@ -1,7 +1,7 @@
 import React, { memo } from "react";
 import { Handle } from "reactflow";
 import styled from "styled-components";
-import IconPeopleAnswer from "../../Icon/IconAnswer/IconSkipAnswer";
+import IconPeopleAnswer from "../../Icon/IconAnswer/IconPeopleAnswer";
 
 const Node = styled.div`
   display: flex;
