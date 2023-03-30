@@ -62,121 +62,118 @@ export default function NavBar() {
       type: "application/json",
     });
 
-    // Save the file
-    saveAs(fileToSave, fileName);
-  };
-  function handleDefualt(e) {
-    e.preventDefault();
-    handleSearch(1, search);
-  }
-  function handleSearch(number, search) {
-    let result = [];
-    const questions = nodes.filter((node) => node.type.includes("question"));
-    switch (number) {
-      case 1:
-        if (search.includes('"')) {
-          const searchWithoutSign = search.replaceAll('"', "");
-          result = questions.filter(
-            (question) =>
-              question.data.text.sv.toLowerCase() ===
-              searchWithoutSign.toLowerCase()
-          );
-        } else {
-          result = questions.filter((question) =>
-            question.data.text.sv.toLowerCase().includes(search.toLowerCase())
-          );
-        }
-        onSelectNodes({ nodes: result, edges: [] });
-        break;
-      case 2:
-        if (search.includes('"')) {
-          const searchWithoutSign = search.replaceAll('"', "");
-          result = questions.filter(
-            (question) =>
-              question.data.type.toLowerCase() ===
-              searchWithoutSign.toLowerCase()
-          );
-        } else {
-          result = questions.filter((question) =>
-            question.data.type.toLowerCase().includes(search.toLowerCase())
-          );
-        }
-        onSelectNodes({ nodes: result, edges: [] });
-        break;
-      case 3:
-        result = nodes.filter((node) => node.id.includes(search.toLowerCase()));
-        onSelectNodes({ nodes: result, edges: [] });
-        break;
+		// Save the file
+		saveAs(fileToSave, fileName);
+	};
+	function handleDefualt(e) {
+		e.preventDefault();
+		handleSearch(1, search);
+	}
+	function handleSearch(number, search) {
+		let result = [];
+		const questions = nodes.filter((node) => node.type.includes("question"));
+		switch (number) {
+			case 1:
+				if (search.includes('"')) {
+					const searchWithoutSign = search.replaceAll('"', "");
+					result = questions.filter(
+						(question) =>
+							question.data.text.sv.toLowerCase() ===
+							searchWithoutSign.toLowerCase()
+					);
+				} else {
+					result = questions.filter((question) =>
+						question.data.text.sv.toLowerCase().includes(search.toLowerCase())
+					);
+				}
+				break;
+			case 2:
+				if (search.includes('"')) {
+					const searchWithoutSign = search.replaceAll('"', "");
+					result = questions.filter(
+						(question) =>
+							question.data.type.toLowerCase() ===
+							searchWithoutSign.toLowerCase()
+					);
+				} else {
+					result = questions.filter((question) =>
+						question.data.type.toLowerCase().includes(search.toLowerCase())
+					);
+				}
+				break;
+			case 3:
+				result = nodes.filter((node) => node.id.includes(search.toLowerCase()));
+				break;
 
-      case 4:
-        result = nodes.filter(
-          (node) =>
-            node.data.tags != undefined &&
-            node.data.tags.includes(search.toUpperCase())
-        );
-        onSelectNodes({ nodes: result, edges: [] });
-        break;
-      default:
-        console.log("Error");
-    }
-  }
-  return (
-    <>
-      <Navbar variant="dark" bg="dark">
-        <Nav>
-          <Button
-            className="button"
-            variant="outline-primary"
-            onClick={() => handleImport()}
-          >
-			<FontAwesomeIcon icon={faFileImport} />
-		  </Button>
-          <Button
-            className="button"
-            variant="outline-primary"
-            onClick={() => handleShow()}
-          >
-			<FontAwesomeIcon icon={faFileExport} />
-          </Button>{" "}
-        </Nav>
-        <Nav>
-          <Form className="d-flex" onSubmit={(e) => handleDefualt(e)}>
-            <Form.Control
-              type="search"
-              placeholder="Search"
-              className="Search"
-              aria-label="Search"
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </Form>
-          <Dropdown>
-            <Dropdown.Toggle variant="success" id="dropdown-basic">
-              Search By
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={() => handleSearch(1, search)}>
-                Question Text
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => handleSearch(2, search)}>
-                Question Type
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => handleSearch(3, search)}>
-                Node ID
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => handleSearch(4, search)}>
-                Tags
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-          <Button className="button" variant="primary">
-			<FontAwesomeIcon icon={faPlus} />
-          </Button>{" "}
-          <Button className="button" variant="primary">
-			<FontAwesomeIcon icon={faTrashCan} />
-          </Button>
-          {""}
-        </Nav>
-      </Navbar>
+			case 4:
+				result = nodes.filter(
+					(node) =>
+						node.data.tags != undefined &&
+						node.data.tags.includes(search.toUpperCase())
+				);
+				break;
+			default:
+				console.log("Error");
+		}
+		onSelectNodes({ nodes: result, edges: [] });
+	}
+	return (
+		<>
+			<Navbar variant="dark" bg="dark">
+				<Nav>
+					<Button
+						className="button"
+						variant="outline-primary"
+						onClick={() => handleImport()}
+					>
+            <FontAwesomeIcon icon={faFileImport} />
+					</Button>
+					<Button
+						className="button"
+						variant="outline-primary"
+						onClick={() => handleShow()}
+					>
+            <FontAwesomeIcon icon={faFileExport} />
+					</Button>{" "}
+				</Nav>
+				<Nav>
+					<Form className="d-flex" onSubmit={(e) => handleDefualt(e)}>
+						<Form.Control
+							type="search"
+							placeholder="Search"
+							className="Search"
+							aria-label="Search"
+							onChange={(e) => setSearch(e.target.value)}
+						/>
+					</Form>
+					<Dropdown>
+						<Dropdown.Toggle variant="success" id="dropdown-basic">
+							Search By
+						</Dropdown.Toggle>
+						<Dropdown.Menu>
+							<Dropdown.Item onClick={() => handleSearch(1, search)}>
+								Question Text
+							</Dropdown.Item>
+							<Dropdown.Item onClick={() => handleSearch(2, search)}>
+								Question Type
+							</Dropdown.Item>
+							<Dropdown.Item onClick={() => handleSearch(3, search)}>
+								Node ID
+							</Dropdown.Item>
+							<Dropdown.Item onClick={() => handleSearch(4, search)}>
+								Tags
+							</Dropdown.Item>
+						</Dropdown.Menu>
+					</Dropdown>
+					<Button className="button" variant="primary">
+            <FontAwesomeIcon icon={faPlus} />
+					</Button>{" "}
+					<Button className="button" variant="primary">
+            <FontAwesomeIcon icon={faMinus} />
+					</Button>
+					{""}
+				</Nav>
+			</Navbar>
 
       <Modal show={showFileNamer} onHide={handleClose}>
         <Modal.Header closeButton>

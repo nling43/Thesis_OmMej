@@ -11,9 +11,8 @@ import {
     OnConnect,
     applyEdgeChanges,
     applyNodeChanges,
-    useReactFlow,
-    Viewport,
-    SetViewport
+    OnViewportChange,
+    Viewport
     
     
 } from 'reactflow';
@@ -40,6 +39,7 @@ const useStore = create<RFState>((set, get) => ({
     edges: [],
     selectedNodes:{},
     reactFlowInstance:null,
+    
     setReactFlowInstance:(instance: any) => set(() => ({ reactFlowInstance: instance })),
     onSelectNodes: (selected: any) => set(() => ({ selectedNodes: selected })),
 
