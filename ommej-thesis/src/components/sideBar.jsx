@@ -89,7 +89,12 @@ function sideBarForSingularAnswer(selected) {
 }
 function moveToNode(id, instance, nodes) {
 	const node = nodes.find((node) => node.id === id);
-	instance.setCenter(node.position.x, node.position.y, { zoom: 0.5 });
+	console.log(node.position);
+	instance.setCenter(node.position.x + 450, node.position.y, {
+		zoom: 0.7,
+		duration: 2000,
+	});
+	console.log(instance.getViewport());
 }
 function multi(nodes, instance) {
 	return (
