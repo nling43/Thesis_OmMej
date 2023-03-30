@@ -1,5 +1,6 @@
 import useStore from "../Store/store";
 import ReactFlow, { Panel } from "reactflow";
+import { useEffect } from "react";
 import { shallow } from "zustand/shallow";
 import styled, { ThemeProvider } from "styled-components";
 import "../css/sidebar.css";
@@ -33,10 +34,19 @@ const questionType = [
 	"multiple_person",
 ];
 
-function sideBarForSingularQuestion(selected) {
+function sideBarForSingularQuestion(selected, instance) {
 	return (
 		<Panel className="sidebar" position="top-right">
 			<h5>{selected.nodes[0].id}</h5>
+			<Button
+				key={selected.nodes[0].id}
+				id={selected.nodes[0].id}
+				onClick={(event) =>
+					moveToNode(event.target.id, instance, selected.nodes)
+				}
+			>
+				Move to node
+			</Button>
 			<Form>
 				<Form.Group className="mb-3" controlId="type">
 					<Form.Label>Question Type</Form.Label>
@@ -78,10 +88,12 @@ function sideBarForSingularAnswer(selected) {
 	);
 }
 function moveToNode(id, instance, nodes) {
-	console.log(id);
 	const node = nodes.find((node) => node.id === id);
 	console.log(node.position);
-	instance.setCenter(node.position.x + 450, node.position.y, { zoom: 0.7 ,duration : 2000});
+	instance.setCenter(node.position.x + 450, node.position.y, {
+		zoom: 0.7,
+		duration: 2000,
+	});
 	console.log(instance.getViewport());
 }
 function multi(nodes, instance) {
@@ -128,7 +140,6 @@ function nodeButton(node) {
 	}
 }
 
-
 export function SideBar() {
 	const { selected, instance } = useStore(selector, shallow);
 
@@ -137,7 +148,7 @@ export function SideBar() {
 		selected.nodes.length === 1 &&
 		selected.nodes[0].type.includes("question_")
 	) {
-		return sideBarForSingularQuestion(selected);
+		return sideBarForSingularQuestion(selected, instance);
 	} else if (selected.nodes && selected.nodes.length > 1) {
 		return multi(selected.nodes, instance);
 	} else if (
