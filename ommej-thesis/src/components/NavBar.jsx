@@ -169,7 +169,7 @@ export default function NavBar() {
             <FontAwesomeIcon icon={faPlus} />
 					</Button>{" "}
 					<Button className="button" variant="primary">
-            <FontAwesomeIcon icon={faMinus} />
+            <FontAwesomeIcon icon={faTrashCan} />
 					</Button>
 					{""}
 				</Nav>
