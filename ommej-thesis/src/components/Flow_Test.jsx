@@ -1,11 +1,9 @@
 import React from "react";
 import ReactFlow, {
-	useReactFlow,
-	onlyRenderVisibleElements,
 	SelectionMode,
 	MiniMap,
 	Controls,
-	Panel,
+	useOnViewportChange,
 } from "reactflow";
 import { shallow } from "zustand/shallow";
 import styled, { ThemeProvider } from "styled-components";
@@ -59,6 +57,7 @@ const selector = (state) => ({
 	selected: state.selectedNodes,
 	onSelectNodes: state.onSelectNodes,
 	setReactFlowInstance: state.setReactFlowInstance,
+	onViewPortChange: state.onViewPortChange,
 });
 
 const ControlsStyled = styled(Controls)`
@@ -88,6 +87,7 @@ function Flow() {
 	const onFlowInit = (reactFlowInstance) => {
 		setReactFlowInstance(reactFlowInstance);
 	};
+
 	return (
 		<div className="flow_container">
 			<ThemeProvider theme={darkTheme}>
@@ -106,8 +106,8 @@ function Flow() {
 					defaultViewport={{ x: 0, y: 0, zoom: 0.1 }}
 					onlyRenderVisibleElements={true}
 					selectionOnDrag
-					panOnDrag={[1, 2]}
 					selectionMode={SelectionMode.Partial}
+					panOnDrag={[1, 2]}
 				>
 					<ControlsStyled />
 					<SideBar />

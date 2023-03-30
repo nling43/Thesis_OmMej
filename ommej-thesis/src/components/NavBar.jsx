@@ -84,7 +84,6 @@ export default function NavBar() {
 						question.data.text.sv.toLowerCase().includes(search.toLowerCase())
 					);
 				}
-				onSelectNodes({ nodes: result, edges: [] });
 				break;
 			case 2:
 				if (search.includes('"')) {
@@ -99,11 +98,9 @@ export default function NavBar() {
 						question.data.type.toLowerCase().includes(search.toLowerCase())
 					);
 				}
-				onSelectNodes({ nodes: result, edges: [] });
 				break;
 			case 3:
 				result = nodes.filter((node) => node.id.includes(search.toLowerCase()));
-				onSelectNodes({ nodes: result, edges: [] });
 				break;
 
 			case 4:
@@ -112,11 +109,11 @@ export default function NavBar() {
 						node.data.tags != undefined &&
 						node.data.tags.includes(search.toUpperCase())
 				);
-				onSelectNodes({ nodes: result, edges: [] });
 				break;
 			default:
 				console.log("Error");
 		}
+		onSelectNodes({ nodes: result, edges: [] });
 	}
 	return (
 		<>
