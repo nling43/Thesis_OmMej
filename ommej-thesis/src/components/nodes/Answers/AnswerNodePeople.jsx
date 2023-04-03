@@ -34,13 +34,13 @@ const NodeZoomed = styled.div`
   border-radius: 15px;
   background: ${(props) => props.theme.answerBg};
   color: ${(props) => props.theme.answerTextPeople};
-  border: 1px solid
+  border: 8px solid
     ${(props) =>
       props.selected ? props.theme.primary : props.theme.nodeBorder};
 
   .react-flow__handle {
     background: ${(props) => props.theme.handleInputAnswerColor};
-    width: 8px;
+    width: 10px;
     height: 10px;
     border: 0px solid #000;
     border-radius: 3px;

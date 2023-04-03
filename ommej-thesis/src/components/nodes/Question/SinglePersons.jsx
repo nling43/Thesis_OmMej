@@ -9,7 +9,7 @@ const Node = styled.div`
 
   background: ${(props) => props.theme.questionBg};
   color: ${(props) => props.theme.handleInputQuestionColor};
-  border: 2px solid
+  border: 10px solid
     ${(props) =>
       props.selected ? props.theme.handleInputColor : props.theme.nodeBorder};
   .react-flow__handle {

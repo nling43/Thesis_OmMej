@@ -36,7 +36,7 @@ const Node = styled.div`
 
   background: ${(props) => props.theme.answerBg};
   color: ${(props) => props.theme.answerSkip};
-  border: 1px solid
+  border: 8px solid
     ${(props) =>
       props.selected ? props.theme.primary : props.theme.nodeBorder};
 

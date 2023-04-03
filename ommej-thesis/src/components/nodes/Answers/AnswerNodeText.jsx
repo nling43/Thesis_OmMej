@@ -46,7 +46,7 @@ const NodeZoomed = styled.div`
   background: ${(props) => props.theme.answerBg};
   color: ${(props) => props.theme.answerText};
 
-  border: 1px solid
+  border: 8px solid
     ${(props) =>
       props.selected ? props.theme.primary : props.theme.nodeBorder};
 
