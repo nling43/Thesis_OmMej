@@ -7,8 +7,6 @@ import Form from "react-bootstrap/Form";
 import Dropdown from "react-bootstrap/Dropdown";
 import Modal from "react-bootstrap/Modal";
 //Search icon
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import "../css/NavBar.css";
 import useStore from "../Store/store";
 import { shallow } from "zustand/shallow";
@@ -16,22 +14,16 @@ import { useState } from "react";
 import { saveAs } from "file-saver";
 const selector = (state) => ({
 	onClear: state.onClear,
-	onEdgesChange: state.onEdgesChange,
 	//Get all node
 	nodes: state.nodes,
-	selectedNodes: state.selectedNodes,
-	onSelectNodes: state.onSelectNodes,
+	onNodesChange: state.onNodesChange,
 });
 
 export default function NavBar() {
-	const { onClear, nodes, onSelectNodes, selectedNodes } = useStore(
-		selector,
-		shallow
-	);
+	const { onClear, nodes, onNodesChange } = useStore(selector, shallow);
 	const [search, setSearch] = useState("");
 	const [showFileNamer, setShowFileNamer] = useState(false);
 	const [fileName, setFileName] = useState("");
-
 	const handleClose = () => setShowFileNamer(false);
 	const handleShow = () => {
 		if (nodes.length > 0) setShowFileNamer(true);
@@ -113,7 +105,20 @@ export default function NavBar() {
 			default:
 				console.log("Error");
 		}
-		onSelectNodes({ nodes: result, edges: [] });
+		select(result);
+	}
+
+	function select(toSelect) {
+		nodes.forEach((node) => {
+			node.selected = false;
+		});
+		toSelect.forEach((fromResult) => {
+			const nodeToSelect = nodes.find(
+				(element) => element.id === fromResult.id
+			);
+			nodeToSelect.selected = true;
+		});
+		onNodesChange(nodes);
 	}
 	return (
 		<>

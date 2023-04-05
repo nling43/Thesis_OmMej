@@ -11,8 +11,6 @@ import {
     OnConnect,
     applyEdgeChanges,
     applyNodeChanges,
-    OnViewportChange,
-    Viewport
     
     
 } from 'reactflow';
@@ -22,6 +20,7 @@ import {
 type RFState = {
     nodes: Node[];
     edges: Edge[];
+
     onClear: ()=>void;
     reactFlowInstance: null,
     setReactFlowInstance: (instance:any)=> void;
@@ -30,6 +29,8 @@ type RFState = {
     onConnect: OnConnect;
     selectedNodes : any; 
     onSelectNodes : (newSelectedNodes: Node[]) => void;
+    questionsTypes : [];
+    setQuestionsTypes:  (types:[])=> void;
 
 }
 
@@ -38,8 +39,9 @@ const useStore = create<RFState>((set, get) => ({
     nodes: [],
     edges: [],
     selectedNodes:{},
+        questionsTypes : [],
     reactFlowInstance:null,
-    
+    setQuestionsTypes:(types: []) => set(() => ({ questionsTypes: types })),
     setReactFlowInstance:(instance: any) => set(() => ({ reactFlowInstance: instance })),
     onSelectNodes: (selected: any) => set(() => ({ selectedNodes: selected })),
 
@@ -58,6 +60,7 @@ const useStore = create<RFState>((set, get) => ({
         edges: addEdge(connection, get().edges),
       });
     },
+    
     onClear: () => {
       set({
         nodes: applyNodeChanges([],[]),
