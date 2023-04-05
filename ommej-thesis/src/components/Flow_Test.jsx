@@ -1,11 +1,20 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ReactFlow, {
   SelectionMode,
   MiniMap,
   Controls,
   useOnViewportChange,
+  useKeyPress,
+  ControlButton,
 } from "reactflow";
+//Icon for ControlButton
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faForwardFast,
+  faBackwardFast,
+} from "@fortawesome/free-solid-svg-icons";
+
 import { shallow } from "zustand/shallow";
 import styled, { ThemeProvider } from "styled-components";
 import { darkTheme } from "../theme";
@@ -30,6 +39,8 @@ import AnswerNodePeople from "./nodes/Answers/AnswerNodePeople.jsx";
 import AnswerNodeSkip from "./nodes/Answers/AnswerNodeSkip.jsx";
 import AnswerNodeAccommodations from "./nodes/Answers/AnswerNodeAccommodations";
 
+//Edge design and presentation
+import CustomEdge from "./edges/CustomEdge";
 const nodeTypes = {
   //Question Types
   question_single: Single_QuestionNode,
@@ -49,6 +60,20 @@ const nodeTypes = {
   answer_accommodations: AnswerNodeAccommodations,
 };
 
+const edgeTypes = {
+  edges_custom: CustomEdge,
+  //Edge Types
+  //edge_single: Single_QuestionEdges,
+  //edge_article_text
+  //edge_persons
+  //edge_multiple
+  //edge_frequency
+  //edge_accommodations
+  //edge_single_accommodation
+  //edge_single_person
+  //edge_multiple_person
+};
+
 const selector = (state) => ({
   nodes: state.nodes,
   edges: state.edges,
@@ -59,6 +84,7 @@ const selector = (state) => ({
   onSelectNodes: state.onSelectNodes,
   setReactFlowInstance: state.setReactFlowInstance,
   onViewPortChange: state.onViewPortChange,
+  instance: state.reactFlowInstance,
 });
 
 const ControlsStyled = styled(Controls)`
@@ -81,7 +107,13 @@ const MiniMapStyled = styled(MiniMap)`
 `;
 
 function Flow() {
-	const [MiniMapOpen, setMiniMapOpen] = useState(false);
+  const [MiniMapOpen, setMiniMapOpen] = useState(false);
+  const mPressed = useKeyPress("m");
+  useEffect(() => {
+    if (mPressed) {
+      setMiniMapOpen(!MiniMapOpen);
+    }
+  }, [mPressed]);
   const {
     nodes,
     edges,
@@ -90,6 +122,7 @@ function Flow() {
     onConnect,
     onSelectNodes,
     setReactFlowInstance,
+    instance,
   } = useStore(selector, shallow);
   const onFlowInit = (reactFlowInstance) => {
     setReactFlowInstance(reactFlowInstance);
@@ -106,6 +139,7 @@ function Flow() {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           onSelectionChange={onSelectNodes}
           panOnScroll
           minZoom={0.05}
@@ -115,20 +149,48 @@ function Flow() {
           selectionOnDrag
           selectionMode={SelectionMode.Partial}
           panOnDrag={[1, 2]}
+          deleteKeyCode={null}
         >
-          <ControlsStyled />
-          <MiniMapStyled
-            position="top-left"
-            nodeColor="rgb(255,0,0)"
-            maskColor="rgb(0,0,0,.1)"
-            style={{
-              margin: 0,
-              height: MiniMapOpen ? 700 : 100,
-              width: MiniMapOpen ? 100 : 100,
+          <ControlsStyled>
+            <ControlButton
+              onClick={() => {
+                console.log(nodes[0].position);
+                instance.setCenter(nodes[0].position.x, nodes[0].position.y, {
+                  zoom: 0.1,
+                });
+              }}
+            >
+              <FontAwesomeIcon icon={faForwardFast} />
+            </ControlButton>
+            <ControlButton
+              onClick={() => {
+                console.log(nodes[nodes.length - 1].position);
+                instance.setCenter(
+                  nodes[nodes.length - 1].position.x,
+                  nodes[nodes.length - 1].position.y,
+                  {
+                    zoom: 0.1,
+                  }
+                );
+              }}
+            >
+              <FontAwesomeIcon icon={faBackwardFast} />
+            </ControlButton>
+          </ControlsStyled>
+          {MiniMapOpen && (
+            <MiniMapStyled
+              position="top-left"
+              nodeColor="rgb(255,0,0)"
+              maskColor="rgb(0,0,0,.1)"
+              style={{
+                background: "rgb(255,255,255,0.9)",
+                margin: 0,
+                height: 680,
+                width: 300,
+              }}
+            />
+          )}
 
-            }}
-			onClick={() => {setMiniMapOpen(current => !current)}}
-          />
           <SideBar />
         </ReactFlow>
       </ThemeProvider>

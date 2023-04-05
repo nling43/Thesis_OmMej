@@ -22,11 +22,12 @@ const selector = (state) => ({
   //Get all node
   nodes: state.nodes,
   selectedNodes: state.selectedNodes,
+  onNodesChange : state.onNodesChange,
   onSelectNodes: state.onSelectNodes,
 });
 
 export default function NavBar() {
-  const { onClear, nodes, onSelectNodes, selectedNodes } = useStore(
+  const { onClear, nodes, onSelectNodes, selectedNodes,onNodesChange } = useStore(
     selector,
     shallow
   );
@@ -167,11 +168,16 @@ export default function NavBar() {
 					</Dropdown>
 					<Button className="button" variant="primary">
             <FontAwesomeIcon icon={faPlus} />
-					</Button>{" "}
-					<Button className="button" variant="primary">
-            <FontAwesomeIcon icon={faTrashCan} />
 					</Button>
-					{""}
+					<Button className="button" variant="primary" onClick={
+						() => {
+							nodes.filter((node) => !selectedNodes.includes(node))
+							console.log(nodes.filter((node) => !selectedNodes.includes(node.id)))
+						}
+					}>
+            <FontAwesomeIcon icon={faTrashCan} />
+						
+					</Button>
 				</Nav>
 			</Navbar>
 
