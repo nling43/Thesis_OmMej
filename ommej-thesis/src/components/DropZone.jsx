@@ -104,7 +104,10 @@ export default function DropZone() {
 							id: "if " + id + " " + element,
 							source: element,
 							target: id,
-							style: { stroke: "green" },
+							style: { 
+								stroke: "green",
+								strokeWidth: 2,
+							},
 						};
 						ifEdges.push(ifEdge);
 					});
@@ -112,7 +115,10 @@ export default function DropZone() {
 						id: "else " + id + " " + data.includeIf.else,
 						source: id,
 						target: data.includeIf.else,
-						style: { stroke: "red" },
+						style: { 
+							stroke: "red",
+							strokeWidth: 2,
+						},
 					};
 					elseEdges.push(elseEdge);
 				}
@@ -133,6 +139,12 @@ export default function DropZone() {
 						id: "fromQ " + question.id + " " + id,
 						source: question.id,
 						target: id,
+						//type: "edge_"+ question.data.type,
+						style : { 
+							stroke: "white",
+							strokeWidth: 2,
+					}
+
 					};
 
 					if (!!data.next) {
@@ -140,6 +152,12 @@ export default function DropZone() {
 							id: "fromA " + id + " " + data.next,
 							source: id,
 							target: data.next,
+							//type: "edge_"+ data.type,
+							style : { 
+								stroke: "yellow",
+								strokeWidth: 2,
+							}
+
 						};
 
 						edgesFromAnswers.push(edgeFromAnswer);

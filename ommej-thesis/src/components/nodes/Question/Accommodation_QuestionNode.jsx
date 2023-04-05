@@ -32,7 +32,7 @@ const NodeZoomed = styled.div`
   justify-content: center;
   background: ${(props) => props.theme.questionBg};
   color: ${(props) => props.theme.questionTextAccommodation};
-  border: 2px solid
+  border: 10px solid
     ${(props) =>
 	  props.selected ? props.theme.handleInputColor : props.theme.nodeBorder};
 	    .react-flow__handle {
