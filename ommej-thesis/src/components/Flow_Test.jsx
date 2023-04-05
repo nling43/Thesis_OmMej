@@ -4,7 +4,7 @@ import ReactFlow, {
   SelectionMode,
   MiniMap,
   Controls,
-  useOnViewportChange,
+  ReactFlowProvider,
   useKeyPress,
   ControlButton,
 } from "reactflow";
@@ -30,7 +30,7 @@ import Multiple_QuestionNode from "./nodes/Question/Multiple_QuestionNode";
 import Frequency_QuestionNode from "./nodes/Question/Frequency_QuestionNode";
 import Accommodation_QuestionNode from "./nodes/Question/Accommodation_QuestionNode";
 import SingleAccommodation_QuestionNode from "./nodes/Question/SingleAccommodation_QuestionNode";
-import SinglePersons from "./nodes/Question/SinglePersons";
+import SinglePersons from "./nodes/Question/SinglePersons_QuestionNode";
 import MultiplePersons from "./nodes/Question/MultiplePersons_QuestionNode";
 
 //Answer nodes design and presentation
@@ -131,24 +131,25 @@ function Flow() {
   return (
     <div className="flow_container">
       <ThemeProvider theme={darkTheme}>
-        <ReactFlow
-          onInit={onFlowInit}
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          nodeTypes={nodeTypes}
+				<ReactFlowProvider>
+	        <ReactFlow
+	          onInit={onFlowInit}
+	          nodes={nodes}
+	          edges={edges}
+	          onNodesChange={onNodesChange}
+	          onEdgesChange={onEdgesChange}
+	          onConnect={onConnect}
+	          nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
-          onSelectionChange={onSelectNodes}
-          panOnScroll
-          minZoom={0.05}
-          maxZoom={1}
-          defaultViewport={{ x: 0, y: 0, zoom: 0.1 }}
-          onlyRenderVisibleElements={true}
-          selectionOnDrag
-          selectionMode={SelectionMode.Partial}
-          panOnDrag={[1, 2]}
+	          onSelectionChange={onSelectNodes}
+	          panOnScroll
+	          minZoom={0.05}
+	          maxZoom={1}
+	          defaultViewport={{ x: 0, y: 0, zoom: 0.1 }}
+	          onlyRenderVisibleElements={true}
+	          selectionOnDrag
+	          selectionMode={SelectionMode.Partial}
+	          panOnDrag={[1, 2]}
           deleteKeyCode={null}
         >
           <ControlsStyled>
@@ -173,8 +174,8 @@ function Flow() {
                   }
                 );
               }}
-            >
-              <FontAwesomeIcon icon={faBackwardFast} />
+	            >
+	              <FontAwesomeIcon icon={faBackwardFast} />
             </ControlButton>
           </ControlsStyled>
           {MiniMapOpen && (
@@ -191,8 +192,9 @@ function Flow() {
             />
           )}
 
-          <SideBar />
-        </ReactFlow>
+	          <SideBar />
+	        </ReactFlow>
+				</ReactFlowProvider>
       </ThemeProvider>
     </div>
   );

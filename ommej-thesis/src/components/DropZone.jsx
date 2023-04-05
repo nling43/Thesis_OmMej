@@ -12,11 +12,10 @@ export default function DropZone() {
 		onNodesChange: state.onNodesChange,
 		edges: state.edges,
 		onEdgesChange: state.onEdgesChange,
+		setQuestionsTypes: state.setQuestionsTypes,
 	});
-	const { nodes, onNodesChange, edges, onEdgesChange } = useStore(
-		selector,
-		shallow
-	);
+	const { nodes, onNodesChange, edges, onEdgesChange, setQuestionsTypes } =
+		useStore(selector, shallow);
 
 	const {
 		acceptedFiles,
@@ -168,7 +167,7 @@ export default function DropZone() {
 				});
 				nodesQuestions.push(question);
 			});
-			console.log(dataType);
+			setQuestionsTypes(Array.from(dataType).sort());
 			console.log(dataParameter);
 			console.log(dataAnswerParameter);
 
