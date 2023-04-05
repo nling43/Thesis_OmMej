@@ -12,11 +12,20 @@ import useStore from "../Store/store";
 import { shallow } from "zustand/shallow";
 import { useState } from "react";
 import { saveAs } from "file-saver";
+import {
+	faFileImport,
+	faFileExport,
+	faPlus,
+	faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
+
 const selector = (state) => ({
 	onClear: state.onClear,
+	onEdgesChange: state.onEdgesChange,
 	//Get all node
 	nodes: state.nodes,
-	onNodesChange: state.onNodesChange,
+	selectedNodes: state.selectedNodes,
+	onSelectNodes: state.onSelectNodes,
 });
 
 export default function NavBar() {
@@ -129,14 +138,14 @@ export default function NavBar() {
 						variant="outline-primary"
 						onClick={() => handleImport()}
 					>
-						Import File
+						<FontAwesomeIcon icon={faFileImport} />
 					</Button>
 					<Button
 						className="button"
 						variant="outline-primary"
 						onClick={() => handleShow()}
 					>
-						Export File
+						<FontAwesomeIcon icon={faFileExport} />
 					</Button>{" "}
 				</Nav>
 				<Nav>
@@ -169,10 +178,10 @@ export default function NavBar() {
 						</Dropdown.Menu>
 					</Dropdown>
 					<Button className="button" variant="primary">
-						Create Question
+						<FontAwesomeIcon icon={faPlus} />
 					</Button>{" "}
 					<Button className="button" variant="primary">
-						Delete Question
+						<FontAwesomeIcon icon={faTrashCan} />
 					</Button>
 					{""}
 				</Nav>
