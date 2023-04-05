@@ -12,6 +12,7 @@ import useStore from "../Store/store";
 import { shallow } from "zustand/shallow";
 import { useState } from "react";
 import { saveAs } from "file-saver";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 	faFileImport,
 	faFileExport,
