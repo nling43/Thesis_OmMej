@@ -21,31 +21,35 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const selector = (state) => ({
-  onClear: state.onClear,
-  onEdgesChange: state.onEdgesChange,
-  //Get all node
-  nodes: state.nodes,
-  selectedNodes: state.selectedNodes,
-  onNodesChange : state.onNodesChange,
-  onSelectNodes: state.onSelectNodes,
+	onClear: state.onClear,
+	onEdgesChange: state.onEdgesChange,
+	//Get all node
+	nodes: state.nodes,
+	selectedNodes: state.selectedNodes,
+	onNodesChange: state.onNodesChange,
+	instance: state.reactFlowInstance,
 });
 
 export default function NavBar() {
-  const { onClear, nodes, onSelectNodes, selectedNodes,onNodesChange } = useStore(
-    selector,
-    shallow
-  );
-  const [search, setSearch] = useState("");
-  const [showFileNamer, setShowFileNamer] = useState(false);
-  const [fileName, setFileName] = useState("");
+	const {
+		onClear,
+		nodes,
+		onSelectNodes,
+		instance,
+		selectedNodes,
+		onNodesChange,
+	} = useStore(selector, shallow);
+	const [search, setSearch] = useState("");
+	const [showFileNamer, setShowFileNamer] = useState(false);
+	const [fileName, setFileName] = useState("");
 
-  const handleClose = () => setShowFileNamer(false);
-  const handleShow = () => {
-    if (nodes.length > 0) setShowFileNamer(true);
-  };
-  const handleImport = () => {
-    onClear();
-  };
+	const handleClose = () => setShowFileNamer(false);
+	const handleShow = () => {
+		if (nodes.length > 0) setShowFileNamer(true);
+	};
+	const handleImport = () => {
+		onClear();
+	};
 
 	const handleExport = () => {
 		handleClose();
@@ -135,6 +139,10 @@ export default function NavBar() {
 		});
 		onNodesChange(nodes);
 	}
+
+	function handleDeleteNodes() {
+		instance.deleteElements(selectedNodes);
+	}
 	return (
 		<>
 			<Navbar variant="dark" bg="dark">
@@ -184,16 +192,16 @@ export default function NavBar() {
 						</Dropdown.Menu>
 					</Dropdown>
 					<Button className="button" variant="primary">
-            <FontAwesomeIcon icon={faPlus} />
+						<FontAwesomeIcon icon={faPlus} />
 					</Button>
-					<Button className="button" variant="primary" onClick={
-						() => {
-							nodes.filter((node) => !selectedNodes.includes(node))
-							console.log(nodes.filter((node) => !selectedNodes.includes(node.id)))
-						}
-					}>
-            <FontAwesomeIcon icon={faTrashCan} />
-						
+					<Button
+						className="button"
+						variant="primary"
+						onClick={() => {
+							handleDeleteNodes();
+						}}
+					>
+						<FontAwesomeIcon icon={faTrashCan} />
 					</Button>
 				</Nav>
 			</Navbar>
