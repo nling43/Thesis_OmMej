@@ -26,6 +26,11 @@
 	grid-template-columns: 1fr 1fr;
 	gap: 1rem;
 }
+.singleSidebarIncludeIfs {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1rem;
+}
 
 .NodeButton {
 	display: grid;

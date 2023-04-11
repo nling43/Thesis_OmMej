@@ -13,9 +13,16 @@ export default function DropZone() {
 		edges: state.edges,
 		onEdgesChange: state.onEdgesChange,
 		setQuestionsTypes: state.setQuestionsTypes,
+		setAnswerTypes: state.setAnswerTypes,
 	});
-	const { nodes, onNodesChange, edges, onEdgesChange, setQuestionsTypes } =
-		useStore(selector, shallow);
+	const {
+		nodes,
+		onNodesChange,
+		edges,
+		onEdgesChange,
+		setQuestionsTypes,
+		setAnswerTypes,
+	} = useStore(selector, shallow);
 
 	const {
 		acceptedFiles,
@@ -86,6 +93,8 @@ export default function DropZone() {
 			const dataParameter = new Set();
 			const dataAnswerParameter = new Set();
 			const dataType = new Set();
+			const dataAnswerType = new Set();
+
 			Object.entries(questions).forEach(([id, data]) => {
 				const question = {
 					id: id,
@@ -104,7 +113,7 @@ export default function DropZone() {
 							id: "if " + id + " " + element,
 							source: element,
 							target: id,
-							style: { 
+							style: {
 								stroke: "green",
 								strokeWidth: 2,
 							},
@@ -115,7 +124,7 @@ export default function DropZone() {
 						id: "else " + id + " " + data.includeIf.else,
 						source: id,
 						target: data.includeIf.else,
-						style: { 
+						style: {
 							stroke: "red",
 							strokeWidth: 2,
 						},
@@ -134,17 +143,17 @@ export default function DropZone() {
 						position: { x: 0, y: -900 },
 						type: "answer_" + data.type,
 					};
+					dataAnswerType.add(data.type);
 
 					const edgeFromQuestion = {
 						id: "fromQ " + question.id + " " + id,
 						source: question.id,
 						target: id,
 						//type: "edge_"+ question.data.type,
-						style : { 
+						style: {
 							stroke: "white",
 							strokeWidth: 2,
-					}
-
+						},
 					};
 
 					if (!!data.next) {
@@ -153,11 +162,10 @@ export default function DropZone() {
 							source: id,
 							target: data.next,
 							//type: "edge_"+ data.type,
-							style : { 
+							style: {
 								stroke: "yellow",
 								strokeWidth: 2,
-							}
-
+							},
 						};
 
 						edgesFromAnswers.push(edgeFromAnswer);
@@ -168,6 +176,8 @@ export default function DropZone() {
 				nodesQuestions.push(question);
 			});
 			setQuestionsTypes(Array.from(dataType).sort());
+			setAnswerTypes(Array.from(dataAnswerType).sort());
+
 			console.log(dataParameter);
 			console.log(dataAnswerParameter);
 

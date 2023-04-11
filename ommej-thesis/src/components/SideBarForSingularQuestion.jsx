@@ -20,28 +20,60 @@ export default function SideBarForSingularQuestion() {
 	const [questionType, setQuestionType] = useState("");
 	const [tags, setTags] = useState([]);
 
+	const [questionRef, setQuestionRef] = useState("");
+	const [questionHeader, setQuestionHeader] = useState("");
+	const [questionIncludeIf, setQuestionIncludeIf] = useState({});
+	const [questionVideo, setQuestionVideo] = useState("");
+	const [questionImage, setQuestionImage] = useState("");
+
 	const { selected, instance, onNodesChange, nodes, questionTypes } = useStore(
 		selector,
 		shallow
 	);
 
 	useEffect(() => {
-		if (selected.nodes != undefined && selected.nodes.length === 1) {
+		if (selected.nodes !== undefined && selected.nodes.length === 1) {
 			setQuestionType(selected.nodes[0].data.type);
-			if (selected.nodes[0].data.text != undefined) {
+			if (selected.nodes[0].data.text !== undefined) {
 				setTextValue(selected.nodes[0].data.text.sv);
 			} else {
 				setTextValue("");
 			}
-			if (selected.nodes[0].data.statementText != undefined) {
+			if (selected.nodes[0].data.statementText !== undefined) {
 				setStatementTextValue(selected.nodes[0].data.statementText.sv);
 			} else {
 				setStatementTextValue("");
 			}
-			if (selected.nodes[0].data.tags != undefined) {
+			if (selected.nodes[0].data.tags !== undefined) {
 				setTags(selected.nodes[0].data.tags);
 			} else {
 				setTags([]);
+			}
+			if (selected.nodes[0].data.ref !== undefined) {
+				setQuestionRef(selected.nodes[0].data.ref);
+			} else {
+				setQuestionRef("");
+			}
+			if (selected.nodes[0].data.header !== undefined) {
+				setQuestionHeader(selected.nodes[0].data.header.sv);
+			} else {
+				setQuestionHeader("");
+			}
+			if (selected.nodes[0].data.includeIf !== undefined) {
+				setQuestionIncludeIf(selected.nodes[0].data.includeIf);
+				console.log(selected.nodes[0].data.includeIf);
+			} else {
+				setQuestionIncludeIf({});
+			}
+			if (selected.nodes[0].data.video !== undefined) {
+				setQuestionVideo(selected.nodes[0].data.video);
+			} else {
+				setQuestionVideo("");
+			}
+			if (selected.nodes[0].data.image !== undefined) {
+				setQuestionImage(selected.nodes[0].data.image);
+			} else {
+				setQuestionImage("");
 			}
 		}
 	}, [selected]);
@@ -56,7 +88,7 @@ export default function SideBarForSingularQuestion() {
 		return updatedTags;
 	}
 
-	function moveToNode(id, instance, nodes) {
+	function moveToNode(id) {
 		const node = nodes.find((node) => node.id === id);
 
 		instance.setCenter(node.position.x + 450, node.position.y, {
@@ -71,18 +103,39 @@ export default function SideBarForSingularQuestion() {
 		onNodesChange(nodes);
 	}
 
+	function select(id) {
+		let index = nodes.findIndex((node) => node.id === selected.nodes[0].id);
+		nodes[index].selected = false;
+		index = nodes.findIndex((node) => node.id === id);
+		nodes[index].selected = true;
+
+		onNodesChange(nodes);
+	}
+	function handleAnswerClick(id) {
+		moveToNode(id);
+		select(id);
+	}
+
 	function handleSave() {
 		const index = nodes.findIndex((node) => node.id === selected.nodes[0].id);
 		nodes[index].data.text.sv = textValue;
 		nodes[index].data.tags = tags;
 		nodes[index].data.type = questionType;
 		nodes[index].type = "question_" + questionType;
-		if (statementTextValue != "") {
-			if (nodes[index].data.statementText != undefined)
-				nodes[index].data.statementText.sv = statementTextValue;
-			else {
-				nodes[index].data.statementText = { sv: statementTextValue };
-			}
+		if (statementTextValue !== "") {
+			nodes[index].data.statementText = { sv: statementTextValue };
+		}
+		if (questionHeader !== "") {
+			nodes[index].data.header = { sv: questionHeader };
+		}
+		if (questionRef !== "") {
+			nodes[index].data.ref = questionRef;
+		}
+		if (questionVideo !== "") {
+			nodes[index].data.video = questionVideo;
+		}
+		if (questionImage !== "") {
+			nodes[index].data.image = questionImage;
 		}
 		unselect();
 	}
@@ -97,9 +150,7 @@ export default function SideBarForSingularQuestion() {
 					variant="secondary"
 					key={selected.nodes[0].id}
 					id={selected.nodes[0].id}
-					onClick={(event) =>
-						moveToNode(event.target.id, instance, selected.nodes)
-					}
+					onClick={(event) => moveToNode(event.target.id)}
 				>
 					Move to node
 				</Button>
@@ -142,7 +193,7 @@ export default function SideBarForSingularQuestion() {
 					<div className="tag">
 						<Form.Control
 							type="text"
-							placeholder="Enter new item"
+							placeholder="New Tag"
 							value={newTag}
 							onChange={(event) => setNewTag(event.target.value)}
 						/>
@@ -158,7 +209,7 @@ export default function SideBarForSingularQuestion() {
 							Add Item
 						</Button>
 					</div>
-					{tags != undefined ? (
+					{tags !== undefined ? (
 						<div className="singleSidebarTags">
 							{tags.map((item, index) => (
 								<div className="tag">
@@ -177,17 +228,115 @@ export default function SideBarForSingularQuestion() {
 					)}
 				</Form.Group>
 
+				<Form.Group>
+					<Form.Label>Answers</Form.Label>
+
+					{selected.nodes[0].data.answers !== undefined ? (
+						<div className="singleSidebarTags">
+							{Object.entries(selected.nodes[0].data.answers).map(
+								([index, data]) =>
+									data.type === "text" ? (
+										<div className="tag">
+											<p key={index}>{data.text.sv}</p>
+											<Button
+												onClick={(event) => handleAnswerClick(event.target.id)}
+												id={index}
+												variant="secondary"
+											>
+												Move to answer
+											</Button>
+										</div>
+									) : (
+										<div className="tag">
+											<p key={index}>{data.type}</p>
+											<Button
+												onClick={(event) => handleAnswerClick(event.target.id)}
+												id={index}
+												variant="secondary"
+											>
+												Move to answer
+											</Button>
+										</div>
+									)
+							)}
+						</div>
+					) : (
+						<></>
+					)}
+				</Form.Group>
+
+				<Form.Group>
+					<Form.Label>includeIf</Form.Label>
+
+					{Object.keys(questionIncludeIf).length !== 0 ? (
+						<div className="singleSidebarIncludeIfs">
+							{questionIncludeIf.answers.map((node) => (
+								<div className="tag">
+									<p key={node}>{node}</p>
+									<Button
+										onClick={(event) => moveToNode(event.target.id)}
+										id={node}
+										variant="secondary"
+									>
+										Move to answer
+									</Button>
+								</div>
+							))}
+							<Form.Label>else</Form.Label>
+							<div className="tag">
+								<p>{questionIncludeIf.else}</p>
+								<Button
+									onClick={(event) => moveToNode(event.target.id)}
+									id={questionIncludeIf.else}
+									variant="secondary"
+								>
+									Move to answer
+								</Button>
+							</div>
+						</div>
+					) : (
+						<></>
+					)}
+				</Form.Group>
+
 				<Form.Group className="mb-3" controlId="text">
 					<Form.Label>Statement Text</Form.Label>
 					<Form.Control
-						as="textarea"
-						rows={
-							Math.ceil(statementTextValue.length / 63) +
-							statementTextValue.split(/\r\n|\r|\n/).length
-						}
 						type="text"
 						value={statementTextValue}
 						onChange={(e) => setStatementTextValue(e.target.value)}
+					/>
+				</Form.Group>
+				<Form.Group className="mb-3" controlId="text">
+					<Form.Label>Question Header</Form.Label>
+					<Form.Control
+						type="text"
+						value={questionHeader}
+						onChange={(e) => setQuestionHeader(e.target.value)}
+					/>
+				</Form.Group>
+				<Form.Group className="mb-3" controlId="text">
+					<Form.Label>Question Ref</Form.Label>
+					<Form.Control
+						type="text"
+						value={questionRef}
+						onChange={(e) => setQuestionRef(e.target.value)}
+					/>
+				</Form.Group>
+				<Form.Group className="mb-3" controlId="text">
+					<Form.Label>Question Video</Form.Label>
+					<Form.Control
+						type="text"
+						value={questionVideo}
+						onChange={(e) => setQuestionVideo(e.target.value)}
+					/>
+				</Form.Group>
+				<Form.Group className="mb-3" controlId="text">
+					<Form.Label>Question Image</Form.Label>
+					<Form.Control
+						type="text"
+						value={questionImage}
+						onChange={(e) => setQuestionImage(e.target.value)}
 					/>
 				</Form.Group>
 			</Form>

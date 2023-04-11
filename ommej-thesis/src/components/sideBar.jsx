@@ -6,24 +6,13 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import styled, { ThemeProvider } from "styled-components";
 import SideBarForSingularQuestion from "./SideBarForSingularQuestion.jsx";
-
+import SideBarForSingularAnswer from "./SideBarForSingularAnswer.jsx";
 const selector = (state) => ({
 	selected: state.selectedNodes,
 	onNodesChange: state.onNodesChange,
 	instance: state.reactFlowInstance,
 });
 
-function sideBarForSingularAnswer(selected) {
-	return (
-		<Panel className="sidebar" position="top-right">
-			<h5>{selected.nodes[0].id}</h5>
-
-			<Button variant="primary" type="save">
-				Save
-			</Button>
-		</Panel>
-	);
-}
 function moveToNode(id, instance, nodes) {
 	const node = nodes.find((node) => node.id === id);
 
@@ -211,7 +200,13 @@ export function SideBar() {
 		selected.nodes.length === 1 &&
 		selected.nodes[0].type.includes("answer")
 	) {
-		return sideBarForSingularAnswer(selected);
+		return (
+			<SideBarForSingularAnswer
+				selected={selected}
+				instance={instance}
+				onNodesChange={onNodesChange}
+			/>
+		);
 	} else {
 		return <></>;
 	}
