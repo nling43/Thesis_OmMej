@@ -88,7 +88,7 @@ export default function SideBarForSingularanswer() {
 
 		onNodesChange(nodes);
 	}
-	function handleAnswerClick(id) {
+	function handleQuestionClick(id) {
 		moveToNode(id);
 		select(id);
 	}
@@ -99,7 +99,7 @@ export default function SideBarForSingularanswer() {
 		nodes[index].data.tags = tags;
 		nodes[index].data.type = answerType;
 		nodes[index].type = "answer_" + answerType;
-
+		nodes[index].data.alarm = alarm;
 		unselect();
 	}
 	return (
@@ -189,6 +189,36 @@ export default function SideBarForSingularanswer() {
 					) : (
 						<></>
 					)}
+				</Form.Group>
+
+				<Form.Group className="mb-3" controlId="type">
+					<Form.Label>Alarm</Form.Label>
+
+					<Form.Select
+						value={alarm.toString()}
+						onChange={(event) => {
+							setAlarm(event.target.value === "true");
+						}}
+					>
+						<option>{true.toString()}</option>
+						<option>{false.toString()}</option>
+					</Form.Select>
+				</Form.Group>
+
+				<Form.Group className="mb-3" controlId="type">
+					<Form.Label>Question</Form.Label>
+					<div className="singleSidebarIncludeIfs">
+						<div className="tag">
+							<p>{selected.nodes[0].data.next}</p>
+							<Button
+								onClick={(event) => handleQuestionClick(event.target.id)}
+								id={selected.nodes[0].data.next}
+								variant="secondary"
+							>
+								Move to question
+							</Button>
+						</div>
+					</div>
 				</Form.Group>
 			</Form>
 		</Panel>

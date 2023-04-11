@@ -200,7 +200,11 @@ export default function NavBar() {
 					<Button className="button" variant="primary">
 						<FontAwesomeIcon icon={faPlus} />
 					</Button>{" "}
-					<Button className="button" variant="primary">
+					<Button
+						className="button"
+						variant="primary"
+						onClick={() => handleDeleteNodes()}
+					>
 						<FontAwesomeIcon icon={faTrashCan} />
 					</Button>
 					{""}
