@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { Panel } from "reactflow";
-import "../css/sidebar.css";
+import "../../css/sidebar.css";
 import { shallow } from "zustand/shallow";
-import useStore from "../Store/store";
+import useStore from "../../Store/store";
 
 const selector = (state) => ({
 	selected: state.selectedNodes,
@@ -19,7 +19,6 @@ export default function SideBarForSingularQuestion() {
 	const [newTag, setNewTag] = useState("");
 	const [questionType, setQuestionType] = useState("");
 	const [tags, setTags] = useState([]);
-
 	const [questionRef, setQuestionRef] = useState("");
 	const [questionHeader, setQuestionHeader] = useState("");
 	const [questionIncludeIf, setQuestionIncludeIf] = useState({});
