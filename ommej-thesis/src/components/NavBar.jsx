@@ -32,11 +32,19 @@ const selector = (state) => ({
 });
 
 export default function NavBar() {
-	const { onClear, nodes, edges, instance, selectedNodes, onNodesChange } =
-		useStore(selector, shallow);
+	const {
+		onClear,
+		nodes,
+		onSelectNodes,
+		instance,
+		selectedNodes,
+		onNodesChange,
+	} = useStore(selector, shallow);
 	const [search, setSearch] = useState("");
 	const [showFileNamer, setShowFileNamer] = useState(false);
+	const [showDelete, setShowDelete] = useState(false);
 	const [fileName, setFileName] = useState("");
+
 	const handleClose = () => setShowFileNamer(false);
 	const handleShow = () => {
 		if (nodes.length > 0) setShowFileNamer(true);
@@ -203,14 +211,35 @@ export default function NavBar() {
 					<Button
 						className="button"
 						variant="primary"
-						onClick={() => handleDeleteNodes()}
+						onClick={() => {
+							setShowDelete(true);
+						}}
 					>
 						<FontAwesomeIcon icon={faTrashCan} />
 					</Button>
 					{""}
 				</Nav>
 			</Navbar>
-
+			<Modal show={showDelete} onHide={() => setShowDelete(false)}>
+				<Modal.Header closeButton>
+					<Modal.Title>Confirmation</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>Are you sure you want to delete this item?</Modal.Body>
+				<Modal.Footer>
+					<Button variant="secondary" onClick={() => setShowDelete(false)}>
+						Cancel
+					</Button>
+					<Button
+						variant="primary"
+						onClick={() => {
+							handleDeleteNodes();
+							setShowDelete(false);
+						}}
+					>
+						Delete
+					</Button>
+				</Modal.Footer>
+			</Modal>
 			<Modal show={showFileNamer} onHide={handleClose}>
 				<Modal.Header closeButton>
 					<Modal.Title>Download File</Modal.Title>
