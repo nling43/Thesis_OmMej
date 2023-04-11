@@ -12,9 +12,15 @@
 	display: grid;
 	gap: 2rem;
 }
-.nodeButton * {
-	pointer-events: none;
+
+.edges {
+	display: grid;
+	gap: 2rem;
 }
+.edges * {
+	max-height: 18rem;
+}
+
 .sidebar_header_buttons {
 	display: flex;
 	justify-content: space-around;
@@ -72,14 +78,6 @@
 }
 .mb-3 {
 	margin: 1rem;
-}
-.parameter {
-	display: grid;
-	grid-template-columns: 1fr 2fr;
-	grid-template-rows: 1fr;
-	text-align: center;
-	align-items: center;
-	padding: 1rem;
 }
 
 h5 {

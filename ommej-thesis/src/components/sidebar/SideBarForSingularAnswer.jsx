@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { Panel } from "reactflow";
-import "../css/sidebar.css";
+import "../../css/sidebar.css";
 import { shallow } from "zustand/shallow";
-import useStore from "../Store/store";
+import useStore from "../../Store/store";
 
 const selector = (state) => ({
 	selected: state.selectedNodes,
@@ -15,14 +15,10 @@ const selector = (state) => ({
 });
 export default function SideBarForSingularanswer() {
 	const [textValue, setTextValue] = useState("");
-
 	const [newTag, setNewTag] = useState("");
 	const [answerType, setAnswerType] = useState("");
 	const [tags, setTags] = useState([]);
-
-	const [nextQuestion, setNextQuestion] = useState({});
 	const [alarm, setAlarm] = useState(false);
-
 	const { selected, instance, onNodesChange, nodes, answerTypes } = useStore(
 		selector,
 		shallow
@@ -42,11 +38,7 @@ export default function SideBarForSingularanswer() {
 			} else {
 				setTags([]);
 			}
-			if (selected.nodes[0].data.next !== undefined) {
-				setNextQuestion(selected.nodes[0].data.next);
-			} else {
-				setNextQuestion({});
-			}
+
 			if (selected.nodes[0].data.alarm !== undefined) {
 				setAlarm(selected.nodes[0].data.alarm);
 			} else {
