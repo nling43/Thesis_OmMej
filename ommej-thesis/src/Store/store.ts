@@ -23,6 +23,7 @@ type RFState = {
 
     onClear: ()=>void;
     reactFlowInstance: null,
+
     setReactFlowInstance: (instance:any)=> void;
     onNodesChange: OnNodesChange;
     onEdgesChange: OnEdgesChange;
@@ -30,7 +31,11 @@ type RFState = {
     selectedNodes : any; 
     onSelectNodes : (newSelectedNodes: Node[]) => void;
     questionsTypes : [];
+    answersTypes : [],
+
     setQuestionsTypes:  (types:[])=> void;
+    setAnswerTypes:  (types:[])=> void;
+
 
 }
 
@@ -39,9 +44,15 @@ const useStore = create<RFState>((set, get) => ({
     nodes: [],
     edges: [],
     selectedNodes:{},
-        questionsTypes : [],
+    questionsTypes : [],
+    answersTypes : [],
+
     reactFlowInstance:null,
     setQuestionsTypes:(types: []) => set(() => ({ questionsTypes: types })),
+
+    setAnswerTypes:(types: []) => set(() => ({ answersTypes: types })),
+
+
     setReactFlowInstance:(instance: any) => set(() => ({ reactFlowInstance: instance })),
     onSelectNodes: (selected: any) => set(() => ({ selectedNodes: selected })),
 

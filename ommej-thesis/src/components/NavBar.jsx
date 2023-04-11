@@ -25,12 +25,15 @@ const selector = (state) => ({
 	onEdgesChange: state.onEdgesChange,
 	//Get all node
 	nodes: state.nodes,
+	onNodesChange: state.onNodesChange,
 	selectedNodes: state.selectedNodes,
-	onSelectNodes: state.onSelectNodes,
+	edges: state.edges,
+	instance: state.reactFlowInstance,
 });
 
 export default function NavBar() {
-	const { onClear, nodes, onNodesChange } = useStore(selector, shallow);
+	const { onClear, nodes, edges, instance, selectedNodes, onNodesChange } =
+		useStore(selector, shallow);
 	const [search, setSearch] = useState("");
 	const [showFileNamer, setShowFileNamer] = useState(false);
 	const [fileName, setFileName] = useState("");
@@ -129,6 +132,22 @@ export default function NavBar() {
 			nodeToSelect.selected = true;
 		});
 		onNodesChange(nodes);
+	}
+
+	function handleDeleteNodes() {
+		const answers = selectedNodes.nodes.filter((el) =>
+			el.type.includes("answer")
+		);
+		instance.deleteElements(selectedNodes);
+		answers.forEach((answer) => {
+			const question = nodes.find(
+				(question) => answer.id in question.data.answers
+			);
+			console.log(question.data.answers);
+
+			delete question.data.answers[answer.id];
+			console.log(question.data.answers);
+		});
 	}
 	return (
 		<>
