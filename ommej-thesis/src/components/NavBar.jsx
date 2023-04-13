@@ -29,6 +29,8 @@ const selector = (state) => ({
 	selectedNodes: state.selectedNodes,
 	edges: state.edges,
 	instance: state.reactFlowInstance,
+	setShowAddNode: state.setShowAddNode,
+	showAddNode: state.showAddNode,
 });
 
 export default function NavBar() {
@@ -36,6 +38,8 @@ export default function NavBar() {
 		onClear,
 		nodes,
 		onSelectNodes,
+		setShowAddNode,
+		showAddNode,
 		instance,
 		selectedNodes,
 		onNodesChange,
@@ -183,7 +187,7 @@ export default function NavBar() {
 							placeholder="Search"
 							className="Search"
 							aria-label="Search"
-							onChange={(e) => setSearch(e.target.value)}
+							onChange={(e) => setSearch(e.target.value.trim())}
 						/>
 					</Form>
 					<Dropdown>
@@ -205,7 +209,13 @@ export default function NavBar() {
 							</Dropdown.Item>
 						</Dropdown.Menu>
 					</Dropdown>
-					<Button className="button" variant="primary">
+					<Button
+						className="button"
+						variant="primary"
+						onClick={() => {
+							setShowAddNode(!showAddNode);
+						}}
+					>
 						<FontAwesomeIcon icon={faPlus} />
 					</Button>{" "}
 					<Button

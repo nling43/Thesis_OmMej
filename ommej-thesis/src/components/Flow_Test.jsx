@@ -1,5 +1,5 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { v4 as uuidv4 } from "uuid";
 import ReactFlow, {
 	SelectionMode,
 	MiniMap,
@@ -107,6 +107,8 @@ const MiniMapStyled = styled(MiniMap)`
 `;
 
 function Flow() {
+	const reactFlowWrapper = useRef(null);
+
 	const [MiniMapOpen, setMiniMapOpen] = useState(false);
 	const mPressed = useKeyPress("m");
 	useEffect(() => {
@@ -133,74 +135,121 @@ function Flow() {
 		});
 		onNodesChange(nodes);
 	};
+
+	const onDragOver = useCallback((event) => {
+		event.preventDefault();
+		event.dataTransfer.dropEffect = "move";
+	}, []);
+
+	const onDrop = useCallback(
+		(event) => {
+			event.preventDefault();
+
+			const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+			const type = event.dataTransfer.getData("application/reactflow");
+			console.log(reactFlowBounds);
+			// check if the dropped element is valid
+			if (typeof type === "undefined" || !type) {
+				return;
+			}
+
+			const position = instance.project({
+				x: event.clientX - reactFlowBounds.left,
+				y: event.clientY - reactFlowBounds.top,
+			});
+			console.log(position);
+			const newNode = {
+				id: uuidv4(),
+				type,
+				position,
+				data: {},
+			};
+			console.log(newNode);
+			instance.addNodes(newNode);
+		},
+		[instance]
+	);
+
 	return (
 		<div className="flow_container">
 			<ThemeProvider theme={darkTheme}>
 				<ReactFlowProvider>
-					<ReactFlow
-						onInit={onFlowInit}
-						nodes={nodes}
-						edges={edges}
-						onNodesChange={onNodesChange}
-						onEdgesChange={onEdgesChange}
-						onConnect={onConnect}
-						nodeTypes={nodeTypes}
-						edgeTypes={edgeTypes}
-						onSelectionChange={onSelectNodes}
-						panOnScroll
-						minZoom={0.05}
-						maxZoom={1}
-						defaultViewport={{ x: 0, y: 0, zoom: 0.1 }}
-						onlyRenderVisibleElements={true}
-						selectionOnDrag
-						selectionMode={SelectionMode.Partial}
-						panOnDrag={[1, 2]}
-						deleteKeyCode={null}
-						zoomActivationKeyCode={null}
-						onNodeClick={handleNodeClick}
-					>
-						<ControlsStyled>
-							<ControlButton
-								onClick={() => {
-									console.log(nodes[0].position);
-									instance.setCenter(nodes[0].position.x, nodes[0].position.y, {
-										zoom: 0.1,
-									});
-								}}
-							>
-								<FontAwesomeIcon icon={faForwardFast} />
-							</ControlButton>
-							<ControlButton
-								onClick={() => {
-									console.log(nodes[nodes.length - 1].position);
-									instance.setCenter(
-										nodes[nodes.length - 1].position.x,
-										nodes[nodes.length - 1].position.y,
-										{
-											zoom: 0.1,
-										}
-									);
-								}}
-							>
-								<FontAwesomeIcon icon={faBackwardFast} />
-							</ControlButton>
-						</ControlsStyled>
-						{MiniMapOpen && (
-							<MiniMapStyled
-								position="top-left"
-								nodeColor="rgb(255,0,0)"
-								maskColor="rgb(0,0,0,.1)"
-								style={{
-									background: "rgb(255,255,255,0.9)",
-									margin: 0,
-									height: 680,
-									width: 300,
-								}}
-							/>
-						)}
+					<div className="reactflow-wrapper" ref={reactFlowWrapper}>
+						<ReactFlow
+							onInit={onFlowInit}
+							nodes={nodes}
+							edges={edges}
+							onNodesChange={onNodesChange}
+							onEdgesChange={onEdgesChange}
+							onConnect={onConnect}
+							nodeTypes={nodeTypes}
+							edgeTypes={edgeTypes}
+							onSelectionChange={onSelectNodes}
+							panOnScroll={true}
+							minZoom={0.05}
+							maxZoom={1}
+							defaultViewport={{ x: 0, y: 0, zoom: 0.1 }}
+							onlyRenderVisibleElements={true}
+							selectionOnDrag={true}
+							selectionMode={SelectionMode.Partial}
+							panOnDrag={[2]}
+							deleteKeyCode={null}
+							panActivationKeyCode={null}
+							multiSelectionKeyCode={null}
+							selectionKeyCode={null}
+							zoomOnScroll={false}
+							zoomActivationKeyCode={"Alt"}
+							onNodeClick={handleNodeClick}
+							onDragOver={onDragOver}
+							onDrop={onDrop}
+						>
+							<ControlsStyled>
+								<ControlButton
+									onClick={() => {
+										console.log(nodes[0].position);
+										instance.setCenter(
+											nodes[0].position.x,
+											nodes[0].position.y,
+											{
+												zoom: 0.1,
+											}
+										);
+									}}
+								>
+									<FontAwesomeIcon icon={faForwardFast} />
+								</ControlButton>
+								<ControlButton
+									onClick={() => {
+										console.log(nodes[nodes.length - 1].position);
+										instance.setCenter(
+											nodes[nodes.length - 1].position.x,
+											nodes[nodes.length - 1].position.y,
+											{
+												zoom: 0.1,
+											}
+										);
+									}}
+								>
+									<FontAwesomeIcon icon={faBackwardFast} />
+								</ControlButton>
+							</ControlsStyled>
+							{MiniMapOpen && (
+								<MiniMapStyled
+									position="top-left"
+									nodeColor="rgb(255,0,0)"
+									maskColor="rgb(0,0,0,.1)"
+									style={{
+										background: "rgb(255,255,255,0.9)",
+										margin: 0,
+										height: 680,
+										width: 300,
+									}}
+								/>
+							)}
 
-						<SideBar />
-					</ReactFlow>
+							<SideBar />
+						</ReactFlow>
+					</div>
 				</ReactFlowProvider>
 			</ThemeProvider>
 		</div>
