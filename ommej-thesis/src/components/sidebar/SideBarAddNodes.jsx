@@ -1,6 +1,13 @@
 import { Panel } from "reactflow";
-
+import "../../css/sidebar.css";
+import useStore from "../../Store/store";
+import { shallow } from "zustand/shallow";
+const selector = (state) => ({
+	questionsTypes: state.questionsTypes,
+	answersTypes: state.answersTypes,
+});
 export default function SideBarAddNodes() {
+	const { questionsTypes, answersTypes } = useStore(selector, shallow);
 	const onDragStart = (event, nodeType) => {
 		event.dataTransfer.setData("application/reactflow", nodeType);
 		event.dataTransfer.effectAllowed = "move";
@@ -8,29 +15,30 @@ export default function SideBarAddNodes() {
 
 	return (
 		<Panel className="sidebar" position="top-right">
-			<div className="description">
-				You can drag these nodes to the pane on the right.
+			<h3 className="title">Questions</h3>
+			<div className="addNodeGrid">
+				{questionsTypes.map((type, index) => (
+					<div
+						className="addNode"
+						onDragStart={(event) => onDragStart(event, "question_" + type)}
+						draggable
+					>
+						{(type.charAt(0).toUpperCase() + type.slice(1)).replace(/_/g, " ")}
+					</div>
+				))}
 			</div>
-			<div
-				className="dndnode input"
-				onDragStart={(event) => onDragStart(event, "question_single")}
-				draggable
-			>
-				Single
-			</div>
-			<div
-				className="dndnode"
-				onDragStart={(event) => onDragStart(event, "question_article_text")}
-				draggable
-			>
-				Article
-			</div>
-			<div
-				className="dndnode output"
-				onDragStart={(event) => onDragStart(event, "answer_text")}
-				draggable
-			>
-				answer_text
+
+			<h3 className="title">Answers</h3>
+			<div className="addNodeGrid">
+				{answersTypes.map((type, index) => (
+					<div
+						className="addNode"
+						onDragStart={(event) => onDragStart(event, "answer_" + type)}
+						draggable
+					>
+						{type.charAt(0).toUpperCase() + type.slice(1)}
+					</div>
+				))}
 			</div>
 		</Panel>
 	);

@@ -85,6 +85,7 @@ export default function NavBar() {
 		handleSearch(1, search);
 	}
 	function handleSearch(number, search) {
+		setShowAddNode(false);
 		let result = [];
 		const questions = nodes.filter((node) => node.type.includes("question"));
 		switch (number) {
@@ -132,7 +133,13 @@ export default function NavBar() {
 		}
 		select(result);
 	}
-
+	function handleAddButtonClick() {
+		nodes.forEach((element) => {
+			element.selected = false;
+		});
+		onNodesChange(nodes);
+		setShowAddNode(!showAddNode);
+	}
 	function select(toSelect) {
 		nodes.forEach((node) => {
 			node.selected = false;
@@ -155,10 +162,7 @@ export default function NavBar() {
 			const question = nodes.find(
 				(question) => answer.id in question.data.answers
 			);
-			console.log(question.data.answers);
-
 			delete question.data.answers[answer.id];
-			console.log(question.data.answers);
 		});
 	}
 	return (
@@ -213,7 +217,7 @@ export default function NavBar() {
 						className="button"
 						variant="primary"
 						onClick={() => {
-							setShowAddNode(!showAddNode);
+							handleAddButtonClick();
 						}}
 					>
 						<FontAwesomeIcon icon={faPlus} />

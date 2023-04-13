@@ -84,6 +84,7 @@ const selector = (state) => ({
 	onSelectNodes: state.onSelectNodes,
 	setReactFlowInstance: state.setReactFlowInstance,
 	onViewPortChange: state.onViewPortChange,
+	setShowAddNode: state.setShowAddNode,
 	instance: state.reactFlowInstance,
 });
 
@@ -125,11 +126,13 @@ function Flow() {
 		onSelectNodes,
 		setReactFlowInstance,
 		instance,
+		setShowAddNode,
 	} = useStore(selector, shallow);
 	const onFlowInit = (reactFlowInstance) => {
 		setReactFlowInstance(reactFlowInstance);
 	};
 	const handleNodeClick = (event, node) => {
+		setShowAddNode(false);
 		nodes.forEach((element) => {
 			if (element.id !== node.id) element.selected = false;
 		});
@@ -144,27 +147,42 @@ function Flow() {
 	const onDrop = useCallback(
 		(event) => {
 			event.preventDefault();
-
 			const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
 			const type = event.dataTransfer.getData("application/reactflow");
-			console.log(reactFlowBounds);
-			// check if the dropped element is valid
 			if (typeof type === "undefined" || !type) {
 				return;
 			}
-
 			const position = instance.project({
 				x: event.clientX - reactFlowBounds.left,
 				y: event.clientY - reactFlowBounds.top,
 			});
-			console.log(position);
-			const newNode = {
-				id: uuidv4(),
-				type,
-				position,
-				data: {},
-			};
-			console.log(newNode);
+			let newNode;
+			if (type.includes("question")) {
+				newNode = {
+					id: uuidv4(),
+					type: type,
+					position,
+					data: {
+						type: type.replace("question_", ""),
+						text: {
+							sv: "",
+						},
+					},
+				};
+			} else {
+				newNode = {
+					id: uuidv4(),
+					type: type,
+					position,
+					data: {
+						type: type.replace("answer_", ""),
+						text: {
+							sv: "",
+						},
+					},
+				};
+			}
+
 			instance.addNodes(newNode);
 		},
 		[instance]
