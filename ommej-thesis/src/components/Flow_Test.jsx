@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { v4 as uuidv4 } from "uuid";
 import ReactFlow, {
 	SelectionMode,
 	MiniMap,
@@ -8,6 +7,7 @@ import ReactFlow, {
 	useKeyPress,
 	ControlButton,
 } from "reactflow";
+import { questionTemplate, answerTemplate } from "./templates.js";
 //Icon for ControlButton
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -112,11 +112,7 @@ function Flow() {
 
 	const [MiniMapOpen, setMiniMapOpen] = useState(false);
 	const mPressed = useKeyPress("m");
-	useEffect(() => {
-		if (mPressed) {
-			setMiniMapOpen(!MiniMapOpen);
-		}
-	}, [mPressed]);
+
 	const {
 		nodes,
 		edges,
@@ -128,6 +124,13 @@ function Flow() {
 		instance,
 		setShowAddNode,
 	} = useStore(selector, shallow);
+
+	useEffect(() => {
+		if (mPressed) {
+			setMiniMapOpen(!MiniMapOpen);
+		}
+	}, [mPressed]);
+
 	const onFlowInit = (reactFlowInstance) => {
 		setReactFlowInstance(reactFlowInstance);
 	};
@@ -156,34 +159,14 @@ function Flow() {
 				x: event.clientX - reactFlowBounds.left,
 				y: event.clientY - reactFlowBounds.top,
 			});
-			let newNode;
 			if (type.includes("question")) {
-				newNode = {
-					id: uuidv4(),
-					type: type,
-					position,
-					data: {
-						type: type.replace("question_", ""),
-						text: {
-							sv: "",
-						},
-					},
-				};
+				const [nodes, edges] = questionTemplate(type, position);
+				instance.addNodes(nodes);
+				instance.addEdges(edges);
 			} else {
-				newNode = {
-					id: uuidv4(),
-					type: type,
-					position,
-					data: {
-						type: type.replace("answer_", ""),
-						text: {
-							sv: "",
-						},
-					},
-				};
+				const newNode = answerTemplate(type, position);
+				instance.addNodes(newNode);
 			}
-
-			instance.addNodes(newNode);
 		},
 		[instance]
 	);

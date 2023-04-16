@@ -22,25 +22,25 @@ const Node = styled.div`
 	}
 `;
 const NodeZoomed = styled.div`
-  display: flex;
-  column-gap: 40px;
-  padding: 20px;
-  height: 150px;
-  width: 150px;
-  align-items: center;
-  justify-content: center;
-  background: ${(props) => props.theme.questionBg};
-  color: ${(props) => props.theme.questionTextSinglePersons};
-  border: 10px solid
-    ${(props) =>
-	  props.selected ? props.theme.handleInputColor : props.theme.nodeBorder};
-	    .react-flow__handle {
-	background: ${(props) => props.theme.handleInputQuestionColor};
-	width: 13px;
-	height: 10px;
-	border: 0px solid #000;
-	border-radius: 3px;
-	  }
+	display: flex;
+	column-gap: 40px;
+	padding: 20px;
+	height: 150px;
+	width: 150px;
+	align-items: center;
+	justify-content: center;
+	background: ${(props) => props.theme.questionBg};
+	color: ${(props) => props.theme.questionTextSinglePersons};
+	border: 10px solid
+		${(props) =>
+			props.selected ? props.theme.handleInputColor : props.theme.nodeBorder};
+	.react-flow__handle {
+		background: ${(props) => props.theme.handleInputQuestionColor};
+		width: ${(props) => props.theme.handleWitdh};
+		height: 10px;
+		border: 0px solid #000;
+		border-radius: 3px;
+	}
 `;
 const zoomSelector = (s) => s.transform[2] >= 0.5;
 

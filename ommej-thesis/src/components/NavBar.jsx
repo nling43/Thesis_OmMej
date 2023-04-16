@@ -157,13 +157,30 @@ export default function NavBar() {
 		const answers = selectedNodes.nodes.filter((el) =>
 			el.type.includes("answer")
 		);
-		instance.deleteElements(selectedNodes);
+		const questions = selectedNodes.nodes.filter((el) =>
+			el.type.includes("question")
+		);
 		answers.forEach((answer) => {
 			const question = nodes.find(
-				(question) => answer.id in question.data.answers
+				(question) =>
+					question.data.answers && answer.id in question.data.answers
 			);
-			delete question.data.answers[answer.id];
+			if (question) {
+				delete question.data.answers[answer.id];
+			}
 		});
+		questions.forEach((question) => {
+			const answers = nodes.filter(
+				(answer) => answer.data.next && question.id === answer.data.next
+			);
+
+			for (const answer of answers) {
+				answer.data.next = null;
+			}
+		});
+
+		instance.deleteElements(selectedNodes);
+		setShowDelete(false);
 	}
 	return (
 		<>
@@ -247,7 +264,6 @@ export default function NavBar() {
 						variant="primary"
 						onClick={() => {
 							handleDeleteNodes();
-							setShowDelete(false);
 						}}
 					>
 						Delete

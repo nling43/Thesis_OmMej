@@ -10,6 +10,7 @@ const selector = (state) => ({
 	selected: state.selectedNodes,
 	onNodesChange: state.onNodesChange,
 	nodes: state.nodes,
+	edges: state.edges,
 	instance: state.reactFlowInstance,
 	answerTypes: state.answersTypes,
 });
@@ -19,20 +20,21 @@ export default function SideBarForSingularanswer() {
 	const [answerType, setAnswerType] = useState("");
 	const [tags, setTags] = useState([]);
 	const [alarm, setAlarm] = useState(false);
-	const { selected, instance, onNodesChange, nodes, answerTypes } = useStore(
-		selector,
-		shallow
-	);
+	const [next, setNext] = useState("");
+	const { selected, instance, onNodesChange, nodes, edges, answerTypes } =
+		useStore(selector, shallow);
 
 	useEffect(() => {
 		if (selected.nodes !== undefined && selected.nodes.length === 1) {
 			setAnswerType(selected.nodes[0].data.type);
-			if (selected.nodes[0].data.text !== undefined) {
+			if (
+				selected.nodes[0].data.text !== undefined &&
+				selected.nodes[0].data.type === "text"
+			) {
 				setTextValue(selected.nodes[0].data.text.sv);
 			} else {
 				setTextValue("");
 			}
-
 			if (selected.nodes[0].data.tags !== undefined) {
 				setTags(selected.nodes[0].data.tags);
 			} else {
@@ -43,6 +45,12 @@ export default function SideBarForSingularanswer() {
 				setAlarm(selected.nodes[0].data.alarm);
 			} else {
 				setAlarm(false);
+			}
+
+			if (selected.nodes[0].data.next !== null) {
+				setNext(selected.nodes[0].data.next);
+			} else {
+				setNext(null);
 			}
 		}
 	}, [selected]);
@@ -87,11 +95,23 @@ export default function SideBarForSingularanswer() {
 
 	function handleSave() {
 		const index = nodes.findIndex((node) => node.id === selected.nodes[0].id);
-		nodes[index].data.text.sv = textValue;
+		if (textValue !== "") nodes[index].data.text = { sv: textValue };
 		nodes[index].data.tags = tags;
 		nodes[index].data.type = answerType;
 		nodes[index].type = "answer_" + answerType;
 		nodes[index].data.alarm = alarm;
+
+		const answerEgde = edges.find(
+			(egde) => egde.target === selected.nodes[0].id
+		);
+		const questionToAnswer = nodes.find(
+			(node) => node.id === answerEgde.source
+		);
+
+		if (textValue !== "") nodes[index].data.text = { sv: textValue };
+		questionToAnswer.data.answers[selected.nodes[0].id].tags = tags;
+		questionToAnswer.data.answers[selected.nodes[0].id].type = answerType;
+		questionToAnswer.data.answers[selected.nodes[0].id].alarm = alarm;
 		unselect();
 	}
 	return (
@@ -167,7 +187,7 @@ export default function SideBarForSingularanswer() {
 					{tags !== undefined ? (
 						<div className="singleSidebarTags">
 							{tags.map((item, index) => (
-								<div className="tag">
+								<div key={index} className="tag">
 									<p key={index}>{item}</p>
 									<Button
 										onClick={() => setTags(deleteTag(index, tags))}
@@ -183,7 +203,7 @@ export default function SideBarForSingularanswer() {
 					)}
 				</Form.Group>
 
-				<Form.Group className="mb-3" controlId="type">
+				<Form.Group className="mb-3" controlId="alarm">
 					<Form.Label>Alarm</Form.Label>
 
 					<Form.Select
@@ -196,22 +216,25 @@ export default function SideBarForSingularanswer() {
 						<option>{false.toString()}</option>
 					</Form.Select>
 				</Form.Group>
-
-				<Form.Group className="mb-3" controlId="type">
-					<Form.Label>Question</Form.Label>
-					<div className="singleSidebarIncludeIfs">
-						<div className="tag">
-							<p>{selected.nodes[0].data.next}</p>
-							<Button
-								onClick={(event) => handleQuestionClick(event.target.id)}
-								id={selected.nodes[0].data.next}
-								variant="secondary"
-							>
-								Move to question
-							</Button>
+				{next !== null ? (
+					<Form.Group className="mb-3" controlId="next">
+						<Form.Label>Question</Form.Label>
+						<div className="singleSidebarIncludeIfs">
+							<div className="tag">
+								<p>{next}</p>
+								<Button
+									onClick={(event) => handleQuestionClick(event.target.id)}
+									id={next}
+									variant="secondary"
+								>
+									Move to question
+								</Button>
+							</div>
 						</div>
-					</div>
-				</Form.Group>
+					</Form.Group>
+				) : (
+					<></>
+				)}
 			</Form>
 		</Panel>
 	);

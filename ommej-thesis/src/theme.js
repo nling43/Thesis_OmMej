@@ -1,8 +1,7 @@
 export const darkTheme = {
 	bg: "#000",
 	primary: "#ff0072",
-	
-	
+
 	questionBg: "#191716",
 	answerBg: "#F7EBEC",
 
@@ -10,7 +9,6 @@ export const darkTheme = {
 	nodeBorder: "#888",
 	handleInputQuestionColor: "#ffff",
 	handleInputAnswerColor: "#FFB140",
-	
 
 	minimapMaskBg: "#343435",
 	controlsBg: "#555",
@@ -18,7 +16,6 @@ export const darkTheme = {
 	controlsColor: "#dddddd",
 	controlsBorder: "#676768",
 
-	
 	questionTextSingle: "#BCF4F5",
 	questionTextPersons: "#B4EBCA",
 	questionTextArticle: "#D9F2B4",
@@ -28,6 +25,8 @@ export const darkTheme = {
 	questionTextSingleAccommodation: "#FF6978",
 	questionTextSinglePersons: "#FFFCF9",
 	questionTextMultiplePersons: "#B1EDE8",
+
+	handleWitdh: "60px",
 
 	answerText: "#3B429F",
 	answerTextPeople: "#AA7DCE",

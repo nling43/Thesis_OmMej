@@ -36,7 +36,7 @@ const NodeZoomed = styled.div`
 			props.selected ? props.theme.handleInputColor : props.theme.nodeBorder};
 	.react-flow__handle {
 		background: ${(props) => props.theme.handleInputQuestionColor};
-		width: 13px;
+		width: ${(props) => props.theme.handleWitdh};
 		height: 10px;
 		border: 0px solid #000;
 		border-radius: 3px;

@@ -19,6 +19,7 @@ export default function SideBarAddNodes() {
 			<div className="addNodeGrid">
 				{questionsTypes.map((type, index) => (
 					<div
+						key={index}
 						className="addNode"
 						onDragStart={(event) => onDragStart(event, "question_" + type)}
 						draggable
@@ -32,6 +33,7 @@ export default function SideBarAddNodes() {
 			<div className="addNodeGrid">
 				{answersTypes.map((type, index) => (
 					<div
+						key={index}
 						className="addNode"
 						onDragStart={(event) => onDragStart(event, "answer_" + type)}
 						draggable
