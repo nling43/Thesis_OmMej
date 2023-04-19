@@ -1,8 +1,13 @@
 import React, { memo } from "react";
-import { Handle, useStore } from "reactflow";
+import { Handle, useStore as flowStore } from "reactflow";
 import styled from "styled-components";
 import IconPeopleAnswer from "../../Icon/IconAnswer/IconPeopleAnswer";
-
+import useStore from "../../../Store/store";
+import { shallow } from "zustand/shallow";
+const selector = (state) => ({
+	nodes: state.nodes,
+	edges: state.edges,
+});
 const Node = styled.div`
 	display: flex;
 	align-items: center;
@@ -50,25 +55,62 @@ const NodeZoomed = styled.div`
 const zoomSelector = (s) => s.transform[2] >= 0.5;
 
 export default memo(({ data, selected }) => {
-	const showContent = useStore(zoomSelector);
+	const { nodes, edges } = useStore(selector, shallow);
+
+	const isValidConnectionUp = (connection) => {
+		const sourceNode = nodes.find((node) => node.id === connection.source);
+		console.log(sourceNode);
+		const isHandleFree = edges.every(
+			(edge) => edge.target !== connection.target
+		);
+		return sourceNode.type.includes("question_persons") && isHandleFree;
+	};
+
+	const isValidConnectionDown = (connection) => {
+		const targetNode = nodes.find((node) => node.id === connection.target);
+		console.log(targetNode);
+		const isHandleFree = edges.every(
+			(edge) => edge.source !== connection.source
+		);
+		return targetNode.type.includes("question") && isHandleFree;
+	};
+	const showContent = flowStore(zoomSelector);
 	if (showContent) {
 		return (
 			<Node selected={selected}>
-				<Handle type="target" position="top" />
+				<Handle
+					type="target"
+					position="top"
+					isValidConnection={isValidConnectionUp}
+				/>
 				<div>
 					<IconPeopleAnswer />
 				</div>
-				<Handle type="source" position="bottom" id="1"></Handle>
+				<Handle
+					type="source"
+					position="bottom"
+					id="1"
+					isValidConnection={isValidConnectionDown}
+				></Handle>
 			</Node>
 		);
 	} else {
 		return (
 			<NodeZoomed selected={selected}>
-				<Handle type="target" position="top" />
+				<Handle
+					type="target"
+					position="top"
+					isValidConnection={isValidConnectionUp}
+				/>
 				<div>
 					<IconPeopleAnswer zoomIn />
 				</div>
-				<Handle type="source" position="bottom" id="1"></Handle>
+				<Handle
+					type="source"
+					position="bottom"
+					id="1"
+					isValidConnection={isValidConnectionDown}
+				></Handle>
 			</NodeZoomed>
 		);
 	}
