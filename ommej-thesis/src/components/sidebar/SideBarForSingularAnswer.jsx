@@ -104,14 +104,16 @@ export default function SideBarForSingularanswer() {
 		const answerEgde = edges.find(
 			(egde) => egde.target === selected.nodes[0].id
 		);
-		const questionToAnswer = nodes.find(
-			(node) => node.id === answerEgde.source
-		);
 
-		if (textValue !== "") nodes[index].data.text = { sv: textValue };
-		questionToAnswer.data.answers[selected.nodes[0].id].tags = tags;
-		questionToAnswer.data.answers[selected.nodes[0].id].type = answerType;
-		questionToAnswer.data.answers[selected.nodes[0].id].alarm = alarm;
+		if (answerEgde !== undefined) {
+			const questionToAnswer = nodes.find(
+				(node) => node.id === answerEgde.source
+			);
+			if (textValue !== "") nodes[index].data.text = { sv: textValue };
+			questionToAnswer.data.answers[selected.nodes[0].id].tags = tags;
+			questionToAnswer.data.answers[selected.nodes[0].id].type = answerType;
+			questionToAnswer.data.answers[selected.nodes[0].id].alarm = alarm;
+		}
 		unselect();
 	}
 	return (

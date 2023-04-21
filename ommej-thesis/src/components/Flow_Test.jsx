@@ -160,15 +160,37 @@ function Flow() {
 				y: event.clientY - reactFlowBounds.top,
 			});
 			if (type.includes("question")) {
-				const [nodes, edges] = questionTemplate(type, position);
-				instance.addNodes(nodes);
+				const [newNodes, edges] = questionTemplate(type, position);
+				instance.addNodes(newNodes);
+
 				instance.addEdges(edges);
 			} else {
-				const newNode = answerTemplate(type, position);
-				instance.addNodes(newNode);
+				instance.addNodes(answerTemplate(type, position));
 			}
+			console.log(nodes);
 		},
 		[instance]
+	);
+	const onConnect2 = useCallback(
+		(edge) => {
+			const sourceNode = nodes.find((node) => node.id === edge.source);
+			const targetNode = nodes.find((node) => node.id === edge.target);
+
+			if (sourceNode.type.includes("question")) {
+				sourceNode.data.answers[targetNode.id] = targetNode.data;
+			} else {
+				const edgeFromQuestion = edges.find(
+					(edge) => edge.target === sourceNode.id
+				);
+				const questionWithAnswer = nodes.find(
+					(node) => node.id === edgeFromQuestion.source
+				);
+				questionWithAnswer.data.answers[sourceNode.id].next = targetNode.id;
+			}
+
+			onConnect(edge);
+		},
+		[nodes, edges]
 	);
 
 	return (
@@ -180,9 +202,9 @@ function Flow() {
 							onInit={onFlowInit}
 							nodes={nodes}
 							edges={edges}
+							onConnect={onConnect2}
 							onNodesChange={onNodesChange}
 							onEdgesChange={onEdgesChange}
-							onConnect={onConnect}
 							nodeTypes={nodeTypes}
 							edgeTypes={edgeTypes}
 							onSelectionChange={onSelectNodes}

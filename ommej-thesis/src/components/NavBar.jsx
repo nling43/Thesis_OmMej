@@ -60,11 +60,12 @@ export default function NavBar() {
 	const handleExport = () => {
 		handleClose();
 		const questions = nodes.filter((node) => node.type.includes("question"));
+		questions.sort((a, b) => a.position.y - b.position.y);
 		const questionFormated = questions.reduce((acc, question) => {
 			acc[question.id] = question.data;
 			return acc;
 		}, {});
-
+		console.log(nodes);
 		const data = {
 			metadata: {
 				name: "general",
