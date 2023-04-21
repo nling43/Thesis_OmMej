@@ -6,7 +6,7 @@
 	display: none;
 }
 
-.flow_container {
+.flow_container .reactflow-wrapper {
 	height: 93vh;
 }
 

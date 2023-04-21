@@ -31,7 +31,7 @@ export default function SideBarMulti() {
 					{node.data.tags !== undefined ? (
 						<div className="tags">
 							{node.data.tags.map((type) => (
-								<p>{type}</p>
+								<p key={type}>{type}</p>
 							))}
 						</div>
 					) : (
@@ -46,7 +46,7 @@ export default function SideBarMulti() {
 					{node.data.tags !== undefined ? (
 						<div className="tags">
 							{node.data.tags.map((type) => (
-								<p>{type}</p>
+								<p key={type}>{type}</p>
 							))}
 						</div>
 					) : (
@@ -63,7 +63,7 @@ export default function SideBarMulti() {
 					{node.data.tags !== undefined ? (
 						<div className="tags">
 							{node.data.tags.map((type) => (
-								<p>{type}</p>
+								<p key={type}>{type}</p>
 							))}
 						</div>
 					) : (
@@ -84,7 +84,7 @@ export default function SideBarMulti() {
 					{node.data.tags !== undefined ? (
 						<div className="tags">
 							{node.data.tags.map((type) => (
-								<p>{type}</p>
+								<p key={type}>{type}</p>
 							))}
 						</div>
 					) : (

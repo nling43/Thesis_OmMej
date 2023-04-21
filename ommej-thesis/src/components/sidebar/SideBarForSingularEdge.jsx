@@ -120,55 +120,93 @@ export default function SideBarForSingularEdge() {
 
 	return (
 		<Panel className="sidebar edges" position="top-right">
-			{[firstNode, secondNode].map((node) => {
-				switch (node.type) {
-					case "question_single":
-						return MultiButtonWrapper(
-							(props) => props.theme.questionTextSingle,
-							node
-						);
-					case "question_accommodations":
-						return MultiButtonWrapper(
-							(props) => props.theme.questionTextAccommodation,
-							node
-						);
+			{[firstNode, secondNode]
+				.map((node, index) => {
+					let title = "";
+					if (index == 0) title = "Source";
+					else title = "Target";
 
-					case "question_article_text":
-						return MultiButtonWrapper(
-							(props) => props.theme.questionTextArticle,
-							node
-						);
-					case "question_frequency":
-						return MultiButtonWrapper(
-							(props) => props.theme.questionTextFrequency,
-							node
-						);
-					case "question_multiple":
-						return MultiButtonWrapper(
-							(props) => props.theme.questionTextMultiple,
-							node
-						);
+					switch (node.type) {
+						case "question_single":
+							return {
+								node: MultiButtonWrapper(
+									(props) => props.theme.questionTextSingle,
+									node
+								),
+								title,
+							};
+						case "question_accommodations":
+							return {
+								node: MultiButtonWrapper(
+									(props) => props.theme.questionTextAccommodation,
+									node
+								),
+								title,
+							};
 
-					case "question_multiple_person":
-						return MultiButtonWrapper(
-							(props) => props.theme.questionTextMultiple,
-							node
-						);
+						case "question_article_text":
+							return {
+								node: MultiButtonWrapper(
+									(props) => props.theme.questionTextArticle,
+									node
+								),
+								title,
+							};
+						case "question_frequency":
+							return {
+								node: MultiButtonWrapper(
+									(props) => props.theme.questionTextFrequency,
+									node
+								),
+								title,
+							};
+						case "question_multiple":
+							return {
+								node: MultiButtonWrapper(
+									(props) => props.theme.questionTextMultiple,
+									node
+								),
+								title,
+							};
 
-					case "question_persons":
-						return MultiButtonWrapper(
-							(props) => props.theme.questionTextPersons,
-							node
-						);
-					case "question_single_accommodation":
-						return MultiButtonWrapper(
-							(props) => props.theme.questionTextSingleAccommodation,
-							node
-						);
-					default:
-						return MultiButtonWrapper((props) => props.theme.answerBg, node);
-				}
-			})}
+						case "question_multiple_person":
+							return {
+								node: MultiButtonWrapper(
+									(props) => props.theme.questionTextMultiple,
+									node
+								),
+								title,
+							};
+
+						case "question_persons":
+							return {
+								node: MultiButtonWrapper(
+									(props) => props.theme.questionTextPersons,
+									node
+								),
+								title,
+							};
+						case "question_single_accommodation":
+							return {
+								node: MultiButtonWrapper(
+									(props) => props.theme.questionTextSingleAccommodation,
+									node
+								),
+								title,
+							};
+						default:
+							return {
+								node: MultiButtonWrapper((props) => props.theme.answerBg, node),
+								title,
+							};
+					}
+				})
+				.map(({ node, title }) => (
+					<div key={node.id}>
+						<h2>{title}</h2>
+						{node}
+					</div>
+				))}
 		</Panel>
 	);
 }

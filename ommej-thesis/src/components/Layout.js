@@ -201,6 +201,7 @@ function setAnswer(answerX, answerY, answers, answer, questionX) {
 function setQuestion(qX, qY, questions, question) {
 	let x = qX;
 	let y = qY;
+
 	while (isColliding(x, y, questions, question)) {
 		if (x > rootX) {
 			x = x + 1000;
@@ -251,8 +252,9 @@ function setQuestionsOnCurrentDepth(question) {
 	);
 	const sortedXPositions = questionOnCurrentDepth.sort((a, b) => {
 		// left to right
-		return a.position.x > b.position.x;
+		return a.position.x - b.position.x;
 	});
+
 	if (questionOnCurrentDepth.length > 2) {
 		for (let index = 1; index < sortedXPositions.length; index++) {
 			const currentQuestion = sortedXPositions[index];
@@ -270,9 +272,14 @@ function setQuestionsOnCurrentDepth(question) {
 	} else if (questionOnCurrentDepth.length === 2) {
 		const currentQuestion = sortedXPositions[1];
 		const prevQuestion = sortedXPositions[0];
+
 		if (currentQuestion.position.x - prevQuestion.position.x < 2000) {
 			currentQuestion.position.x = prevQuestion.position.x + 2000;
+			if (currentQuestion.id === "1451003c-ca21-492a-bc38-e54bc53e09d4")
+				console.log("current", currentQuestion.position.x);
 
+			if (prevQuestion.id === "1451003c-ca21-492a-bc38-e54bc53e09d4")
+				console.log("prev", prevQuestion.position.x);
 			placeAnswers(currentQuestion);
 			placeAnswers(prevQuestion);
 		}

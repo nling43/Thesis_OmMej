@@ -79,6 +79,25 @@
 .mb-3 {
 	margin: 1rem;
 }
+.addNodeGrid {
+	display: grid;
+	gap: 2rem;
+	grid-template-columns: 1fr 1fr;
+}
+.title {
+	margin: 2rem;
+}
+.addNode {
+	height: 50px;
+	padding: 4px;
+	border: 5px solid #ffffff;
+	border-radius: 2px;
+	margin-bottom: 10px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: grab;
+}
 
 h5 {
 	margin: 2rem;

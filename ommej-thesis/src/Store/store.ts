@@ -23,7 +23,7 @@ type RFState = {
 
     onClear: ()=>void;
     reactFlowInstance: null,
-
+    showAddNode:boolean
     setReactFlowInstance: (instance:any)=> void;
     onNodesChange: OnNodesChange;
     onEdgesChange: OnEdgesChange;
@@ -34,6 +34,7 @@ type RFState = {
     answersTypes : [],
 
     setQuestionsTypes:  (types:[])=> void;
+    setShowAddNode:  (show:boolean)=> void;
     setAnswerTypes:  (types:[])=> void;
 
 
@@ -46,11 +47,11 @@ const useStore = create<RFState>((set, get) => ({
     selectedNodes:{},
     questionsTypes : [],
     answersTypes : [],
-
+    showAddNode: false,
     reactFlowInstance:null,
     setQuestionsTypes:(types: []) => set(() => ({ questionsTypes: types })),
-
     setAnswerTypes:(types: []) => set(() => ({ answersTypes: types })),
+    setShowAddNode:(show:boolean) => set(() => ({ showAddNode: show })),
 
 
     setReactFlowInstance:(instance: any) => set(() => ({ reactFlowInstance: instance })),

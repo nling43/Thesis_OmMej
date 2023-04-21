@@ -186,7 +186,14 @@ export default function SideBarForSingularQuestion() {
 						onChange={(e) => setTextValue(e.target.value)}
 					/>
 				</Form.Group>
-
+				<Form.Group className="mb-3" controlId="text">
+					<Form.Label>Ref</Form.Label>
+					<Form.Control
+						type="text"
+						value={questionRef}
+						onChange={(e) => setQuestionRef(e.target.value)}
+					/>
+				</Form.Group>
 				<Form.Group>
 					<Form.Label>Tags</Form.Label>
 					<div className="tag">
@@ -211,7 +218,7 @@ export default function SideBarForSingularQuestion() {
 					{tags !== undefined ? (
 						<div className="singleSidebarTags">
 							{tags.map((item, index) => (
-								<div className="tag">
+								<div key={index} className="tag">
 									<p key={index}>{item}</p>
 									<Button
 										onClick={() => setTags(deleteTag(index, tags))}
@@ -235,7 +242,7 @@ export default function SideBarForSingularQuestion() {
 							{Object.entries(selected.nodes[0].data.answers).map(
 								([index, data]) =>
 									data.type === "text" ? (
-										<div className="tag">
+										<div key={index} className="tag">
 											<p key={index}>{data.text.sv}</p>
 											<Button
 												onClick={(event) => handleAnswerClick(event.target.id)}
@@ -246,7 +253,7 @@ export default function SideBarForSingularQuestion() {
 											</Button>
 										</div>
 									) : (
-										<div className="tag">
+										<div key={index} className="tag">
 											<p key={index}>{data.type}</p>
 											<Button
 												onClick={(event) => handleAnswerClick(event.target.id)}
@@ -299,7 +306,7 @@ export default function SideBarForSingularQuestion() {
 				</Form.Group>
 
 				<Form.Group className="mb-3" controlId="text">
-					<Form.Label>Statement Text</Form.Label>
+					<Form.Label>Web Text</Form.Label>
 					<Form.Control
 						type="text"
 						value={statementTextValue}
@@ -314,14 +321,7 @@ export default function SideBarForSingularQuestion() {
 						onChange={(e) => setQuestionHeader(e.target.value)}
 					/>
 				</Form.Group>
-				<Form.Group className="mb-3" controlId="text">
-					<Form.Label>Question Ref</Form.Label>
-					<Form.Control
-						type="text"
-						value={questionRef}
-						onChange={(e) => setQuestionRef(e.target.value)}
-					/>
-				</Form.Group>
+
 				<Form.Group className="mb-3" controlId="text">
 					<Form.Label>Question Video</Form.Label>
 					<Form.Control

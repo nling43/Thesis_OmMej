@@ -29,6 +29,8 @@ const selector = (state) => ({
 	selectedNodes: state.selectedNodes,
 	edges: state.edges,
 	instance: state.reactFlowInstance,
+	setShowAddNode: state.setShowAddNode,
+	showAddNode: state.showAddNode,
 });
 
 export default function NavBar() {
@@ -36,6 +38,8 @@ export default function NavBar() {
 		onClear,
 		nodes,
 		onSelectNodes,
+		setShowAddNode,
+		showAddNode,
 		instance,
 		selectedNodes,
 		onNodesChange,
@@ -56,11 +60,12 @@ export default function NavBar() {
 	const handleExport = () => {
 		handleClose();
 		const questions = nodes.filter((node) => node.type.includes("question"));
+		questions.sort((a, b) => a.position.y - b.position.y);
 		const questionFormated = questions.reduce((acc, question) => {
 			acc[question.id] = question.data;
 			return acc;
 		}, {});
-
+		console.log(nodes);
 		const data = {
 			metadata: {
 				name: "general",
@@ -81,6 +86,7 @@ export default function NavBar() {
 		handleSearch(1, search);
 	}
 	function handleSearch(number, search) {
+		setShowAddNode(false);
 		let result = [];
 		const questions = nodes.filter((node) => node.type.includes("question"));
 		switch (number) {
@@ -128,7 +134,13 @@ export default function NavBar() {
 		}
 		select(result);
 	}
-
+	function handleAddButtonClick() {
+		nodes.forEach((element) => {
+			element.selected = false;
+		});
+		onNodesChange(nodes);
+		setShowAddNode(!showAddNode);
+	}
 	function select(toSelect) {
 		nodes.forEach((node) => {
 			node.selected = false;
@@ -146,16 +158,30 @@ export default function NavBar() {
 		const answers = selectedNodes.nodes.filter((el) =>
 			el.type.includes("answer")
 		);
-		instance.deleteElements(selectedNodes);
+		const questions = selectedNodes.nodes.filter((el) =>
+			el.type.includes("question")
+		);
 		answers.forEach((answer) => {
 			const question = nodes.find(
-				(question) => answer.id in question.data.answers
+				(question) =>
+					question.data.answers && answer.id in question.data.answers
 			);
-			console.log(question.data.answers);
-
-			delete question.data.answers[answer.id];
-			console.log(question.data.answers);
+			if (question) {
+				delete question.data.answers[answer.id];
+			}
 		});
+		questions.forEach((question) => {
+			const answers = nodes.filter(
+				(answer) => answer.data.next && question.id === answer.data.next
+			);
+
+			for (const answer of answers) {
+				answer.data.next = null;
+			}
+		});
+
+		instance.deleteElements(selectedNodes);
+		setShowDelete(false);
 	}
 	return (
 		<>
@@ -183,7 +209,7 @@ export default function NavBar() {
 							placeholder="Search"
 							className="Search"
 							aria-label="Search"
-							onChange={(e) => setSearch(e.target.value)}
+							onChange={(e) => setSearch(e.target.value.trim())}
 						/>
 					</Form>
 					<Dropdown>
@@ -205,7 +231,13 @@ export default function NavBar() {
 							</Dropdown.Item>
 						</Dropdown.Menu>
 					</Dropdown>
-					<Button className="button" variant="primary">
+					<Button
+						className="button"
+						variant="primary"
+						onClick={() => {
+							handleAddButtonClick();
+						}}
+					>
 						<FontAwesomeIcon icon={faPlus} />
 					</Button>{" "}
 					<Button
@@ -233,7 +265,6 @@ export default function NavBar() {
 						variant="primary"
 						onClick={() => {
 							handleDeleteNodes();
-							setShowDelete(false);
 						}}
 					>
 						Delete
