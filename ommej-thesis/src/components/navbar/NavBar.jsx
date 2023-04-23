@@ -4,11 +4,9 @@ import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 // Search bar amd drop down button
-import Dropdown from "react-bootstrap/Dropdown";
 import Modal from "react-bootstrap/Modal";
-//Search icon
-import "../css/NavBar.css";
-import useStore from "../Store/store";
+import "../../css/NavBar.css";
+import useStore from "../../Store/store";
 import { shallow } from "zustand/shallow";
 import { useState } from "react";
 import { saveAs } from "file-saver";
@@ -19,6 +17,7 @@ import {
 	faPlus,
 	faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
+import Search from "./Search.jsx";
 
 const selector = (state) => ({
 	onClear: state.onClear,
@@ -37,14 +36,12 @@ export default function NavBar() {
 	const {
 		onClear,
 		nodes,
-		onSelectNodes,
 		setShowAddNode,
 		showAddNode,
 		instance,
 		selectedNodes,
 		onNodesChange,
 	} = useStore(selector, shallow);
-	const [search, setSearch] = useState("");
 	const [showFileNamer, setShowFileNamer] = useState(false);
 	const [showDelete, setShowDelete] = useState(false);
 	const [fileName, setFileName] = useState("");
@@ -81,77 +78,13 @@ export default function NavBar() {
 		// Save the file
 		saveAs(fileToSave, fileName);
 	};
-	function handleDefualt(e) {
-		e.preventDefault();
-		handleSearch(1, search);
-	}
-	function handleSearch(number, search) {
-		setShowAddNode(false);
-		let result = [];
-		const questions = nodes.filter((node) => node.type.includes("question"));
-		switch (number) {
-			case 1:
-				if (search.includes('"')) {
-					const searchWithoutSign = search.replaceAll('"', "");
-					result = questions.filter(
-						(question) =>
-							question.data.text.sv.toLowerCase() ===
-							searchWithoutSign.toLowerCase()
-					);
-				} else {
-					result = questions.filter((question) =>
-						question.data.text.sv.toLowerCase().includes(search.toLowerCase())
-					);
-				}
-				break;
-			case 2:
-				if (search.includes('"')) {
-					const searchWithoutSign = search.replaceAll('"', "");
-					result = questions.filter(
-						(question) =>
-							question.data.type.toLowerCase() ===
-							searchWithoutSign.toLowerCase()
-					);
-				} else {
-					result = questions.filter((question) =>
-						question.data.type.toLowerCase().includes(search.toLowerCase())
-					);
-				}
-				break;
-			case 3:
-				result = nodes.filter((node) => node.id.includes(search.toLowerCase()));
-				break;
 
-			case 4:
-				result = nodes.filter(
-					(node) =>
-						node.data.tags != undefined &&
-						node.data.tags.includes(search.toUpperCase())
-				);
-				break;
-			default:
-				console.log("Error");
-		}
-		select(result);
-	}
 	function handleAddButtonClick() {
 		nodes.forEach((element) => {
 			element.selected = false;
 		});
 		onNodesChange(nodes);
 		setShowAddNode(!showAddNode);
-	}
-	function select(toSelect) {
-		nodes.forEach((node) => {
-			node.selected = false;
-		});
-		toSelect.forEach((fromResult) => {
-			const nodeToSelect = nodes.find(
-				(element) => element.id === fromResult.id
-			);
-			nodeToSelect.selected = true;
-		});
-		onNodesChange(nodes);
 	}
 
 	function handleDeleteNodes() {
@@ -161,6 +94,31 @@ export default function NavBar() {
 		const questions = selectedNodes.nodes.filter((el) =>
 			el.type.includes("question")
 		);
+
+		const edges = selectedNodes.edges;
+
+		if (answers.length === 0 && questions.length === 0 && edges.length === 1) {
+			const source = nodes.find((node) => node.id === edges[0].source);
+			const target = nodes.find((node) => node.id === edges[0].target);
+
+			if (source.type.includes("question")) {
+				console.log("source = question");
+				delete source.data.answers[target.id];
+			} else {
+				console.log("source = answer");
+
+				const question = nodes.find(
+					(question) =>
+						question.data.answers && source.id in question.data.answers
+				);
+				if (question !== undefined)
+					question.data.answers[source.id].next = null;
+				else {
+					source.data.next = null;
+				}
+			}
+		}
+
 		answers.forEach((answer) => {
 			const question = nodes.find(
 				(question) =>
@@ -203,34 +161,10 @@ export default function NavBar() {
 					</Button>{" "}
 				</Nav>
 				<Nav>
-					<Form className="d-flex" onSubmit={(e) => handleDefualt(e)}>
-						<Form.Control
-							type="search"
-							placeholder="Search"
-							className="Search"
-							aria-label="Search"
-							onChange={(e) => setSearch(e.target.value.trim())}
-						/>
-					</Form>
-					<Dropdown>
-						<Dropdown.Toggle variant="success" id="dropdown-basic">
-							Search By
-						</Dropdown.Toggle>
-						<Dropdown.Menu>
-							<Dropdown.Item onClick={() => handleSearch(1, search)}>
-								Question Text
-							</Dropdown.Item>
-							<Dropdown.Item onClick={() => handleSearch(2, search)}>
-								Question Type
-							</Dropdown.Item>
-							<Dropdown.Item onClick={() => handleSearch(3, search)}>
-								Node ID
-							</Dropdown.Item>
-							<Dropdown.Item onClick={() => handleSearch(4, search)}>
-								Tags
-							</Dropdown.Item>
-						</Dropdown.Menu>
-					</Dropdown>
+					<Search></Search>
+				</Nav>
+
+				<Nav>
 					<Button
 						className="button"
 						variant="primary"
