@@ -41,6 +41,10 @@ import AnswerNodeAccommodations from "./nodes/Answers/AnswerNodeAccommodations";
 
 //Edge design and presentation
 import CustomEdge from "./edges/CustomEdge";
+import IfEdge from "./edges/IfEdge";
+import ElseEdge from "./edges/ElseEdge";
+import { forEachChild } from "typescript";
+
 const nodeTypes = {
 	//Question Types
 	question_single: Single_QuestionNode,
@@ -62,6 +66,9 @@ const nodeTypes = {
 
 const edgeTypes = {
 	edges_custom: CustomEdge,
+	edges_if: IfEdge,
+	edges_else: ElseEdge,
+
 	//Edge Types
 	//edge_single: Single_QuestionEdges,
 	//edge_article_text
@@ -139,6 +146,16 @@ function Flow() {
 		nodes.forEach((element) => {
 			if (element.id !== node.id) element.selected = false;
 		});
+
+		const connectedEdges = edges.filter(
+			(el) => el.source === node.id || el.target === node.id
+		);
+		connectedEdges.forEach((edge) => {
+			edge.selected = true;
+		});
+
+		onEdgesChange(edges);
+
 		onNodesChange(nodes);
 	};
 
@@ -173,6 +190,7 @@ function Flow() {
 	);
 	const onConnect2 = useCallback(
 		(edge) => {
+			console.log(edge.type);
 			const sourceNode = nodes.find((node) => node.id === edge.source);
 			const targetNode = nodes.find((node) => node.id === edge.target);
 
@@ -182,12 +200,15 @@ function Flow() {
 				const edgeFromQuestion = edges.find(
 					(edge) => edge.target === sourceNode.id
 				);
-				const questionWithAnswer = nodes.find(
-					(node) => node.id === edgeFromQuestion.source
-				);
-				questionWithAnswer.data.answers[sourceNode.id].next = targetNode.id;
+				if (edgeFromQuestion !== undefined) {
+					const questionWithAnswer = nodes.find(
+						(node) => node.id === edgeFromQuestion.source
+					);
+					questionWithAnswer.data.answers[sourceNode.id].next = targetNode.id;
+				} else {
+					sourceNode.data.next = targetNode.id;
+				}
 			}
-
 			onConnect(edge);
 		},
 		[nodes, edges]
