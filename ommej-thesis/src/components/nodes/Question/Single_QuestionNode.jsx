@@ -57,20 +57,40 @@ export default memo(({ data, selected }) => {
 
 	const isValidConnectionUp = (connection) => {
 		const sourceNode = nodes.find((node) => node.id === connection.source);
-		console.log(sourceNode);
-		const isHandleFree = edges.every(
-			(edge) => edge.source !== connection.source
-		);
-		return sourceNode.type.includes("answer") && isHandleFree;
+		const targetNode = nodes.find((node) => node.id === connection.target);
+
+		switch (selectedEdgeType) {
+			case "Default":
+				const commonEdges = edges.filter(
+					(edge) => edge.type === "edges_new" || edge.type == "edges_custom"
+				);
+				const isHandleFree = commonEdges.every(
+					(edge) => edge.source !== connection.source
+				);
+				return sourceNode.type.includes("answer") && isHandleFree;
+			case "IncludeIf":
+				return sourceNode.type.includes("answer");
+			case "Else":
+				return sourceNode.type.includes("question");
+		}
 	};
 
 	const isValidConnectionDown = (connection) => {
 		const targetNode = nodes.find((node) => node.id === connection.target);
-		console.log(targetNode);
-		const isHandleFree = edges.every(
-			(edge) => edge.target !== connection.target
-		);
-		return targetNode.type === "answer_text" && isHandleFree;
+		switch (selectedEdgeType) {
+			case "Default":
+				const commonEdges = edges.filter(
+					(edge) => edge.type === "edges_new" || edge.type == "edges_custom"
+				);
+				const isHandleFree = commonEdges.every(
+					(edge) => edge.target !== connection.target
+				);
+				return targetNode.type === "answer_text" && isHandleFree;
+			case "IncludeIf":
+				return false;
+			case "Else":
+				return targetNode.type.includes("question");
+		}
 	};
 	if (showContent) {
 		return (
