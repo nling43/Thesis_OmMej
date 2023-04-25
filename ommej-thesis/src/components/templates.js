@@ -96,6 +96,7 @@ function createEdges(question, answers) {
 			id: "fromQ " + question.id + " " + answer.id,
 			source: question.id,
 			target: answer.id,
+			type: "edges_new",
 		});
 	}
 	return edges;

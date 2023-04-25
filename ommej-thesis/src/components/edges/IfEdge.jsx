@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { getBezierPath } from "reactflow";
+import { getStraightPath } from "reactflow";
 import styled from "styled-components";
 
 export default function CustomEdge({
@@ -13,7 +13,7 @@ export default function CustomEdge({
 	markerEnd,
 	selected,
 }) {
-	const [edgePath] = getBezierPath({
+	const [edgePath] = getStraightPath({
 		sourceX,
 		sourceY,
 		sourcePosition,
@@ -28,9 +28,8 @@ export default function CustomEdge({
 				<path
 					id={id}
 					style={{
-						stroke: "green",
-						strokeWidth: 8,
-						padding: 4,
+						stroke: "#90ee90",
+						strokeWidth: 10,
 					}}
 					className="react-flow__edge-path"
 					d={edgePath}
@@ -45,8 +44,7 @@ export default function CustomEdge({
 					id={id}
 					style={{
 						stroke: "green",
-						strokeWidth: 4,
-						padding: 4,
+						strokeWidth: 10,
 					}}
 					className="react-flow__edge-path"
 					d={edgePath}

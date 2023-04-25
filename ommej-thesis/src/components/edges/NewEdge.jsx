@@ -43,6 +43,7 @@ export default memo(
 					<path
 						id={id}
 						style={{
+							stroke: "#00ccff",
 							strokeWidth: 10,
 						}}
 						className="react-flow__edge-path"

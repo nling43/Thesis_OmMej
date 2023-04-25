@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { getBezierPath } from "reactflow";
+import { getSmoothStepPath } from "reactflow";
 import styled from "styled-components";
 
 export default function CustomEdge({
@@ -13,7 +13,7 @@ export default function CustomEdge({
 	markerEnd,
 	selected,
 }) {
-	const [edgePath] = getBezierPath({
+	const [edgePath] = getSmoothStepPath({
 		sourceX,
 		sourceY,
 		sourcePosition,
@@ -29,8 +29,7 @@ export default function CustomEdge({
 					id={id}
 					style={{
 						stroke: "red",
-						strokeWidth: 8,
-						padding: 4,
+						strokeWidth: 10,
 					}}
 					className="react-flow__edge-path"
 					d={edgePath}
@@ -45,8 +44,7 @@ export default function CustomEdge({
 					id={id}
 					style={{
 						stroke: "red",
-						strokeWidth: 4,
-						padding: 4,
+						strokeWidth: 10,
 					}}
 					className="react-flow__edge-path"
 					d={edgePath}

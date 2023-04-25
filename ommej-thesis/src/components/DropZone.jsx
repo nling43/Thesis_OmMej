@@ -12,17 +12,11 @@ export default function DropZone() {
 		onNodesChange: state.onNodesChange,
 		edges: state.edges,
 		onEdgesChange: state.onEdgesChange,
-		setQuestionsTypes: state.setQuestionsTypes,
-		setAnswerTypes: state.setAnswerTypes,
 	});
-	const {
-		nodes,
-		onNodesChange,
-		edges,
-		onEdgesChange,
-		setQuestionsTypes,
-		setAnswerTypes,
-	} = useStore(selector, shallow);
+	const { nodes, onNodesChange, edges, onEdgesChange } = useStore(
+		selector,
+		shallow
+	);
 
 	const {
 		acceptedFiles,
@@ -92,8 +86,6 @@ export default function DropZone() {
 			const questions = json.questions;
 			const dataParameter = new Set();
 			const dataAnswerParameter = new Set();
-			const dataType = new Set();
-			const dataAnswerType = new Set();
 
 			Object.entries(questions).forEach(([id, data]) => {
 				const question = {
@@ -102,7 +94,6 @@ export default function DropZone() {
 					position: { x: 0, y: -900 },
 					type: "question_" + data.type,
 				};
-				dataType.add(data.type);
 				Object.entries(data).forEach(([parameter, data]) => {
 					dataParameter.add(parameter);
 				});
@@ -137,7 +128,6 @@ export default function DropZone() {
 						position: { x: 0, y: -900 },
 						type: "answer_" + data.type,
 					};
-					dataAnswerType.add(data.type);
 
 					const edgeFromQuestion = {
 						id: "fromQ " + question.id + " " + id,
@@ -163,8 +153,6 @@ export default function DropZone() {
 				});
 				nodesQuestions.push(question);
 			});
-			setQuestionsTypes(Array.from(dataType).sort());
-			setAnswerTypes(Array.from(dataAnswerType).sort());
 
 			console.log(dataParameter);
 			console.log(dataAnswerParameter);
