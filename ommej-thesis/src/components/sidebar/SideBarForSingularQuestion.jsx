@@ -11,7 +11,6 @@ const selector = (state) => ({
 	onNodesChange: state.onNodesChange,
 	nodes: state.nodes,
 	instance: state.reactFlowInstance,
-	questionTypes: state.questionsTypes,
 });
 export default function SideBarForSingularQuestion() {
 	const [textValue, setTextValue] = useState("");
@@ -25,11 +24,21 @@ export default function SideBarForSingularQuestion() {
 	const [questionVideo, setQuestionVideo] = useState("");
 	const [questionImage, setQuestionImage] = useState("");
 
-	const { selected, instance, onNodesChange, nodes, questionTypes } = useStore(
+	const { selected, instance, onNodesChange, nodes } = useStore(
 		selector,
 		shallow
 	);
-
+	const questionTypes = [
+		"article_text",
+		"accommodations",
+		"persons",
+		"frequency",
+		"multiple",
+		"multiple_person",
+		"single",
+		"single_accommodation",
+		"single_person",
+	];
 	useEffect(() => {
 		if (selected.nodes !== undefined && selected.nodes.length === 1) {
 			setQuestionType(selected.nodes[0].data.type);
@@ -151,7 +160,7 @@ export default function SideBarForSingularQuestion() {
 					id={selected.nodes[0].id}
 					onClick={(event) => moveToNode(event.target.id)}
 				>
-					Move to node
+					Move to Question
 				</Button>
 				<Button variant="primary" type="save" onClick={() => handleSave()}>
 					Save
@@ -274,7 +283,8 @@ export default function SideBarForSingularQuestion() {
 				<Form.Group>
 					<Form.Label>includeIf</Form.Label>
 
-					{Object.keys(questionIncludeIf).length !== 0 ? (
+					{Object.keys(questionIncludeIf).length !== 0 &&
+					questionIncludeIf.answers !== undefined ? (
 						<div className="singleSidebarIncludeIfs">
 							{questionIncludeIf.answers.map((node) => (
 								<div className="tag">

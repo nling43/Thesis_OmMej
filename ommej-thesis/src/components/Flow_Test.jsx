@@ -43,7 +43,7 @@ import AnswerNodeAccommodations from "./nodes/Answers/AnswerNodeAccommodations";
 import CustomEdge from "./edges/CustomEdge";
 import IfEdge from "./edges/IfEdge";
 import ElseEdge from "./edges/ElseEdge";
-import { forEachChild } from "typescript";
+import NewEdge from "./edges/NewEdge";
 
 const nodeTypes = {
 	//Question Types
@@ -68,6 +68,7 @@ const edgeTypes = {
 	edges_custom: CustomEdge,
 	edges_if: IfEdge,
 	edges_else: ElseEdge,
+	edges_new: NewEdge,
 
 	//Edge Types
 	//edge_single: Single_QuestionEdges,
@@ -93,6 +94,7 @@ const selector = (state) => ({
 	onViewPortChange: state.onViewPortChange,
 	setShowAddNode: state.setShowAddNode,
 	instance: state.reactFlowInstance,
+	selectedEdgeType: state.selectedEdgeType,
 });
 
 const ControlsStyled = styled(Controls)`
@@ -130,6 +132,7 @@ function Flow() {
 		setReactFlowInstance,
 		instance,
 		setShowAddNode,
+		selectedEdgeType,
 	} = useStore(selector, shallow);
 
 	useEffect(() => {
@@ -143,18 +146,18 @@ function Flow() {
 	};
 	const handleNodeClick = (event, node) => {
 		setShowAddNode(false);
-		nodes.forEach((element) => {
-			if (element.id !== node.id) element.selected = false;
-		});
-
 		const connectedEdges = edges.filter(
 			(el) => el.source === node.id || el.target === node.id
 		);
-		connectedEdges.forEach((edge) => {
-			edge.selected = true;
-		});
+		for (let i = 0; i < connectedEdges.length; i++) {
+			connectedEdges[i].selected = true;
+		}
 
-		onEdgesChange(edges);
+		onEdgesChange(connectedEdges);
+
+		for (let i = 0; i < nodes.length; i++) {
+			if (nodes[i].id !== node.id) nodes[i].selected = false;
+		}
 
 		onNodesChange(nodes);
 	};
@@ -193,25 +196,49 @@ function Flow() {
 			console.log(edge.type);
 			const sourceNode = nodes.find((node) => node.id === edge.source);
 			const targetNode = nodes.find((node) => node.id === edge.target);
-
-			if (sourceNode.type.includes("question")) {
-				sourceNode.data.answers[targetNode.id] = targetNode.data;
-			} else {
-				const edgeFromQuestion = edges.find(
-					(edge) => edge.target === sourceNode.id
-				);
-				if (edgeFromQuestion !== undefined) {
-					const questionWithAnswer = nodes.find(
-						(node) => node.id === edgeFromQuestion.source
-					);
-					questionWithAnswer.data.answers[sourceNode.id].next = targetNode.id;
-				} else {
-					sourceNode.data.next = targetNode.id;
-				}
+			switch (selectedEdgeType) {
+				case "Default":
+					if (sourceNode.type.includes("question")) {
+						sourceNode.data.answers[targetNode.id] = targetNode.data;
+					} else {
+						const edgeFromQuestion = edges.find(
+							(edge) => edge.target === sourceNode.id
+						);
+						if (edgeFromQuestion !== undefined) {
+							const questionWithAnswer = nodes.find(
+								(node) => node.id === edgeFromQuestion.source
+							);
+							questionWithAnswer.data.answers[sourceNode.id].next =
+								targetNode.id;
+						} else {
+							sourceNode.data.next = targetNode.id;
+						}
+					}
+					edge.type = "edges_new";
+					onConnect(edge);
+					break;
+				case "IncludeIf":
+					if (targetNode.data.includeIf !== undefined) {
+						if (!targetNode.data.includeIf.answers.includes(sourceNode.id))
+							targetNode.data.includeIf.answers.push(sourceNode.id);
+					} else {
+						targetNode.data.includeIf = { answers: [sourceNode.id] };
+					}
+					edge.type = "edges_if";
+					onConnect(edge);
+					break;
+				case "Else":
+					if (sourceNode.data.includeIf !== undefined) {
+						sourceNode.data.includeIf.else = targetNode.id;
+					} else {
+						sourceNode.data.includeIf = { else: targetNode.id };
+					}
+					edge.type = "edges_else";
+					onConnect(edge);
+					break;
 			}
-			onConnect(edge);
 		},
-		[nodes, edges]
+		[nodes, edges, selectedEdgeType]
 	);
 
 	return (

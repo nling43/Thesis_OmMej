@@ -7,6 +7,7 @@ import { shallow } from "zustand/shallow";
 const selector = (state) => ({
 	nodes: state.nodes,
 	edges: state.edges,
+	selectedEdgeType: state.selectedEdgeType,
 });
 
 const Node = styled.div`
@@ -16,7 +17,7 @@ const Node = styled.div`
 
 	background: ${(props) => props.theme.questionBg};
 	color: ${(props) => props.theme.questionTextArticle};
-	border: 2px solid
+	border: 5px solid
 		${(props) =>
 			props.selected ? props.theme.handleInputColor : props.theme.nodeBorder};
 	.react-flow__handle {
@@ -54,7 +55,7 @@ const zoomSelector = (s) => s.transform[2] >= 0.5;
 
 export default memo(({ data, selected }) => {
 	const showContent = flowStore(zoomSelector);
-	const { nodes, edges } = useStore(selector, shallow);
+	const { nodes, edges, selectedEdgeType } = useStore(selector, shallow);
 
 	const isValidConnectionUp = (connection) => {
 		const sourceNode = nodes.find((node) => node.id === connection.source);
@@ -120,11 +121,20 @@ export default memo(({ data, selected }) => {
 	} else {
 		return (
 			<NodeZoomed selected={selected}>
-				<Handle type="target" position="top" />
+				<Handle
+					type="target"
+					position="top"
+					isValidConnection={isValidConnectionUp}
+				/>
 
 				<IconArticalQuestion zoomIn />
 
-				<Handle type="source" position="bottom" id="1"></Handle>
+				<Handle
+					type="source"
+					position="bottom"
+					id="1"
+					isValidConnection={isValidConnectionDown}
+				></Handle>
 			</NodeZoomed>
 		);
 	}

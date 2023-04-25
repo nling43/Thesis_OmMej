@@ -30,12 +30,17 @@ type RFState = {
     onConnect: OnConnect;
     selectedNodes : any; 
     onSelectNodes : (newSelectedNodes: Node[]) => void;
-    questionsTypes : [];
-    answersTypes : [],
 
-    setQuestionsTypes:  (types:[])=> void;
+
+    selectedEdgeType : String,
+    setselectedEdgeType:  (type : String) => void;
+
+    undo: [],
+    redo:[],
+    setUndo : (change:any) => void;
+    setRedo : (change:any) => void;
+
     setShowAddNode:  (show:boolean)=> void;
-    setAnswerTypes:  (types:[])=> void;
 
 
 }
@@ -44,14 +49,18 @@ type RFState = {
 const useStore = create<RFState>((set, get) => ({
     nodes: [],
     edges: [],
+    undo: [],
+    redo:[],
+
     selectedNodes:{},
-    questionsTypes : [],
-    answersTypes : [],
+    selectedEdgeType:'default',
+
     showAddNode: false,
     reactFlowInstance:null,
-    setQuestionsTypes:(types: []) => set(() => ({ questionsTypes: types })),
-    setAnswerTypes:(types: []) => set(() => ({ answersTypes: types })),
     setShowAddNode:(show:boolean) => set(() => ({ showAddNode: show })),
+    setUndo:(newUndo:any) => set(({ undo:  newUndo })),
+    setRedo:(newRedo:any) => set(({ redo:  newRedo })),
+    setselectedEdgeType:(type:String) => set(({ selectedEdgeType:  type })),
 
 
     setReactFlowInstance:(instance: any) => set(() => ({ reactFlowInstance: instance })),

@@ -12,7 +12,6 @@ const selector = (state) => ({
 	nodes: state.nodes,
 	edges: state.edges,
 	instance: state.reactFlowInstance,
-	answerTypes: state.answersTypes,
 });
 export default function SideBarForSingularanswer() {
 	const [textValue, setTextValue] = useState("");
@@ -21,8 +20,12 @@ export default function SideBarForSingularanswer() {
 	const [tags, setTags] = useState([]);
 	const [alarm, setAlarm] = useState(false);
 	const [next, setNext] = useState("");
-	const { selected, instance, onNodesChange, nodes, edges, answerTypes } =
-		useStore(selector, shallow);
+	const { selected, instance, onNodesChange, nodes, edges } = useStore(
+		selector,
+		shallow
+	);
+
+	const answerTypes = ["text", "persons", "accommodations", "none"];
 
 	useEffect(() => {
 		if (selected.nodes !== undefined && selected.nodes.length === 1) {
@@ -129,7 +132,7 @@ export default function SideBarForSingularanswer() {
 					id={selected.nodes[0].id}
 					onClick={(event) => moveToNode(event.target.id)}
 				>
-					Move to node
+					Move to Answer
 				</Button>
 				<Button variant="primary" type="save" onClick={() => handleSave()}>
 					Save
