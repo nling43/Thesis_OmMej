@@ -7,6 +7,7 @@ import { shallow } from "zustand/shallow";
 const selector = (state) => ({
 	nodes: state.nodes,
 	edges: state.edges,
+	selectedEdgeType: state.selectedEdgeType,
 });
 const Node = styled.div`
 	display: flex;
@@ -67,7 +68,7 @@ const NodeZoomed = styled.div`
 const zoomSelector = (s) => s.transform[2] >= 0.5;
 
 export default memo(({ data, selected }) => {
-	const { nodes, edges } = useStore(selector, shallow);
+	const { nodes, edges, selectedEdgeType } = useStore(selector, shallow);
 
 	const isValidConnectionUp = (connection) => {
 		const sourceNode = nodes.find((node) => node.id === connection.source);

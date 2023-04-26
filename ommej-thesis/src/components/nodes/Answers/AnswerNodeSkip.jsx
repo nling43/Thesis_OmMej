@@ -7,6 +7,7 @@ import { shallow } from "zustand/shallow";
 const selector = (state) => ({
 	nodes: state.nodes,
 	edges: state.edges,
+	selectedEdgeType: state.selectedEdgeType,
 });
 const Node = styled.div`
 	display: flex;
@@ -56,11 +57,10 @@ const NodeZoomed = styled.div`
 const zoomSelector = (s) => s.transform[2] >= 0.5;
 
 export default memo(({ data, selected }) => {
-	const { nodes, edges } = useStore(selector, shallow);
+	const { nodes, edges, selectedEdgeType } = useStore(selector, shallow);
 
 	const isValidConnectionUp = (connection) => {
 		const sourceNode = nodes.find((node) => node.id === connection.source);
-		console.log(sourceNode);
 		const isHandleFree = edges.every(
 			(edge) =>
 				edge.target !== connection.target && edge.source !== connection.source
@@ -70,11 +70,20 @@ export default memo(({ data, selected }) => {
 
 	const isValidConnectionDown = (connection) => {
 		const targetNode = nodes.find((node) => node.id === connection.target);
-		console.log(targetNode);
-		const isHandleFree = edges.every(
-			(edge) => edge.source !== connection.source
-		);
-		return targetNode.type.includes("question") && isHandleFree;
+		switch (selectedEdgeType) {
+			case "Default":
+				const commonEdges = edges.filter(
+					(edge) => edge.type === "edges_new" || edge.type == "edges_custom"
+				);
+				const isHandleFree = commonEdges.every(
+					(edge) => edge.source !== connection.source
+				);
+				return targetNode.type.includes("question") && isHandleFree;
+			case "IncludeIf":
+				return targetNode.type.includes("question");
+			case "Else":
+				return false;
+		}
 	};
 	const showContent = flowStore(zoomSelector);
 	if (showContent) {

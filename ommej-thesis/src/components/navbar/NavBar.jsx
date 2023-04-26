@@ -100,7 +100,13 @@ export default function NavBar() {
 			const source = nodes.find((node) => node.id === edges[0].source);
 			const target = nodes.find((node) => node.id === edges[0].target);
 
-			if (source.type.includes("question")) {
+			if (edges[0].type === "edges_else") {
+				source.data.includeIf.else = "";
+			} else if (edges[0].type === "edges_if") {
+				target.data.includeIf.answers = target.data.includeIf.answers.filter(
+					(el) => el !== edges[0].source
+				);
+			} else if (source.type.includes("question")) {
 				console.log("source = question");
 				delete source.data.answers[target.id];
 			} else {

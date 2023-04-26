@@ -53,7 +53,7 @@ const useStore = create<RFState>((set, get) => ({
     redo:[],
 
     selectedNodes:{},
-    selectedEdgeType:'default',
+    selectedEdgeType:'Default',
 
     showAddNode: false,
     reactFlowInstance:null,

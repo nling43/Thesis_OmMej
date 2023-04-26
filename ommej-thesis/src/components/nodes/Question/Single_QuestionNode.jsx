@@ -71,7 +71,11 @@ export default memo(({ data, selected }) => {
 			case "IncludeIf":
 				return sourceNode.type.includes("answer");
 			case "Else":
-				return sourceNode.type.includes("question");
+				const elseEdges = edges.filter((edge) => edge.type === "edges_else");
+				const isHandleFromElseFree = elseEdges.every(
+					(edge) => edge.source !== connection.source
+				);
+				return sourceNode.type.includes("question") && isHandleFromElseFree;
 		}
 	};
 
@@ -89,7 +93,11 @@ export default memo(({ data, selected }) => {
 			case "IncludeIf":
 				return false;
 			case "Else":
-				return targetNode.type.includes("question");
+				const elseEdges = edges.filter((edge) => edge.type === "edges_else");
+				const isHandleFromElseFree = elseEdges.every(
+					(edge) => edge.source !== connection.source
+				);
+				return targetNode.type.includes("question") && isHandleFromElseFree;
 		}
 	};
 	if (showContent) {
