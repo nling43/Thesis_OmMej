@@ -271,6 +271,7 @@ function Flow() {
 							zoomOnScroll={false}
 							zoomActivationKeyCode={"Alt"}
 							onNodeClick={handleNodeClick}
+							onNodeDrag={handleNodeClick}
 							onDragOver={onDragOver}
 							onDrop={onDrop}
 						>
