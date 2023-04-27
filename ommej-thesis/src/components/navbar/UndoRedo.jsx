@@ -21,10 +21,8 @@ const selector = (state) => ({
 });
 
 export default function UndoRedo() {
-	const { undo, setUndo, redo, setRedo, instance, nodes } = useStore(
-		selector,
-		shallow
-	);
+	const { undo, setUndo, redo, setRedo, instance, nodes, onNodesChange } =
+		useStore(selector, shallow);
 	const [disableUndo, setDisableUndo] = useState(false);
 	const [disableRedo, setDisableRedo] = useState(false);
 
@@ -61,6 +59,10 @@ export default function UndoRedo() {
 	function modify(state) {
 		const index = nodes.findIndex((node) => node.id === state.id);
 		nodes[index].data = state.data;
+		nodes[index].type = state.type;
+		nodes[index].selected = true;
+		nodes[index].selected = false;
+		onNodesChange(nodes);
 	}
 
 	function handleUndo() {

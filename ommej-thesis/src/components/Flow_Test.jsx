@@ -97,7 +97,7 @@ const selector = (state) => ({
 	instance: state.reactFlowInstance,
 	selectedEdgeType: state.selectedEdgeType,
 	undo: state.undo,
-	setUndo: state.setUndo,
+	setUndoClearRedo: state.setUndoClearRedo,
 });
 
 const ControlsStyled = styled(Controls)`
@@ -137,7 +137,7 @@ function Flow() {
 		setShowAddNode,
 		selectedEdgeType,
 		undo,
-		setUndo,
+		setUndoClearRedo,
 	} = useStore(selector, shallow);
 
 	useEffect(() => {
@@ -176,11 +176,11 @@ function Flow() {
 
 	const onDrop = useCallback(
 		(event) => {
-			const newUndo = [];
-
 			event.preventDefault();
 			const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
 			const type = event.dataTransfer.getData("application/reactflow");
+			const newUndo = [];
+
 			if (typeof type === "undefined" || !type) {
 				return;
 			}
@@ -189,14 +189,14 @@ function Flow() {
 				y: event.clientY - reactFlowBounds.top,
 			});
 			if (type.includes("question")) {
-				const [newNodes, edges] = questionTemplate(type, position);
+				const [newNodes, newEdges] = questionTemplate(type, position);
 				newUndo.push({
 					action: "add",
 					nodes: _.cloneDeep(newNodes),
-					edges: _.cloneDeep(edges),
+					edges: _.cloneDeep(newEdges),
 				});
 				instance.addNodes(newNodes);
-				instance.addEdges(edges);
+				instance.addEdges(newEdges);
 			} else {
 				const newNode = answerTemplate(type, position);
 				newUndo.push({
@@ -206,20 +206,30 @@ function Flow() {
 				});
 				instance.addNodes(newNode);
 			}
-			setUndo([...undo, newUndo]);
+			setUndoClearRedo([...undo, newUndo]);
 		},
 		[instance, undo]
 	);
 	const onEdgeConnect = useCallback(
 		(edge) => {
-			console.log(edge.type);
+			const newUndo = [];
+			newUndo.push({
+				action: "add",
+				nodes: [],
+				edges: [edge],
+			});
 			const sourceNode = nodes.find((node) => node.id === edge.source);
 			const targetNode = nodes.find((node) => node.id === edge.target);
+			const oldStateSource = _.cloneDeep(sourceNode);
+			const oldStateTarget = _.cloneDeep(targetNode);
 			switch (selectedEdgeType) {
 				case "Default":
 					if (sourceNode.type.includes("question")) {
 						sourceNode.data.answers[targetNode.id] = targetNode.data;
+						edge.id = "fromQ " + sourceNode.id + " " + targetNode.id;
 					} else {
+						edge.id = "fromA " + sourceNode.id + " " + targetNode.id;
+
 						const edgeFromQuestion = edges.find(
 							(edge) => edge.target === sourceNode.id
 						);
@@ -243,6 +253,8 @@ function Flow() {
 					} else {
 						targetNode.data.includeIf = { answers: [sourceNode.id] };
 					}
+					edge.id = "if " + sourceNode.id + " " + targetNode.id;
+
 					edge.type = "edges_if";
 					onConnect(edge);
 					break;
@@ -252,12 +264,27 @@ function Flow() {
 					} else {
 						sourceNode.data.includeIf = { else: targetNode.id };
 					}
+					edge.id = "else " + sourceNode.id + " " + targetNode.id;
+
 					edge.type = "edges_else";
 					onConnect(edge);
 					break;
 			}
+			const newStateSource = _.cloneDeep(sourceNode);
+			const newStateTarget = _.cloneDeep(targetNode);
+			newUndo.push({
+				action: "modify",
+				oldState: oldStateSource,
+				newState: newStateSource,
+			});
+			newUndo.push({
+				action: "modify",
+				oldState: oldStateTarget,
+				newState: newStateTarget,
+			});
+			setUndoClearRedo([...undo, newUndo]);
 		},
-		[nodes, edges, selectedEdgeType]
+		[nodes, edges, selectedEdgeType, undo]
 	);
 
 	return (

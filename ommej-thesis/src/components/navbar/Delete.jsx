@@ -12,9 +12,9 @@ export default function Delete() {
 		selectedNodes: state.selectedNodes,
 		instance: state.reactFlowInstance,
 		undo: state.undo,
-		setUndo: state.setUndo,
+		setUndoClearRedo: state.setUndoClearRedo,
 	});
-	const { nodes, instance, selectedNodes, undo, setUndo } = useStore(
+	const { nodes, instance, selectedNodes, undo, setUndoClearRedo } = useStore(
 		selector,
 		shallow
 	);
@@ -156,7 +156,7 @@ export default function Delete() {
 				}
 			}
 		});
-		setUndo([...undo, newUndo]);
+		setUndoClearRedo([...undo, newUndo]);
 		instance.deleteElements(selectedNodes);
 		setShowDelete(false);
 	}

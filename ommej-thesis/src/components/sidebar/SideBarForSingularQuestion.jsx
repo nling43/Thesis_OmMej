@@ -5,6 +5,7 @@ import { Panel } from "reactflow";
 import "../../css/sidebar.css";
 import { shallow } from "zustand/shallow";
 import useStore from "../../Store/store";
+import _ from "lodash";
 
 const selector = (state) => ({
 	selected: state.selectedNodes,
@@ -12,6 +13,8 @@ const selector = (state) => ({
 	nodes: state.nodes,
 	onEdgesChange: state.onEdgesChange,
 	edges: state.edges,
+	undo: state.undo,
+	setUndoClearRedo: state.setUndoClearRedo,
 
 	instance: state.reactFlowInstance,
 });
@@ -27,8 +30,16 @@ export default function SideBarForSingularQuestion() {
 	const [questionVideo, setQuestionVideo] = useState("");
 	const [questionImage, setQuestionImage] = useState("");
 
-	const { selected, instance, onNodesChange, nodes, onEdgesChange, edges } =
-		useStore(selector, shallow);
+	const {
+		selected,
+		instance,
+		onNodesChange,
+		nodes,
+		onEdgesChange,
+		edges,
+		undo,
+		setUndoClearRedo,
+	} = useStore(selector, shallow);
 	const questionTypes = [
 		"article_text",
 		"accommodations",
@@ -85,7 +96,7 @@ export default function SideBarForSingularQuestion() {
 				setQuestionImage("");
 			}
 		}
-	}, [selected]);
+	}, [selected, nodes]);
 	function handleDefualt(e) {
 		e.preventDefault();
 	}
@@ -140,6 +151,7 @@ export default function SideBarForSingularQuestion() {
 
 	function handleSave() {
 		const index = nodes.findIndex((node) => node.id === selected.nodes[0].id);
+		const oldState = _.cloneDeep(nodes[index]);
 		nodes[index].data.text.sv = textValue;
 		nodes[index].data.tags = tags;
 		nodes[index].data.type = questionType;
@@ -159,6 +171,15 @@ export default function SideBarForSingularQuestion() {
 		if (questionImage !== "") {
 			nodes[index].data.image = questionImage;
 		}
+		const newState = _.cloneDeep(nodes[index]);
+		const newUndo = [
+			{
+				action: "modify",
+				oldState: oldState,
+				newState: newState,
+			},
+		];
+		setUndoClearRedo([...undo, newUndo]);
 		unselect();
 	}
 	return (
