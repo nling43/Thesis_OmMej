@@ -10,6 +10,9 @@ const selector = (state) => ({
 	selected: state.selectedNodes,
 	onNodesChange: state.onNodesChange,
 	nodes: state.nodes,
+	onEdgesChange: state.onEdgesChange,
+	edges: state.edges,
+
 	instance: state.reactFlowInstance,
 });
 export default function SideBarForSingularQuestion() {
@@ -24,10 +27,8 @@ export default function SideBarForSingularQuestion() {
 	const [questionVideo, setQuestionVideo] = useState("");
 	const [questionImage, setQuestionImage] = useState("");
 
-	const { selected, instance, onNodesChange, nodes } = useStore(
-		selector,
-		shallow
-	);
+	const { selected, instance, onNodesChange, nodes, onEdgesChange, edges } =
+		useStore(selector, shallow);
 	const questionTypes = [
 		"article_text",
 		"accommodations",
@@ -107,8 +108,9 @@ export default function SideBarForSingularQuestion() {
 	function unselect() {
 		const index = nodes.findIndex((node) => node.id === selected.nodes[0].id);
 		nodes[index].selected = false;
-
+		edges.forEach((el) => (el.selected = false));
 		onNodesChange(nodes);
+		onEdgesChange(edges);
 	}
 
 	function select(id) {
@@ -116,6 +118,18 @@ export default function SideBarForSingularQuestion() {
 		nodes[index].selected = false;
 		index = nodes.findIndex((node) => node.id === id);
 		nodes[index].selected = true;
+
+		for (let i = 0; i < edges.length; i++) {
+			edges[i].selected = false;
+		}
+
+		const connectedEdges = edges.filter(
+			(el) => el.source === id || el.target === id
+		);
+		for (let i = 0; i < connectedEdges.length; i++) {
+			connectedEdges[i].selected = true;
+		}
+		onEdgesChange(connectedEdges);
 
 		onNodesChange(nodes);
 	}
@@ -280,11 +294,11 @@ export default function SideBarForSingularQuestion() {
 					)}
 				</Form.Group>
 
-				<Form.Group>
-					<Form.Label>includeIf</Form.Label>
+				{Object.keys(questionIncludeIf).length !== 0 &&
+				questionIncludeIf.answers !== undefined ? (
+					<Form.Group>
+						<Form.Label>includeIf</Form.Label>
 
-					{Object.keys(questionIncludeIf).length !== 0 &&
-					questionIncludeIf.answers !== undefined ? (
 						<div className="singleSidebarIncludeIfs">
 							{questionIncludeIf.answers.map((node) => (
 								<div className="tag">
@@ -310,10 +324,10 @@ export default function SideBarForSingularQuestion() {
 								</Button>
 							</div>
 						</div>
-					) : (
-						<></>
-					)}
-				</Form.Group>
+					</Form.Group>
+				) : (
+					<></>
+				)}
 
 				<Form.Group className="mb-3" controlId="text">
 					<Form.Label>Web Text</Form.Label>

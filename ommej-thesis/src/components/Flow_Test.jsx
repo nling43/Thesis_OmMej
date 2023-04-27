@@ -14,6 +14,7 @@ import {
 	faForwardFast,
 	faBackwardFast,
 } from "@fortawesome/free-solid-svg-icons";
+import _ from "lodash";
 
 import { shallow } from "zustand/shallow";
 import styled, { ThemeProvider } from "styled-components";
@@ -95,6 +96,8 @@ const selector = (state) => ({
 	setShowAddNode: state.setShowAddNode,
 	instance: state.reactFlowInstance,
 	selectedEdgeType: state.selectedEdgeType,
+	undo: state.undo,
+	setUndo: state.setUndo,
 });
 
 const ControlsStyled = styled(Controls)`
@@ -133,6 +136,8 @@ function Flow() {
 		instance,
 		setShowAddNode,
 		selectedEdgeType,
+		undo,
+		setUndo,
 	} = useStore(selector, shallow);
 
 	useEffect(() => {
@@ -161,7 +166,9 @@ function Flow() {
 
 		onNodesChange(nodes);
 	};
-
+	const handleEdgeClick = (event, edge) => {
+		setShowAddNode(false);
+	};
 	const onDragOver = useCallback((event) => {
 		event.preventDefault();
 		event.dataTransfer.dropEffect = "move";
@@ -169,6 +176,8 @@ function Flow() {
 
 	const onDrop = useCallback(
 		(event) => {
+			const newUndo = [];
+
 			event.preventDefault();
 			const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
 			const type = event.dataTransfer.getData("application/reactflow");
@@ -181,17 +190,27 @@ function Flow() {
 			});
 			if (type.includes("question")) {
 				const [newNodes, edges] = questionTemplate(type, position);
+				newUndo.push({
+					action: "add",
+					nodes: _.cloneDeep(newNodes),
+					edges: _.cloneDeep(edges),
+				});
 				instance.addNodes(newNodes);
-
 				instance.addEdges(edges);
 			} else {
-				instance.addNodes(answerTemplate(type, position));
+				const newNode = answerTemplate(type, position);
+				newUndo.push({
+					action: "add",
+					nodes: _.cloneDeep(newNode),
+					edges: [],
+				});
+				instance.addNodes(newNode);
 			}
-			console.log(nodes);
+			setUndo([...undo, newUndo]);
 		},
-		[instance]
+		[instance, undo]
 	);
-	const onConnect2 = useCallback(
+	const onEdgeConnect = useCallback(
 		(edge) => {
 			console.log(edge.type);
 			const sourceNode = nodes.find((node) => node.id === edge.source);
@@ -250,7 +269,7 @@ function Flow() {
 							onInit={onFlowInit}
 							nodes={nodes}
 							edges={edges}
-							onConnect={onConnect2}
+							onConnect={onEdgeConnect}
 							onNodesChange={onNodesChange}
 							onEdgesChange={onEdgesChange}
 							nodeTypes={nodeTypes}
@@ -271,6 +290,7 @@ function Flow() {
 							zoomOnScroll={false}
 							zoomActivationKeyCode={"Alt"}
 							onNodeClick={handleNodeClick}
+							onEdgeClick={handleEdgeClick}
 							onNodeDrag={handleNodeClick}
 							onDragOver={onDragOver}
 							onDrop={onDrop}
@@ -311,7 +331,7 @@ function Flow() {
 									nodeColor="rgb(255,0,0)"
 									maskColor="rgb(0,0,0,.1)"
 									style={{
-										background: "rgb(255,255,255,0.9)",
+										background: "rgb(a,255,255,0.9)",
 										margin: 0,
 										height: 680,
 										width: 300,

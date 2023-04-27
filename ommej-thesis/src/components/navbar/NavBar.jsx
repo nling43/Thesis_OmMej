@@ -14,19 +14,17 @@ import {
 	faFileImport,
 	faFileExport,
 	faPlus,
-	faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import Search from "./Search.jsx";
+import Delete from "./Delete.jsx";
+import UndoRedo from "./UndoRedo.jsx";
 
 const selector = (state) => ({
 	onClear: state.onClear,
 	onEdgesChange: state.onEdgesChange,
-	//Get all node
 	nodes: state.nodes,
-	onNodesChange: state.onNodesChange,
-	selectedNodes: state.selectedNodes,
 	edges: state.edges,
-	instance: state.reactFlowInstance,
+	onNodesChange: state.onNodesChange,
 	setShowAddNode: state.setShowAddNode,
 	showAddNode: state.showAddNode,
 });
@@ -35,14 +33,13 @@ export default function NavBar() {
 	const {
 		onClear,
 		nodes,
+		edges,
 		setShowAddNode,
 		showAddNode,
-		instance,
-		selectedNodes,
 		onNodesChange,
+		onEdgesChange,
 	} = useStore(selector, shallow);
 	const [showFileNamer, setShowFileNamer] = useState(false);
-	const [showDelete, setShowDelete] = useState(false);
 	const [fileName, setFileName] = useState("");
 
 	const handleClose = () => setShowFileNamer(false);
@@ -74,78 +71,21 @@ export default function NavBar() {
 			type: "application/json",
 		});
 
-		// Save the file
 		saveAs(fileToSave, fileName);
 	};
 
 	function handleAddButtonClick() {
-		nodes.forEach((element) => {
-			element.selected = false;
-		});
+		for (let i = 0; i < nodes.length; i++) {
+			nodes[i].selected = false;
+		}
+		for (let i = 0; i < edges.length; i++) {
+			edges[i].selected = false;
+		}
+		onEdgesChange(edges);
 		onNodesChange(nodes);
 		setShowAddNode(!showAddNode);
 	}
 
-	function handleDeleteNodes() {
-		const answers = selectedNodes.nodes.filter((el) =>
-			el.type.includes("answer")
-		);
-		const questions = selectedNodes.nodes.filter((el) =>
-			el.type.includes("question")
-		);
-
-		const edges = selectedNodes.edges;
-
-		if (answers.length === 0 && questions.length === 0 && edges.length === 1) {
-			const source = nodes.find((node) => node.id === edges[0].source);
-			const target = nodes.find((node) => node.id === edges[0].target);
-
-			if (edges[0].type === "edges_else") {
-				source.data.includeIf.else = "";
-			} else if (edges[0].type === "edges_if") {
-				target.data.includeIf.answers = target.data.includeIf.answers.filter(
-					(el) => el !== edges[0].source
-				);
-			} else if (source.type.includes("question")) {
-				console.log("source = question");
-				delete source.data.answers[target.id];
-			} else {
-				console.log("source = answer");
-
-				const question = nodes.find(
-					(question) =>
-						question.data.answers && source.id in question.data.answers
-				);
-				if (question !== undefined)
-					question.data.answers[source.id].next = null;
-				else {
-					source.data.next = null;
-				}
-			}
-		}
-
-		answers.forEach((answer) => {
-			const question = nodes.find(
-				(question) =>
-					question.data.answers && answer.id in question.data.answers
-			);
-			if (question) {
-				delete question.data.answers[answer.id];
-			}
-		});
-		questions.forEach((question) => {
-			const answers = nodes.filter(
-				(answer) => answer.data.next && question.id === answer.data.next
-			);
-
-			for (const answer of answers) {
-				answer.data.next = null;
-			}
-		});
-
-		instance.deleteElements(selectedNodes);
-		setShowDelete(false);
-	}
 	return (
 		<>
 			<Navbar variant="dark" bg="dark">
@@ -172,44 +112,18 @@ export default function NavBar() {
 				<Nav>
 					<Button
 						className="button"
-						variant="primary"
+						variant={showAddNode ? "primary" : "outline-primary"}
 						onClick={() => {
 							handleAddButtonClick();
 						}}
 					>
 						<FontAwesomeIcon icon={faPlus} />
 					</Button>{" "}
-					<Button
-						className="button"
-						variant="primary"
-						onClick={() => {
-							setShowDelete(true);
-						}}
-					>
-						<FontAwesomeIcon icon={faTrashCan} />
-					</Button>
-					{""}
 				</Nav>
+				<Delete />
+				<UndoRedo />
 			</Navbar>
-			<Modal show={showDelete} onHide={() => setShowDelete(false)}>
-				<Modal.Header closeButton>
-					<Modal.Title>Confirmation</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>Are you sure you want to delete this item?</Modal.Body>
-				<Modal.Footer>
-					<Button variant="secondary" onClick={() => setShowDelete(false)}>
-						Cancel
-					</Button>
-					<Button
-						variant="primary"
-						onClick={() => {
-							handleDeleteNodes();
-						}}
-					>
-						Delete
-					</Button>
-				</Modal.Footer>
-			</Modal>
+
 			<Modal show={showFileNamer} onHide={handleClose}>
 				<Modal.Header closeButton>
 					<Modal.Title>Download File</Modal.Title>

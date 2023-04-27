@@ -15,7 +15,6 @@ export default function SideBarMulti() {
 
 	function moveToNode(id) {
 		const node = nodes.find((element) => element.id === id);
-		console.log(id);
 		instance.setCenter(node.position.x + 450, node.position.y, {
 			zoom: 0.7,
 		});

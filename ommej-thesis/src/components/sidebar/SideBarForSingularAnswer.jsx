@@ -9,6 +9,8 @@ import useStore from "../../Store/store";
 const selector = (state) => ({
 	selected: state.selectedNodes,
 	onNodesChange: state.onNodesChange,
+	onEdgesChange: state.onEdgesChange,
+
 	nodes: state.nodes,
 	edges: state.edges,
 	instance: state.reactFlowInstance,
@@ -20,10 +22,8 @@ export default function SideBarForSingularanswer() {
 	const [tags, setTags] = useState([]);
 	const [alarm, setAlarm] = useState(false);
 	const [next, setNext] = useState("");
-	const { selected, instance, onNodesChange, nodes, edges } = useStore(
-		selector,
-		shallow
-	);
+	const { selected, instance, onNodesChange, onEdgesChange, nodes, edges } =
+		useStore(selector, shallow);
 
 	const answerTypes = ["text", "persons", "accommodations", "none"];
 
@@ -79,6 +79,8 @@ export default function SideBarForSingularanswer() {
 	function unselect() {
 		const index = nodes.findIndex((node) => node.id === selected.nodes[0].id);
 		nodes[index].selected = false;
+		edges.forEach((el) => (el.selected = false));
+		onEdgesChange(edges);
 
 		onNodesChange(nodes);
 	}
@@ -88,6 +90,18 @@ export default function SideBarForSingularanswer() {
 		nodes[index].selected = false;
 		index = nodes.findIndex((node) => node.id === id);
 		nodes[index].selected = true;
+
+		for (let i = 0; i < edges.length; i++) {
+			edges[i].selected = false;
+		}
+
+		const connectedEdges = edges.filter(
+			(el) => el.source === id || el.target === id
+		);
+		for (let i = 0; i < connectedEdges.length; i++) {
+			connectedEdges[i].selected = true;
+		}
+		onEdgesChange(connectedEdges);
 
 		onNodesChange(nodes);
 	}
