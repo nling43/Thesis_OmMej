@@ -58,6 +58,7 @@ export default function UndoRedo() {
 
 	function modify(state) {
 		const index = nodes.findIndex((node) => node.id === state.id);
+		console.log(state.id);
 		nodes[index].data = state.data;
 		nodes[index].type = state.type;
 		nodes[index].selected = true;
