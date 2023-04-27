@@ -6,12 +6,16 @@ import Form from "react-bootstrap/Form";
 
 const selector = (state) => ({
 	nodes: state.nodes,
+	edges: state.edges,
+	onEdgesChange: state.onEdgesChange,
+
 	setShowAddNode: state.setShowAddNode,
 	onNodesChange: state.onNodesChange,
 });
 
 export default function Search() {
-	const { nodes, setShowAddNode, onNodesChange } = useStore(selector, shallow);
+	const { nodes, setShowAddNode, onNodesChange, onEdgesChange, edges } =
+		useStore(selector, shallow);
 	const [search, setSearch] = useState("");
 
 	function handleDefualt(e) {
@@ -78,7 +82,15 @@ export default function Search() {
 				(element) => element.id === fromResult.id
 			);
 			nodeToSelect.selected = true;
+			const connectedEdges = edges.filter(
+				(el) => el.source === nodeToSelect.id || el.target === nodeToSelect.id
+			);
+			for (let i = 0; i < connectedEdges.length; i++) {
+				connectedEdges[i].selected = true;
+			}
+			onEdgesChange(connectedEdges);
 		});
+
 		onNodesChange(nodes);
 	}
 	return (

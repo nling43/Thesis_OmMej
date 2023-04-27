@@ -5,12 +5,16 @@ import { Panel } from "reactflow";
 import "../../css/sidebar.css";
 import { shallow } from "zustand/shallow";
 import useStore from "../../Store/store";
+import _ from "lodash";
 
 const selector = (state) => ({
 	selected: state.selectedNodes,
 	onNodesChange: state.onNodesChange,
+	onEdgesChange: state.onEdgesChange,
+	setUndoClearRedo: state.setUndoClearRedo,
 	nodes: state.nodes,
 	edges: state.edges,
+	undo: state.undo,
 	instance: state.reactFlowInstance,
 });
 export default function SideBarForSingularanswer() {
@@ -20,10 +24,16 @@ export default function SideBarForSingularanswer() {
 	const [tags, setTags] = useState([]);
 	const [alarm, setAlarm] = useState(false);
 	const [next, setNext] = useState("");
-	const { selected, instance, onNodesChange, nodes, edges } = useStore(
-		selector,
-		shallow
-	);
+	const {
+		selected,
+		instance,
+		onNodesChange,
+		onEdgesChange,
+		setUndoClearRedo,
+		undo,
+		nodes,
+		edges,
+	} = useStore(selector, shallow);
 
 	const answerTypes = ["text", "persons", "accommodations", "none"];
 
@@ -79,6 +89,8 @@ export default function SideBarForSingularanswer() {
 	function unselect() {
 		const index = nodes.findIndex((node) => node.id === selected.nodes[0].id);
 		nodes[index].selected = false;
+		edges.forEach((el) => (el.selected = false));
+		onEdgesChange(edges);
 
 		onNodesChange(nodes);
 	}
@@ -89,6 +101,18 @@ export default function SideBarForSingularanswer() {
 		index = nodes.findIndex((node) => node.id === id);
 		nodes[index].selected = true;
 
+		for (let i = 0; i < edges.length; i++) {
+			edges[i].selected = false;
+		}
+
+		const connectedEdges = edges.filter(
+			(el) => el.source === id || el.target === id
+		);
+		for (let i = 0; i < connectedEdges.length; i++) {
+			connectedEdges[i].selected = true;
+		}
+		onEdgesChange(connectedEdges);
+
 		onNodesChange(nodes);
 	}
 	function handleQuestionClick(id) {
@@ -98,12 +122,22 @@ export default function SideBarForSingularanswer() {
 
 	function handleSave() {
 		const index = nodes.findIndex((node) => node.id === selected.nodes[0].id);
+		const newUndo = [];
+
+		const answerOldState = _.cloneDeep(nodes[index]);
+
 		if (textValue !== "") nodes[index].data.text = { sv: textValue };
+
 		nodes[index].data.tags = tags;
 		nodes[index].data.type = answerType;
 		nodes[index].type = "answer_" + answerType;
 		nodes[index].data.alarm = alarm;
-
+		const answerNewState = _.cloneDeep(nodes[index]);
+		newUndo.push({
+			action: "modify",
+			oldState: answerOldState,
+			newState: answerNewState,
+		});
 		const answerEgde = edges.find(
 			(egde) => egde.target === selected.nodes[0].id
 		);
@@ -112,11 +146,21 @@ export default function SideBarForSingularanswer() {
 			const questionToAnswer = nodes.find(
 				(node) => node.id === answerEgde.source
 			);
+			const questionOldState = _.cloneDeep(questionToAnswer);
+
 			if (textValue !== "") nodes[index].data.text = { sv: textValue };
 			questionToAnswer.data.answers[selected.nodes[0].id].tags = tags;
 			questionToAnswer.data.answers[selected.nodes[0].id].type = answerType;
 			questionToAnswer.data.answers[selected.nodes[0].id].alarm = alarm;
+			const questionNewState = _.cloneDeep(questionToAnswer);
+			newUndo.push({
+				action: "modify",
+				oldState: questionOldState,
+				newState: questionNewState,
+			});
 		}
+
+		setUndoClearRedo([...undo, newUndo]);
 		unselect();
 	}
 	return (

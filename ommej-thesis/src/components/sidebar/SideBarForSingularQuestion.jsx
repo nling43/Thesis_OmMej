@@ -5,11 +5,17 @@ import { Panel } from "reactflow";
 import "../../css/sidebar.css";
 import { shallow } from "zustand/shallow";
 import useStore from "../../Store/store";
+import _ from "lodash";
 
 const selector = (state) => ({
 	selected: state.selectedNodes,
 	onNodesChange: state.onNodesChange,
 	nodes: state.nodes,
+	onEdgesChange: state.onEdgesChange,
+	edges: state.edges,
+	undo: state.undo,
+	setUndoClearRedo: state.setUndoClearRedo,
+
 	instance: state.reactFlowInstance,
 });
 export default function SideBarForSingularQuestion() {
@@ -24,10 +30,16 @@ export default function SideBarForSingularQuestion() {
 	const [questionVideo, setQuestionVideo] = useState("");
 	const [questionImage, setQuestionImage] = useState("");
 
-	const { selected, instance, onNodesChange, nodes } = useStore(
-		selector,
-		shallow
-	);
+	const {
+		selected,
+		instance,
+		onNodesChange,
+		nodes,
+		onEdgesChange,
+		edges,
+		undo,
+		setUndoClearRedo,
+	} = useStore(selector, shallow);
 	const questionTypes = [
 		"article_text",
 		"accommodations",
@@ -84,7 +96,7 @@ export default function SideBarForSingularQuestion() {
 				setQuestionImage("");
 			}
 		}
-	}, [selected]);
+	}, [selected, nodes]);
 	function handleDefualt(e) {
 		e.preventDefault();
 	}
@@ -107,8 +119,9 @@ export default function SideBarForSingularQuestion() {
 	function unselect() {
 		const index = nodes.findIndex((node) => node.id === selected.nodes[0].id);
 		nodes[index].selected = false;
-
+		edges.forEach((el) => (el.selected = false));
 		onNodesChange(nodes);
+		onEdgesChange(edges);
 	}
 
 	function select(id) {
@@ -116,6 +129,18 @@ export default function SideBarForSingularQuestion() {
 		nodes[index].selected = false;
 		index = nodes.findIndex((node) => node.id === id);
 		nodes[index].selected = true;
+
+		for (let i = 0; i < edges.length; i++) {
+			edges[i].selected = false;
+		}
+
+		const connectedEdges = edges.filter(
+			(el) => el.source === id || el.target === id
+		);
+		for (let i = 0; i < connectedEdges.length; i++) {
+			connectedEdges[i].selected = true;
+		}
+		onEdgesChange(connectedEdges);
 
 		onNodesChange(nodes);
 	}
@@ -126,6 +151,7 @@ export default function SideBarForSingularQuestion() {
 
 	function handleSave() {
 		const index = nodes.findIndex((node) => node.id === selected.nodes[0].id);
+		const oldState = _.cloneDeep(nodes[index]);
 		nodes[index].data.text.sv = textValue;
 		nodes[index].data.tags = tags;
 		nodes[index].data.type = questionType;
@@ -145,6 +171,15 @@ export default function SideBarForSingularQuestion() {
 		if (questionImage !== "") {
 			nodes[index].data.image = questionImage;
 		}
+		const newState = _.cloneDeep(nodes[index]);
+		const newUndo = [
+			{
+				action: "modify",
+				oldState: oldState,
+				newState: newState,
+			},
+		];
+		setUndoClearRedo([...undo, newUndo]);
 		unselect();
 	}
 	return (
@@ -280,11 +315,11 @@ export default function SideBarForSingularQuestion() {
 					)}
 				</Form.Group>
 
-				<Form.Group>
-					<Form.Label>includeIf</Form.Label>
+				{Object.keys(questionIncludeIf).length !== 0 &&
+				questionIncludeIf.answers !== undefined ? (
+					<Form.Group>
+						<Form.Label>includeIf</Form.Label>
 
-					{Object.keys(questionIncludeIf).length !== 0 &&
-					questionIncludeIf.answers !== undefined ? (
 						<div className="singleSidebarIncludeIfs">
 							{questionIncludeIf.answers.map((node) => (
 								<div className="tag">
@@ -310,10 +345,10 @@ export default function SideBarForSingularQuestion() {
 								</Button>
 							</div>
 						</div>
-					) : (
-						<></>
-					)}
-				</Form.Group>
+					</Form.Group>
+				) : (
+					<></>
+				)}
 
 				<Form.Group className="mb-3" controlId="text">
 					<Form.Label>Web Text</Form.Label>

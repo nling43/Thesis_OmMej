@@ -58,7 +58,6 @@ export default memo(({ data, selected }) => {
 
 	const isValidConnectionUp = (connection) => {
 		const sourceNode = nodes.find((node) => node.id === connection.source);
-		const targetNode = nodes.find((node) => node.id === connection.target);
 
 		switch (selectedEdgeType) {
 			case "Default":

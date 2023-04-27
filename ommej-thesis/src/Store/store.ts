@@ -38,6 +38,8 @@ type RFState = {
     undo: [],
     redo:[],
     setUndo : (change:any) => void;
+    setUndoClearRedo : (change:any) => void;
+
     setRedo : (change:any) => void;
 
     setShowAddNode:  (show:boolean)=> void;
@@ -58,11 +60,18 @@ const useStore = create<RFState>((set, get) => ({
     showAddNode: false,
     reactFlowInstance:null,
     setShowAddNode:(show:boolean) => set(() => ({ showAddNode: show })),
-    setUndo:(newUndo:any) => set(({ undo:  newUndo })),
-    setRedo:(newRedo:any) => set(({ redo:  newRedo })),
+    setUndo:(newUndo:[]) => set(({ undo:  newUndo })),
+    setRedo:(newRedo:[]) => set(({ redo:  newRedo })),
     setselectedEdgeType:(type:String) => set(({ selectedEdgeType:  type })),
 
-
+    setUndoClearRedo: (newUndo:[]) => {
+      set({
+        undo: newUndo ,
+      });
+      set({
+        redo: [],
+      });
+    },
     setReactFlowInstance:(instance: any) => set(() => ({ reactFlowInstance: instance })),
     onSelectNodes: (selected: any) => set(() => ({ selectedNodes: selected })),
 
