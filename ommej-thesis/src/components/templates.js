@@ -1,10 +1,40 @@
 import { v4 as uuidv4 } from "uuid";
 
-export function answerTemplate(type, position) {
-	return createAnswer(type, position);
+export function answerTemplate(type, position, quantity) {
+	const answers = [];
+	for (let index = 0; index < quantity; index++) {
+		answers.push(
+			createAnswer(type, { x: position.x + 200 * index, y: position.y })
+		);
+	}
+	return answers;
 }
 
-export function questionTemplate(type, position) {
+export function questionTemplate(type, position, quantity) {
+	const answers = answerTemplate(
+		"answer_text",
+		{
+			x: position.x,
+			y: position.y + 300,
+		},
+		quantity
+	);
+
+	const firstXPos = answers[0].position.x;
+	const lastXPos = answers[answers.length - 1].position.x;
+	const newX = (firstXPos + lastXPos) / 2;
+	const question = createQuestion(type, { x: newX, y: position.y });
+
+	for (const answer of answers) {
+		question.data.answers[answer.id] = answer.data;
+	}
+
+	const edges = createEdges(question, answers);
+	const nodes = [question, ...answers];
+	return [nodes, edges];
+}
+
+export function specialQuestionTemplate(type, position) {
 	let answers = [];
 	switch (type) {
 		case "question_article_text":

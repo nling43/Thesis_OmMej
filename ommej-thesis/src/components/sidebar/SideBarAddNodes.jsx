@@ -7,15 +7,11 @@ import useStore from "../../Store/store";
 import { shallow } from "zustand/shallow";
 
 const selector = (state) => ({
-	setShowAddNode: state.setShowAddNode,
 	setselectedEdgeType: state.setselectedEdgeType,
 	selectedEdgeType: state.selectedEdgeType,
 });
 export default function SideBarAddNodes() {
-	const { setShowAddNode, setselectedEdgeType, selectedEdgeType } = useStore(
-		selector,
-		shallow
-	);
+	const { setselectedEdgeType, selectedEdgeType } = useStore(selector, shallow);
 	const onDragStart = (event, nodeType) => {
 		event.dataTransfer.setData("application/reactflow", nodeType);
 		event.dataTransfer.effectAllowed = "move";
@@ -33,7 +29,7 @@ export default function SideBarAddNodes() {
 	const answersTypes = ["text", "persons", "accommodations", "none"];
 	return (
 		<Panel className="sidebar" position="top-right">
-			<h5 className="title">Edge</h5>
+			<h5 className="title">Connections</h5>
 			<div>
 				<Form.Group className="mb-3" controlId="type">
 					<Form.Select

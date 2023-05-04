@@ -32,75 +32,79 @@ export default function Delete() {
 		}
 	}, [selectedNodes]);
 
+	function deleteEdgeFromNodes(edge) {
+		const source = nodes.find((node) => node.id === edge.source);
+		const target = nodes.find((node) => node.id === edge.target);
+
+		if (edge.type === "edges_else") {
+			const oldState = _.cloneDeep(source);
+			source.data.includeIf.else = "";
+			const newState = _.cloneDeep(source);
+
+			return {
+				action: "modify",
+				oldState: oldState,
+				newState: newState,
+			};
+		} else if (edge.type === "edges_if") {
+			const oldState = _.cloneDeep(target);
+			target.data.includeIf.answers = target.data.includeIf.answers.filter(
+				(el) => el !== edge.source
+			);
+			const newState = _.cloneDeep(target);
+			return {
+				action: "modify",
+				oldState: oldState,
+				newState: newState,
+			};
+		} else if (source.type.includes("question")) {
+			const oldState = _.cloneDeep(source);
+			delete source.data.answers[target.id];
+			const newState = _.cloneDeep(source);
+			return {
+				action: "modify",
+				oldState: oldState,
+				newState: newState,
+			};
+		} else {
+			//for deleting edge from answers, need to modify prev question connected to it
+			const question = nodes.find(
+				(question) =>
+					question.data.answers && source.id in question.data.answers
+			);
+			if (question !== undefined) {
+				const oldState = _.cloneDeep(question);
+				question.data.answers[source.id].next = null;
+				const newState = _.cloneDeep(question);
+				return {
+					action: "modify",
+					oldState: oldState,
+					newState: newState,
+				};
+			} else {
+				const oldState = _.cloneDeep(source);
+				source.data.next = null;
+				const newState = _.cloneDeep(source);
+				return {
+					action: "modify",
+					oldState: oldState,
+					newState: newState,
+				};
+			}
+		}
+	}
 	function handleDeleteNodes() {
 		const edges = selectedNodes.edges;
+
 		const newUndo = [];
 		newUndo.push({
 			action: "delete",
 			nodes: _.cloneDeep(selectedNodes.nodes),
-			edges: _.cloneDeep(selectedNodes.edges),
+			edges: _.cloneDeep(edges),
 		});
 
 		if (answers.length === 0 && questions.length === 0 && edges.length === 1) {
-			const source = nodes.find((node) => node.id === edges[0].source);
-			const target = nodes.find((node) => node.id === edges[0].target);
-
-			if (edges[0].type === "edges_else") {
-				const oldState = _.cloneDeep(source);
-				source.data.includeIf.else = "";
-				const newState = _.cloneDeep(source);
-
-				newUndo.push({
-					action: "modify",
-					oldState: oldState,
-					newState: newState,
-				});
-			} else if (edges[0].type === "edges_if") {
-				const oldState = _.cloneDeep(target);
-				target.data.includeIf.answers = target.data.includeIf.answers.filter(
-					(el) => el !== edges[0].source
-				);
-				const newState = _.cloneDeep(target);
-				newUndo.push({
-					action: "modify",
-					oldState: oldState,
-					newState: newState,
-				});
-			} else if (source.type.includes("question")) {
-				const oldState = _.cloneDeep(source);
-				delete source.data.answers[target.id];
-				const newState = _.cloneDeep(source);
-				newUndo.push({
-					action: "modify",
-					oldState: oldState,
-					newState: newState,
-				});
-			} else {
-				//for deleting edge from answers, need to modify prev question connected to it
-				const question = nodes.find(
-					(question) =>
-						question.data.answers && source.id in question.data.answers
-				);
-				if (question !== undefined) {
-					const oldState = _.cloneDeep(question);
-					question.data.answers[source.id].next = null;
-					const newState = _.cloneDeep(question);
-					newUndo.push({
-						action: "modify",
-						oldState: oldState,
-						newState: newState,
-					});
-				} else {
-					const oldState = _.cloneDeep(source);
-					source.data.next = null;
-					const newState = _.cloneDeep(source);
-					newUndo.push({
-						action: "modify",
-						oldState: oldState,
-						newState: newState,
-					});
-				}
-			}
+			newUndo.push(deleteEdgeFromNodes(edges[0]));
 		}
 
 		answers.forEach((answer) => {
@@ -112,6 +116,7 @@ export default function Delete() {
 				question &&
 				!selectedNodes.nodes.find((node) => node.id === question.id)
 			) {
+				console.log(question.id);
 				const oldState = _.cloneDeep(question);
 				delete question.data.answers[answer.id];
 				const newState = _.cloneDeep(question);
@@ -132,29 +137,50 @@ export default function Delete() {
 			}
 		});
 		questions.forEach((question) => {
-			const answers = nodes.filter(
-				(answer) => answer.data.next && question.id === answer.data.next
+			const connectedEdges = edges.filter(
+				(el) => el.target === question.id && !edges.includes(el)
 			);
-			for (const answer of answers) {
-				if (!selectedNodes.nodes.find((node) => node.id === answer.id)) {
-					const oldState = _.cloneDeep(answer);
-					answer.data.next = null;
-					const newState = _.cloneDeep(answer);
-					const hasAnswerBeenModified = newUndo.find(
-						(obj) => obj.oldState !== undefined && obj.oldState.id === answer.id
-					);
 
-					if (!hasAnswerBeenModified) {
+			connectedEdges.forEach((edge) => {
+				const answer = nodes.find((node) => node.id === edge.source);
+				const oldState = _.cloneDeep(answer);
+				answer.data.next = null;
+				const newState = _.cloneDeep(answer);
+				const hasQuestionBeenModified = newUndo.find(
+					(obj) => obj.oldState !== undefined && obj.oldState.id === question.id
+				);
+				if (!hasQuestionBeenModified) {
+					newUndo.push({
+						action: "modify",
+						oldState: oldState,
+						newState: newState,
+					});
+				} else {
+					hasQuestionBeenModified.newState = newState;
+				}
+				const connectedEdges = edges.filter(
+					(el) => el.target === answer.id && !edges.includes(el)
+				);
+				connectedEdges.forEach((edge) => {
+					const question = nodes.find((node) => node.id === edge.source);
+					const oldState = _.cloneDeep(question);
+					question.data.answers[answer.id].next = null;
+					const newState = _.cloneDeep(question);
+					const hasQuestionBeenModified = newUndo.find(
+						(obj) =>
+							obj.oldState !== undefined && obj.oldState.id === question.id
+					);
+					if (!hasQuestionBeenModified) {
 						newUndo.push({
 							action: "modify",
 							oldState: oldState,
 							newState: newState,
 						});
 					} else {
-						hasAnswerBeenModified.newState = newState;
+						hasQuestionBeenModified.newState = newState;
 					}
-				}
-			}
+				});
+			});
 		});
 		setUndoClearRedo([...undo, newUndo]);
 		instance.deleteElements(selectedNodes);

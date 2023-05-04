@@ -2,7 +2,6 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-// Search bar amd drop down button
 import Modal from "react-bootstrap/Modal";
 import "../../css/NavBar.css";
 import useStore from "../../Store/store";
@@ -41,13 +40,19 @@ export default function NavBar() {
 	} = useStore(selector, shallow);
 	const [showFileNamer, setShowFileNamer] = useState(false);
 	const [fileName, setFileName] = useState("");
+	const [showImportModal, setShowImportModal] = useState(false);
 
 	const handleClose = () => setShowFileNamer(false);
 	const handleShow = () => {
 		if (nodes.length > 0) setShowFileNamer(true);
 	};
 	const handleImport = () => {
+		setShowImportModal(true);
+	};
+
+	const removeNodesForImport = () => {
 		onClear();
+		setShowImportModal(false);
 	};
 
 	const handleExport = () => {
@@ -85,7 +90,9 @@ export default function NavBar() {
 		onNodesChange(nodes);
 		setShowAddNode(!showAddNode);
 	}
-
+	function handleDefualt(e) {
+		e.preventDefault();
+	}
 	return (
 		<>
 			<Navbar variant="dark" bg="dark">
@@ -129,7 +136,7 @@ export default function NavBar() {
 					<Modal.Title>Download File</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<Form>
+					<Form onSubmit={(e) => handleDefualt(e)}>
 						<Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
 							<Form.Label>Choose a name</Form.Label>
 							<Form.Control
@@ -147,6 +154,26 @@ export default function NavBar() {
 					</Button>
 					<Button variant="primary" onClick={handleExport}>
 						Download
+					</Button>
+				</Modal.Footer>
+			</Modal>
+
+			<Modal show={showImportModal} onHide={() => setShowImportModal(false)}>
+				<Modal.Header closeButton>
+					<Modal.Title>
+						Clear current questions and answers, to import new file
+					</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					This will remove all questions/answers and changes. This can not be
+					undone
+				</Modal.Body>
+				<Modal.Footer>
+					<Button variant="secondary" onClick={() => setShowImportModal(false)}>
+						Cancel
+					</Button>
+					<Button variant="danger" onClick={() => removeNodesForImport()}>
+						Continue
 					</Button>
 				</Modal.Footer>
 			</Modal>
