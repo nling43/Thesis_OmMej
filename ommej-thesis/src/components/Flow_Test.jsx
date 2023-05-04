@@ -1,4 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Modal from "react-bootstrap/Modal";
 import ReactFlow, {
 	SelectionMode,
 	MiniMap,
@@ -7,7 +10,11 @@ import ReactFlow, {
 	useKeyPress,
 	ControlButton,
 } from "reactflow";
-import { questionTemplate, answerTemplate } from "./templates.js";
+import {
+	questionTemplate,
+	answerTemplate,
+	specialQuestionTemplate,
+} from "./templates.js";
 //Icon for ControlButton
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -121,6 +128,10 @@ const MiniMapStyled = styled(MiniMap)`
 
 function Flow() {
 	const reactFlowWrapper = useRef(null);
+	const [quantity, setQuantity] = useState(2);
+	const [showQuantityModal, setShowQuantityModal] = useState(false);
+	const [position, setPosition] = useState({});
+	const [type, setType] = useState("");
 
 	const [MiniMapOpen, setMiniMapOpen] = useState(false);
 	const mPressed = useKeyPress("m");
@@ -178,18 +189,25 @@ function Flow() {
 		(event) => {
 			event.preventDefault();
 			const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-			const type = event.dataTransfer.getData("application/reactflow");
-			const newUndo = [];
-
-			if (typeof type === "undefined" || !type) {
-				return;
-			}
-			const position = instance.project({
+			const typeFromDrop = event.dataTransfer.getData("application/reactflow");
+			const posFromDrop = instance.project({
 				x: event.clientX - reactFlowBounds.left,
 				y: event.clientY - reactFlowBounds.top,
 			});
-			if (type.includes("question")) {
-				const [newNodes, newEdges] = questionTemplate(type, position);
+			setType(typeFromDrop);
+			setQuantity(2);
+			setPosition(posFromDrop);
+			const newUndo = [];
+
+			if (
+				typeFromDrop === "question_accommodations" ||
+				typeFromDrop === "question_article_text" ||
+				typeFromDrop === "question_persons"
+			) {
+				const [newNodes, newEdges] = specialQuestionTemplate(
+					typeFromDrop,
+					posFromDrop
+				);
 				newUndo.push({
 					action: "add",
 					nodes: _.cloneDeep(newNodes),
@@ -197,19 +215,48 @@ function Flow() {
 				});
 				instance.addNodes(newNodes);
 				instance.addEdges(newEdges);
-			} else {
-				const newNode = answerTemplate(type, position);
+				setUndoClearRedo([...undo, newUndo]);
+			} else if (
+				typeFromDrop !== "answer_text" &&
+				!typeFromDrop.includes("question")
+			) {
+				const newNode = answerTemplate(typeFromDrop, posFromDrop, 1);
 				newUndo.push({
 					action: "add",
 					nodes: _.cloneDeep(newNode),
 					edges: [],
 				});
 				instance.addNodes(newNode);
-			}
-			setUndoClearRedo([...undo, newUndo]);
+			} else setShowQuantityModal(true);
 		},
 		[instance, undo]
 	);
+	const addNodes = () => {
+		const newUndo = [];
+
+		if (type.includes("question")) {
+			const [newNodes, newEdges] = questionTemplate(type, position, quantity);
+			newUndo.push({
+				action: "add",
+				nodes: _.cloneDeep(newNodes),
+				edges: _.cloneDeep(newEdges),
+			});
+			instance.addNodes(newNodes);
+			instance.addEdges(newEdges);
+		} else {
+			const newNode = answerTemplate(type, position, quantity);
+			newUndo.push({
+				action: "add",
+				nodes: _.cloneDeep(newNode),
+				edges: [],
+			});
+			instance.addNodes(newNode);
+		}
+		setUndoClearRedo([...undo, newUndo]);
+		handleClose();
+	};
+	const handleClose = () => setShowQuantityModal(false);
+
 	const onEdgeConnect = useCallback(
 		(edge) => {
 			const newUndo = [];
@@ -286,7 +333,9 @@ function Flow() {
 		},
 		[nodes, edges, selectedEdgeType, undo]
 	);
-
+	function handleDefualt(e) {
+		e.preventDefault();
+	}
 	return (
 		<div className="flow_container">
 			<ThemeProvider theme={darkTheme}>
@@ -308,7 +357,8 @@ function Flow() {
 							defaultViewport={{ x: 0, y: 0, zoom: 0.1 }}
 							onlyRenderVisibleElements={true}
 							selectionOnDrag={true}
-							selectionMode={SelectionMode.Partial}
+							selectionMode={SelectionMode.Full}
+							elevateEdgesOnSelect={true}
 							panOnDrag={[2]}
 							deleteKeyCode={null}
 							panActivationKeyCode={null}
@@ -354,11 +404,12 @@ function Flow() {
 							</ControlsStyled>
 							{MiniMapOpen && (
 								<MiniMapStyled
+									zoomable
 									position="top-left"
 									nodeColor="rgb(255,0,0)"
-									maskColor="rgb(0,0,0,.1)"
+									maskColor="rgb(255,255,255,.1)"
 									style={{
-										background: "rgb(a,255,255,0.9)",
+										background: "rgb(10,10,10,1)",
 										margin: 0,
 										height: 680,
 										width: 300,
@@ -371,6 +422,50 @@ function Flow() {
 					</div>
 				</ReactFlowProvider>
 			</ThemeProvider>
+
+			<Modal show={showQuantityModal} onHide={handleClose}>
+				<Modal.Header closeButton>
+					<Modal.Title>How many answers do you need?</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<Form onSubmit={(e) => handleDefualt(e)}>
+						<Form.Select
+							value={quantity}
+							onChange={(event) => {
+								setQuantity(event.target.value);
+							}}
+						>
+							<option key={1}>{"1"}</option>
+							<option key={2}>{"2"}</option>
+							<option key={3}>{"3"}</option>
+							<option key={4}>{"4"}</option>
+							<option key={5}>{"5"}</option>
+							<option key={6}>{"6"}</option>
+							<option key={7}>{"7"}</option>
+							<option key={8}>{"8"}</option>
+							<option key={9}>{"9"}</option>
+							<option key={10}>{"10"}</option>
+							<option key={11}>{"11"}</option>
+							<option key={12}>{"12"}</option>
+							<option key={13}>{"13"}</option>
+							<option key={14}>{"14"}</option>
+							<option key={15}>{"15"}</option>
+							<option key={16}>{"16"}</option>
+							<option key={17}>{"17"}</option>
+							<option key={18}>{"18"}</option>
+							<option key={19}>{"19"}</option>
+						</Form.Select>
+					</Form>
+				</Modal.Body>
+				<Modal.Footer>
+					<Button variant="secondary" onClick={handleClose}>
+						Cancel
+					</Button>
+					<Button variant="primary" onClick={addNodes}>
+						Ok
+					</Button>
+				</Modal.Footer>
+			</Modal>
 		</div>
 	);
 }

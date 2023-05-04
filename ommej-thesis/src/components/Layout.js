@@ -43,6 +43,16 @@ function getNextAnswers(question) {
 	return nextanswers;
 }
 
+function getPathTo(start, nodeEnd, path) {
+	if (start.id !== nodeEnd.id) {
+		const nextquestions = getNextQuestions();
+		if (nextquestions.length === 1) {
+			return path.push(getPathTo(nextquestions[0], nodeEnd, path));
+		} else return -1;
+	}
+	return path;
+}
+
 function getNextQuestions(question) {
 	const nextQEdge = edgesFromQuestion.filter((el) => el.source === question.id);
 	const nextanswers = [];
@@ -96,15 +106,16 @@ function placeQuestion(question) {
 		nextX = Math.round(nextX / prevAnswers.length);
 		const yPositions = prevAnswers.map((answer) => answer.position.y);
 		let maxY = Math.max(...yPositions);
+		const sameY = [];
+		const differentY = [];
+		for (let i = 1; i < yPositions.length; i++) {
+			if (yPositions[i] === yPositions[0]) {
+				sameY.push(yPositions[i]);
+			} else {
+				differentY.push(yPositions[i]);
+			}
+		}
 
-		/*
-		this was used to get all the answers to a question on the same level close to the next question without it answers from a question is close to the current question
-		
-		prevAnswers.forEach((answer) => {
-			if (!isColliding(answer.position.x, maxY, answers, answer))
-				setNodePosition(answer, answer.position.x, maxY);
-		});
-		*/
 		if (prevAnswers.length > 6) {
 			maxY = maxY + doubleNodeHeight * 2;
 		}
@@ -275,11 +286,7 @@ function setQuestionsOnCurrentDepth(question) {
 
 		if (currentQuestion.position.x - prevQuestion.position.x < 2000) {
 			currentQuestion.position.x = prevQuestion.position.x + 2000;
-			if (currentQuestion.id === "1451003c-ca21-492a-bc38-e54bc53e09d4")
-				console.log("current", currentQuestion.position.x);
 
-			if (prevQuestion.id === "1451003c-ca21-492a-bc38-e54bc53e09d4")
-				console.log("prev", prevQuestion.position.x);
 			placeAnswers(currentQuestion);
 			placeAnswers(prevQuestion);
 		}
@@ -311,7 +318,7 @@ export function layout(
 		placeAnswers(question);
 	}
 
-	// fix so it doesnt need 2 passes, reason for it is we follow the flow of the json but json is only one dimension, first pass gets weird when the answers hasnt been initialized with anything yet, should follow the flow for edges instead
+	// fix so it doesnt need 2 passes, reason for it is we follow the flow of the json but json is only one dimension, a question is defined after its been refrence.
 	for (let i = 1; i < questions.length; i++) {
 		const question = questions[i];
 		placeQuestion(question);
