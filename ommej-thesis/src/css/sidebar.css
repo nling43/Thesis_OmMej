@@ -71,6 +71,14 @@
 	background-color: rgb(27, 27, 27);
 	border-radius: 10%;
 }
+.nodeType {
+	display: grid;
+	align-items: center;
+	justify-content: center;
+	padding-block: 1rem;
+	background-color: rgb(27, 27, 27);
+}
+
 .tag * {
 	align-self: center;
 	justify-self: center;

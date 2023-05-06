@@ -40,17 +40,7 @@ export default function SideBarForSingularQuestion() {
 		undo,
 		setUndoClearRedo,
 	} = useStore(selector, shallow);
-	const questionTypes = [
-		"article_text",
-		"accommodations",
-		"persons",
-		"frequency",
-		"multiple",
-		"multiple_person",
-		"single",
-		"single_accommodation",
-		"single_person",
-	];
+
 	useEffect(() => {
 		if (selected.nodes !== undefined && selected.nodes.length === 1) {
 			setQuestionType(selected.nodes[0].data.type);
@@ -114,6 +104,40 @@ export default function SideBarForSingularQuestion() {
 		instance.setCenter(node.position.x + 450, node.position.y, {
 			zoom: 0.7,
 		});
+	}
+
+	function handleDeleteConnection(answerId) {
+		const newUndo = [];
+		console.log(answerId);
+		const nodeIndex = nodes.findIndex(
+			(node) => node.id === selected.nodes[0].id
+		);
+		const answerOldState = _.cloneDeep(nodes[nodeIndex]);
+
+		delete nodes[nodeIndex].data.answers[answerId];
+
+		const answerNewState = _.cloneDeep(nodes[nodeIndex]);
+
+		const edgeIndex = edges.findIndex(
+			(edge) =>
+				edge.target === answerId &&
+				(edge.type == "edges_new" || edge.type == "edges_custom")
+		);
+
+		newUndo.push({
+			action: "delete",
+			nodes: [],
+			edges: _.cloneDeep([edges[edgeIndex]]),
+		});
+		newUndo.push({
+			action: "modify",
+			oldState: answerOldState,
+			newState: answerNewState,
+		});
+		instance.deleteElements({ nodes: [], edges: [edges[edgeIndex]] });
+		setUndoClearRedo([...undo, newUndo]);
+
+		unselect();
 	}
 
 	function unselect() {
@@ -184,7 +208,6 @@ export default function SideBarForSingularQuestion() {
 	}
 	return (
 		<Panel className="sidebar" position="top-right">
-			<h5>{selected.nodes[0].id}</h5>
 			<div className="sidebar_header_buttons">
 				<Button variant="danger" type="cancel" onClick={() => unselect()}>
 					Cancel
@@ -203,18 +226,11 @@ export default function SideBarForSingularQuestion() {
 			</div>
 			<Form onSubmit={(e) => handleDefualt(e)}>
 				<Form.Group className="mb-3" controlId="type">
-					<Form.Label>Question Type</Form.Label>
+					<div className="nodeType">
+						<h5>{selected.nodes[0].id}</h5>
 
-					<Form.Select
-						value={questionType}
-						onChange={(event) => {
-							setQuestionType(event.target.value);
-						}}
-					>
-						{questionTypes.map((type, index) => (
-							<option key={index}>{type}</option>
-						))}
-					</Form.Select>
+						<h5>{questionType}</h5>
+					</div>
 				</Form.Group>
 
 				<Form.Group className="mb-3" controlId="text">
@@ -289,22 +305,26 @@ export default function SideBarForSingularQuestion() {
 										<div key={index} className="tag">
 											<p key={index}>{data.text.sv}</p>
 											<Button
-												onClick={(event) => handleAnswerClick(event.target.id)}
+												onClick={(event) =>
+													handleDeleteConnection(event.target.id)
+												}
 												id={index}
-												variant="secondary"
+												variant="danger"
 											>
-												Move to answer
+												Delete Connection
 											</Button>
 										</div>
 									) : (
 										<div key={index} className="tag">
 											<p key={index}>{data.type}</p>
 											<Button
-												onClick={(event) => handleAnswerClick(event.target.id)}
+												onClick={(event) =>
+													handleDeleteConnection(event.target.id)
+												}
 												id={index}
-												variant="secondary"
+												variant="danger"
 											>
-												Move to answer
+												Delete Connection
 											</Button>
 										</div>
 									)

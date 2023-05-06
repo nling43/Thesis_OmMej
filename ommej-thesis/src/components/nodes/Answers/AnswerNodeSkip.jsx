@@ -61,11 +61,26 @@ export default memo(({ data, selected }) => {
 
 	const isValidConnectionUp = (connection) => {
 		const sourceNode = nodes.find((node) => node.id === connection.source);
-		const isHandleFree = edges.every(
-			(edge) =>
-				edge.target !== connection.target && edge.source !== connection.source
-		);
-		return sourceNode.type.includes("question_article") && isHandleFree;
+		switch (selectedEdgeType) {
+			case "Default":
+				console.log("ss");
+				const commonEdges = edges.filter(
+					(edge) => edge.type === "edges_new" || edge.type == "edges_custom"
+				);
+				const isHandleFree = commonEdges.every(
+					(edge) =>
+						edge.target !== connection.target &&
+						edge.source !== connection.source
+				);
+
+				return (
+					sourceNode.type.includes("question_article_text") && isHandleFree
+				);
+			case "IncludeIf":
+				return false;
+			case "Else":
+				return false;
+		}
 	};
 
 	const isValidConnectionDown = (connection) => {

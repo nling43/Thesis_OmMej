@@ -91,7 +91,7 @@ export default memo(({ data, selected }) => {
 					(edge) => edge.target !== connection.target
 				);
 				return (
-					(targetNode.type === "answer_accomodation" ||
+					(targetNode.type === "answer_accommodations" ||
 						targetNode.type === "answer_text") &&
 					isHandleFree
 				);

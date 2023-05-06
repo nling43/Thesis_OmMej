@@ -8,6 +8,7 @@ import { shallow } from "zustand/shallow";
 const selector = (state) => ({
 	nodes: state.nodes,
 	edges: state.edges,
+	selectedEdgeType: state.selectedEdgeType,
 });
 const Node = styled.div`
 	display: flex;

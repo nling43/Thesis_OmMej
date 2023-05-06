@@ -17,12 +17,23 @@ const selector = (state) => ({
 	setRedo: state.setRedo,
 	instance: state.reactFlowInstance,
 	nodes: state.nodes,
+	edges: state.edges,
 	onNodesChange: state.onNodesChange,
+	onEdgesChange: state.onEdgesChange,
 });
 
 export default function UndoRedo() {
-	const { undo, setUndo, redo, setRedo, instance, nodes, onNodesChange } =
-		useStore(selector, shallow);
+	const {
+		undo,
+		setUndo,
+		redo,
+		edges,
+		setRedo,
+		instance,
+		nodes,
+		onNodesChange,
+		onEdgesChange,
+	} = useStore(selector, shallow);
 	const [disableUndo, setDisableUndo] = useState(false);
 	const [disableRedo, setDisableRedo] = useState(false);
 
@@ -61,9 +72,14 @@ export default function UndoRedo() {
 		console.log(state.id);
 		nodes[index].data = state.data;
 		nodes[index].type = state.type;
+		nodes[index].position = state.position;
 		nodes[index].selected = true;
 		nodes[index].selected = false;
+		edges.forEach((edge) => {
+			edge.selected = false;
+		});
 		onNodesChange(nodes);
+		onNodesChange(edges);
 	}
 
 	function handleUndo() {

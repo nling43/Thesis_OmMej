@@ -29,43 +29,57 @@ export default function Search() {
 		const questions = nodes.filter((node) => node.type.includes("question"));
 		switch (number) {
 			case 1:
-				if (search.includes('"')) {
-					const searchWithoutSign = search.replaceAll('"', "");
-					result = questions.filter(
-						(question) =>
-							question.data.text.sv.toLowerCase() ===
-							searchWithoutSign.toLowerCase()
-					);
-				} else {
-					result = questions.filter((question) =>
-						question.data.text.sv.toLowerCase().includes(search.toLowerCase())
-					);
-				}
+				result = questions.filter((question) =>
+					question.data.text.sv.toLowerCase().includes(search.toLowerCase())
+				);
 				break;
+
 			case 2:
-				if (search.includes('"')) {
-					const searchWithoutSign = search.replaceAll('"', "");
-					result = questions.filter(
-						(question) =>
-							question.data.type.toLowerCase() ===
-							searchWithoutSign.toLowerCase()
-					);
-				} else {
-					result = questions.filter((question) =>
-						question.data.type.toLowerCase().includes(search.toLowerCase())
-					);
-				}
+				result = questions.filter(
+					(question) =>
+						question.data.text.sv.toLowerCase() === search.toLowerCase()
+				);
 				break;
 			case 3:
-				result = nodes.filter((node) => node.id.includes(search.toLowerCase()));
+				result = questions.filter((question) =>
+					question.data.type
+						.toLowerCase()
+						.replace("_", " ")
+						.includes(search.toLowerCase())
+				);
+
 				break;
 
 			case 4:
-				result = nodes.filter(
-					(node) =>
-						node.data.tags != undefined &&
-						node.data.tags.includes(search.toUpperCase())
+				result = questions.filter(
+					(question) =>
+						question.data.type.toLowerCase().replace("_", " ") ===
+						search.toLowerCase()
 				);
+				break;
+
+			case 5:
+				result = nodes.filter((node) => {
+					return (
+						node.data.tags != undefined &&
+						node.data.tags.some((tag) =>
+							tag.toLowerCase().includes(search.toLowerCase())
+						)
+					);
+				});
+				break;
+			case 6:
+				result = nodes.filter((node) => {
+					return (
+						node.data.tags != undefined &&
+						node.data.tags.some(
+							(tag) => tag.toLowerCase() === search.toLowerCase()
+						)
+					);
+				});
+				break;
+			case 7:
+				result = nodes.filter((node) => node.id.includes(search.toLowerCase()));
 				break;
 			default:
 				console.log("Error");
@@ -76,6 +90,9 @@ export default function Search() {
 	function select(toSelect) {
 		nodes.forEach((node) => {
 			node.selected = false;
+		});
+		edges.forEach((edge) => {
+			edge.selected = false;
 		});
 		toSelect.forEach((fromResult) => {
 			const nodeToSelect = nodes.find(
@@ -113,10 +130,20 @@ export default function Search() {
 						Question Text
 					</Dropdown.Item>
 					<Dropdown.Item onClick={() => handleSearch(2)}>
+						Question Text Match Exact
+					</Dropdown.Item>
+					<Dropdown.Item onClick={() => handleSearch(3)}>
 						Question Type
 					</Dropdown.Item>
-					<Dropdown.Item onClick={() => handleSearch(3)}>Node ID</Dropdown.Item>
-					<Dropdown.Item onClick={() => handleSearch(4)}>Tags</Dropdown.Item>
+					<Dropdown.Item onClick={() => handleSearch(4)}>
+						Question Type Match Exact
+					</Dropdown.Item>
+					<Dropdown.Item onClick={() => handleSearch(5)}>Tags</Dropdown.Item>
+					<Dropdown.Item onClick={() => handleSearch(6)}>
+						Tags Match Exact
+					</Dropdown.Item>
+
+					<Dropdown.Item onClick={() => handleSearch(7)}>Node ID</Dropdown.Item>
 				</Dropdown.Menu>
 			</Dropdown>
 		</>

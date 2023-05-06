@@ -8,9 +8,10 @@ import useStore from "./Store/store";
 export default function App() {
 	const selector = (state: any) => ({
 		nodes: state.nodes,
+		undo: state.undo,
 	});
-	const { nodes } = useStore(selector, shallow);
-	if (nodes.length === 0) {
+	const { nodes, undo } = useStore(selector, shallow);
+	if (nodes.length === 0 && undo.length === 0) {
 		return (
 			<>
 				<NavBar />

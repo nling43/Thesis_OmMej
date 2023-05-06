@@ -26,6 +26,7 @@ const selector = (state) => ({
 	onNodesChange: state.onNodesChange,
 	setShowAddNode: state.setShowAddNode,
 	showAddNode: state.showAddNode,
+	undo: state.undo,
 });
 
 export default function NavBar() {
@@ -37,6 +38,7 @@ export default function NavBar() {
 		showAddNode,
 		onNodesChange,
 		onEdgesChange,
+		undo,
 	} = useStore(selector, shallow);
 	const [showFileNamer, setShowFileNamer] = useState(false);
 	const [fileName, setFileName] = useState("");
@@ -100,6 +102,7 @@ export default function NavBar() {
 					<Button
 						className="button"
 						variant="outline-primary"
+						disabled={nodes.length === 0 && undo.length === 0}
 						onClick={() => handleImport()}
 					>
 						<FontAwesomeIcon icon={faFileImport} />
@@ -107,6 +110,7 @@ export default function NavBar() {
 					<Button
 						className="button"
 						variant="outline-primary"
+						disabled={nodes.length === 0}
 						onClick={() => handleShow()}
 					>
 						<FontAwesomeIcon icon={faFileExport} />

@@ -35,8 +35,6 @@ export default function SideBarForSingularanswer() {
 		edges,
 	} = useStore(selector, shallow);
 
-	const answerTypes = ["text", "persons", "accommodations", "none"];
-
 	useEffect(() => {
 		if (selected.nodes !== undefined && selected.nodes.length === 1) {
 			setAnswerType(selected.nodes[0].data.type);
@@ -120,6 +118,40 @@ export default function SideBarForSingularanswer() {
 		select(id);
 	}
 
+	function handleDeleteConnection() {
+		const newUndo = [];
+
+		const nodeIndex = nodes.findIndex(
+			(node) => node.id === selected.nodes[0].id
+		);
+		const answerOldState = _.cloneDeep(nodes[nodeIndex]);
+
+		nodes[nodeIndex].data.next = null;
+
+		const answerNewState = _.cloneDeep(nodes[nodeIndex]);
+
+		const edgeIndex = edges.findIndex(
+			(edge) =>
+				edge.source === selected.nodes[0].id &&
+				(edge.type == "edges_new" || edge.type == "edges_custom")
+		);
+
+		newUndo.push({
+			action: "delete",
+			nodes: [],
+			edges: _.cloneDeep([edges[edgeIndex]]),
+		});
+		newUndo.push({
+			action: "modify",
+			oldState: answerOldState,
+			newState: answerNewState,
+		});
+		instance.deleteElements({ nodes: [], edges: [edges[edgeIndex]] });
+		setUndoClearRedo([...undo, newUndo]);
+
+		unselect();
+	}
+
 	function handleSave() {
 		const index = nodes.findIndex((node) => node.id === selected.nodes[0].id);
 		const newUndo = [];
@@ -165,7 +197,6 @@ export default function SideBarForSingularanswer() {
 	}
 	return (
 		<Panel className="sidebar" position="top-right">
-			<h5>{selected.nodes[0].id}</h5>
 			<div className="sidebar_header_buttons">
 				<Button variant="danger" type="cancel" onClick={() => unselect()}>
 					Cancel
@@ -184,34 +215,28 @@ export default function SideBarForSingularanswer() {
 			</div>
 			<Form onSubmit={(e) => handleDefualt(e)}>
 				<Form.Group className="mb-3" controlId="type">
-					<Form.Label>answer Type</Form.Label>
+					<div className="nodeType">
+						<h5>{selected.nodes[0].id}</h5>
 
-					<Form.Select
-						value={answerType}
-						onChange={(event) => {
-							setAnswerType(event.target.value);
-						}}
-					>
-						{answerTypes.map((type, index) => (
-							<option key={index}>{type}</option>
-						))}
-					</Form.Select>
+						<h5>{answerType}</h5>
+					</div>
 				</Form.Group>
-
-				<Form.Group className="mb-3" controlId="text">
-					<Form.Label>answer Text</Form.Label>
-					<Form.Control
-						as="textarea"
-						rows={
-							Math.ceil(textValue.length / 63) +
-							textValue.split(/\r\n|\r|\n/).length
-						}
-						type="text"
-						value={textValue}
-						onChange={(e) => setTextValue(e.target.value)}
-					/>
-				</Form.Group>
-
+				{answerType === "text" ? (
+					<Form.Group className="mb-3" controlId="text">
+						<Form.Label>Text</Form.Label>
+						<Form.Control
+							as="textarea"
+							rows={
+								Math.ceil(textValue.length / 63) +
+								textValue.split(/\r\n|\r|\n/).length
+							}
+							disabled={!answerType === "text"}
+							type="text"
+							value={textValue}
+							onChange={(e) => setTextValue(e.target.value)}
+						/>
+					</Form.Group>
+				) : null}
 				<Form.Group>
 					<Form.Label>Tags</Form.Label>
 					<div className="tag">
@@ -242,7 +267,7 @@ export default function SideBarForSingularanswer() {
 										onClick={() => setTags(deleteTag(index, tags))}
 										variant="danger"
 									>
-										del
+										Delete Tag
 									</Button>
 								</div>
 							))}
@@ -251,7 +276,6 @@ export default function SideBarForSingularanswer() {
 						<></>
 					)}
 				</Form.Group>
-
 				<Form.Group className="mb-3" controlId="alarm">
 					<Form.Label>Alarm</Form.Label>
 
@@ -267,16 +291,16 @@ export default function SideBarForSingularanswer() {
 				</Form.Group>
 				{next !== null ? (
 					<Form.Group className="mb-3" controlId="next">
-						<Form.Label>Question</Form.Label>
+						<Form.Label>Next Question</Form.Label>
 						<div className="singleSidebarIncludeIfs">
 							<div className="tag">
 								<p>{next}</p>
 								<Button
-									onClick={(event) => handleQuestionClick(event.target.id)}
+									onClick={(event) => handleDeleteConnection(event.target.id)}
 									id={next}
-									variant="secondary"
+									variant="danger"
 								>
-									Move to question
+									Delete connection
 								</Button>
 							</div>
 						</div>

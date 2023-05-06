@@ -161,6 +161,7 @@ function Flow() {
 		setReactFlowInstance(reactFlowInstance);
 	};
 	const handleNodeClick = (event, node) => {
+		console.log(node);
 		setShowAddNode(false);
 		const connectedEdges = edges.filter(
 			(el) => el.source === node.id || el.target === node.id
@@ -357,7 +358,7 @@ function Flow() {
 							defaultViewport={{ x: 0, y: 0, zoom: 0.1 }}
 							onlyRenderVisibleElements={true}
 							selectionOnDrag={true}
-							selectionMode={SelectionMode.Full}
+							selectionMode={SelectionMode.Partial}
 							elevateEdgesOnSelect={true}
 							panOnDrag={[2]}
 							deleteKeyCode={null}
@@ -375,24 +376,16 @@ function Flow() {
 							<ControlsStyled>
 								<ControlButton
 									onClick={() => {
-										console.log(nodes[0].position);
-										instance.setCenter(
-											nodes[0].position.x,
-											nodes[0].position.y,
-											{
-												zoom: 0.1,
+										const lowestNode = nodes.reduce((lowest, node) => {
+											if (node.position.y < lowest.position.y) {
+												return node;
+											} else {
+												return lowest;
 											}
-										);
-									}}
-								>
-									<FontAwesomeIcon icon={faForwardFast} />
-								</ControlButton>
-								<ControlButton
-									onClick={() => {
-										console.log(nodes[nodes.length - 1].position);
+										});
 										instance.setCenter(
-											nodes[nodes.length - 1].position.x,
-											nodes[nodes.length - 1].position.y,
+											lowestNode.position.x,
+											lowestNode.position.y + 3000,
 											{
 												zoom: 0.1,
 											}
@@ -400,6 +393,26 @@ function Flow() {
 									}}
 								>
 									<FontAwesomeIcon icon={faBackwardFast} />
+								</ControlButton>
+								<ControlButton
+									onClick={() => {
+										const highestNode = nodes.reduce((highest, node) => {
+											if (node.position.y > highest.position.y) {
+												return node;
+											} else {
+												return highest;
+											}
+										});
+										instance.setCenter(
+											highestNode.position.x,
+											highestNode.position.y - 3000,
+											{
+												zoom: 0.1,
+											}
+										);
+									}}
+								>
+									<FontAwesomeIcon icon={faForwardFast} />
 								</ControlButton>
 							</ControlsStyled>
 							{MiniMapOpen && (
@@ -435,25 +448,9 @@ function Flow() {
 								setQuantity(event.target.value);
 							}}
 						>
-							<option key={1}>{"1"}</option>
-							<option key={2}>{"2"}</option>
-							<option key={3}>{"3"}</option>
-							<option key={4}>{"4"}</option>
-							<option key={5}>{"5"}</option>
-							<option key={6}>{"6"}</option>
-							<option key={7}>{"7"}</option>
-							<option key={8}>{"8"}</option>
-							<option key={9}>{"9"}</option>
-							<option key={10}>{"10"}</option>
-							<option key={11}>{"11"}</option>
-							<option key={12}>{"12"}</option>
-							<option key={13}>{"13"}</option>
-							<option key={14}>{"14"}</option>
-							<option key={15}>{"15"}</option>
-							<option key={16}>{"16"}</option>
-							<option key={17}>{"17"}</option>
-							<option key={18}>{"18"}</option>
-							<option key={19}>{"19"}</option>
+							{[...Array(50)].map((_, index) => (
+								<option key={index + 1}>{index + 1}</option>
+							))}
 						</Form.Select>
 					</Form>
 				</Modal.Body>
